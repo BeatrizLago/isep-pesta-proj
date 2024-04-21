@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, AsyncStorage } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './app/screens/Login';
@@ -34,6 +34,15 @@ function LoginLayout(){
 const App = () => {
 
   const [user, setUser] = useState(null);
+
+  const getdata = async () => {
+    try {
+      return await AsyncStorage.getItem("user");
+    } catch (error) {
+      console.log(error.message);
+      return null;
+    }
+  }
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user)=>{
