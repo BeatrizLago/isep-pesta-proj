@@ -1,19 +1,19 @@
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import{FIREBASE_AUTH} from '../../Firebase.config'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
 
-const Login = () => {
+const Login = ({navigation}) => {
 
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 const [loading, setLoading] = useState(false);
 const auth = FIREBASE_AUTH;
 
-const signIn = async () => {
+const signInAnonymous = async () => {
     setLoading(true);
     try {
-        const response = await signInWithEmailAndPassword(auth, email, password);
+        const response = await signInAnonymously(auth);
         console.log(response);  
     } catch (error) {
         console.log(error);
@@ -23,15 +23,14 @@ const signIn = async () => {
     }
 }
 
-const signUp = async () => {
+const signIn = async () => {
     setLoading(true);
     try {
-        const response = await createUserWithEmailAndPassword(auth, email, password);
+        const response = await signInWithEmailAndPassword(auth, email, password);
         console.log(response);  
-        alert('Verifique o seu email')
     } catch (error) {
         console.log(error);
-        alert('Criar a conta falhou: ' + error.message);
+        alert('O Login falhou: ' + error.message);
     } finally {
         setLoading(false);
     }
@@ -48,7 +47,8 @@ const signUp = async () => {
       ) : (
         <>
             <Button title='Login' onPress={signIn}/>
-            <Button title='Criar Conta' onPress={signUp}/>
+            <Button title='Criar Conta' onPress={() => navigation.navigate('Signup')}/>
+            <Button title='Login Anonimo' onPress={signInAnonymous}/>
         </>
       )}
       </KeyboardAvoidingView>

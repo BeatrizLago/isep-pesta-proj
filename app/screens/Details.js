@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import { FIREBASE_AUTH } from '../../Firebase.config'
 
 const Details = () => {
   return (
     <View>
-      <Text>Details</Text>
+      <Text>{FIREBASE_AUTH.currentUser.displayName}</Text>
     </View>
   )
 }
