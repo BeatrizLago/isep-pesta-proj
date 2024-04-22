@@ -6,7 +6,6 @@ const Details = () => {
   return (
     <View>
       <Text>{FIREBASE_AUTH.currentUser.displayName}</Text>
-      <Text>"Hello world"</Text>
     </View>
   )
 }

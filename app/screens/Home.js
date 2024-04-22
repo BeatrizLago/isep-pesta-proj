@@ -23,6 +23,7 @@ const Home = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <View style={styles.topBar}>
+          <Button onPress={() => navigation.navigate('Details')} title='Abrir Detalhes'/>
           <Button title="Logout" onPress={() => FIREBASE_AUTH.signOut()} style={styles.logoutButton} />
           <ToggleSwitch showMap={showMap} toggleMap={toggleMap} style={styles.toggleSwitch} />
         </View>

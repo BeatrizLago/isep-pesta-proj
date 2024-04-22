@@ -3,9 +3,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
+import Login from './app/screens/Login';
+import Home from './app/screens/Home';
+import Details from './app/screens/Details';
+import Signup from './app/screens/Signup';
 import { FIREBASE_AUTH } from './Firebase.config';
 
 const Stack = createNativeStackNavigator();
+
+const InsideStack = createNativeStackNavigator();
+const LoginStack = createNativeStackNavigator();
+
+function InsideLayout(){
+  return(
+    <InsideStack.Navigator>
+      <InsideStack.Screen name='Home' component={Home}/>
+      <InsideStack.Screen name='Details' component={Details}/>
+    </InsideStack.Navigator>
+  )
+}
+
+function LoginLayout(){
+  return(
+    <LoginStack.Navigator>
+      <LoginStack.Screen name='Login' component={Login}/>
+      <LoginStack.Screen name='Signup' component={Signup}/>
+    </LoginStack.Navigator>
+  )
+}
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -41,11 +66,11 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
         {user ? (
-          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} /> // Use the Home screen
+          <Stack.Screen name='Inside' component={InsideLayout} options={{headerShown: false}}/>
         ) : (
-          <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+          <Stack.Screen name='LoginHome' component={LoginLayout} options={{headerShown: false}}/>
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
