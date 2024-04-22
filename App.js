@@ -1,42 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Login from './app/screens/Login';
+import Home from './app/screens/Home'; // Import the modified Home screen
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './app/screens/Login';
-import List from './app/screens/List';
-import Details from './app/screens/Details';
-import Signup from './app/screens/Signup';
-import {User, onAuthStateChanged} from 'firebase/auth';
-import { FIREBASE_APP, FIREBASE_AUTH } from './Firebase.config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { FIREBASE_AUTH } from './Firebase.config';
 
 const Stack = createNativeStackNavigator();
 
-const InsideStack = createNativeStackNavigator();
-const LoginStack = createNativeStackNavigator();
-
-function InsideLayout(){
-  return(
-    <InsideStack.Navigator>
-      <InsideStack.Screen name='Home' component={List}/>
-      <InsideStack.Screen name='Details' component={Details}/>
-    </InsideStack.Navigator>
-  )
-}
-
-function LoginLayout(){
-  return(
-    <LoginStack.Navigator>
-      <LoginStack.Screen name='Login' component={Login}/>
-      <LoginStack.Screen name='Signup' component={Signup}/>
-    </LoginStack.Navigator>
-  )
-}
-
-const App = () => {
-
+export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user)=>{
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log('user', user);
       setUser(user);
     });
@@ -46,15 +23,11 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
         {user ? (
-          <Stack.Screen name='Inside' component={InsideLayout} options={{headerShown: false}}/>
+          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} /> // Use the Home screen
         ) : (
-          <Stack.Screen name='LoginHome' component={LoginLayout} options={{headerShown: false}}/>
+          <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
-};
-
-
-
-export default App;
+}
