@@ -1,4 +1,5 @@
-import React, { useEffect, useState, AsyncStorage } from 'react';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './app/screens/Login';
@@ -35,20 +36,31 @@ const App = () => {
 
   const [user, setUser] = useState(null);
 
-  const getdata = async () => {
-    try {
-      return await AsyncStorage.getItem("user");
-    } catch (error) {
-      console.log(error.message);
-      return null;
-    }
-  }
-
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user)=>{
-      console.log('user', user);
-      setUser(user);
+    const checkUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          // User data found in AsyncStorage, parse and set user state
+          setUser(JSON.parse(userData));
+          console.log("test:",userData);
+        }
+      } catch (error) {
+        console.error('Error retrieving user data from AsyncStorage:', error.message);
+      }
+    };
+
+    // Check for user data on app start
+    checkUser();
+
+    // Listen for Firebase authentication changes
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
+      setUser(authUser);
+      console.log("user:", authUser);
     });
+
+    // Cleanup function
+    return () => unsubscribe();
   }, []);
 
   return (

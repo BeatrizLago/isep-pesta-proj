@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, AsyncStorage } from 'react-native'
+import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react'
 import{FIREBASE_AUTH} from '../../Firebase.config'
 import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
@@ -14,7 +15,7 @@ const signInAnonymous = async () => {
     setLoading(true);
     try {
         const response = await signInAnonymously(auth);
-        console.log(response);  
+        console.log("Anonymous response:",response);  
     } catch (error) {
         console.log(error);
         alert('O Login falhou: ' + error.message);
@@ -28,7 +29,7 @@ const signIn = async () => {
     try {
         const response = await signInWithEmailAndPassword(auth, email, password);
         //savedata(email, password);
-        console.log(response);  
+        console.log("Login response:",response);  
     } catch (error) {
         console.log(error);
         alert('O Login falhou: ' + error.message);

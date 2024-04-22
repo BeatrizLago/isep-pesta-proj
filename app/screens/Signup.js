@@ -22,7 +22,7 @@ const Signup = () => {
             await updateProfile(auth.currentUser, {
                 displayName: displayName
             });
-            console.log(response);  
+            console.log("Login response:", response);  
             alert('Verifique o seu email');
         } catch (error) {
             console.error(error);

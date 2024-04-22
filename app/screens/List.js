@@ -1,4 +1,5 @@
 import { Button, Text, View } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react'
 import { FIREBASE_AUTH } from '../../Firebase.config'
 
