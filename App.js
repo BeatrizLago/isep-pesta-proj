@@ -12,6 +12,15 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const [user, setUser] = useState(null);
 
+  const getdata = async () => {
+    try {
+      return await AsyncStorage.getItem("user");
+    } catch (error) {
+      console.log(error.message);
+      return null;
+    }
+  }
+
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       console.log('user', user);

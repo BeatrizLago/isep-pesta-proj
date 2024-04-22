@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, AsyncStorage } from 'react-native'
 import React, { useState } from 'react'
 import{FIREBASE_AUTH} from '../../Firebase.config'
 import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
@@ -27,6 +27,7 @@ const signIn = async () => {
     setLoading(true);
     try {
         const response = await signInWithEmailAndPassword(auth, email, password);
+        //savedata(email, password);
         console.log(response);  
     } catch (error) {
         console.log(error);
@@ -35,6 +36,14 @@ const signIn = async () => {
         setLoading(false);
     }
 }
+
+const savedata = async (eamil,password) => {
+    let value = {'email': eamil, 'password': password}   
+    await AsyncStorage.setItem('user', JSON.stringify(value));
+       this.setState({user: value});
+    
+       console.log("deneme",value);
+   } 
 
 
   return (
