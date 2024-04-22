@@ -1,7 +1,8 @@
 import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react'
 import{FIREBASE_AUTH} from '../../Firebase.config'
-import { createUserWithEmailAndPassword, updateCurrentUser, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, updateCurrentUser, updateProfile } from 'firebase/auth';
 
 const Signup = () => {
 

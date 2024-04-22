@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardA
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react'
 import{FIREBASE_AUTH} from '../../Firebase.config'
-import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = ({navigation}) => {
 
@@ -28,7 +28,6 @@ const signIn = async () => {
     setLoading(true);
     try {
         const response = await signInWithEmailAndPassword(auth, email, password);
-        //savedata(email, password);
         console.log("Login response:",response);  
     } catch (error) {
         console.log(error);
@@ -37,14 +36,6 @@ const signIn = async () => {
         setLoading(false);
     }
 }
-
-const savedata = async (eamil,password) => {
-    let value = {'email': eamil, 'password': password}   
-    await AsyncStorage.setItem('user', JSON.stringify(value));
-       this.setState({user: value});
-    
-       console.log("deneme",value);
-   } 
 
 
   return (
