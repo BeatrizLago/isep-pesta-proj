@@ -4,7 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapComponent from '../Components/MapComponent';
 import SearchBar from '../Components/SearchBar';
 import ToggleSwitch from '../Components/ToggleSwitch';
-import { FIREBASE_AUTH } from '../../Firebase.config';
+import Styles from '../Components/Styles';
+import { FIREBASE_AUTH } from '../config/Firebase.config'
 
 const Home = ({ navigation }) => {
   const [destination, setDestination] = useState(null);
@@ -27,13 +28,13 @@ const Home = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
-        <View style={styles.topBar}>
+      <View style={Styles.container}>
+        <View style={Styles.topBar}>
           <Button onPress={() => navigation.navigate('Details')} title='Abrir Detalhes'/>
-          <Button title="Logout" onPress={() => handleLogout()} style={styles.logoutButton} />
-          <ToggleSwitch showMap={showMap} toggleMap={toggleMap} style={styles.toggleSwitch} />
+          <Button title="Logout" onPress={() => handleLogout()} style={Styles.logoutButton} />
+          <ToggleSwitch showMap={showMap} toggleMap={toggleMap} style={Styles.toggleSwitch} />
         </View>
-        <View style={styles.mapContainer}>
+        <View style={Styles.mapContainerScreen}>
           {showMap && <MapComponent destination={destination} portugalCenter={portugalCenter} />}
           {showMap && <SearchBar handleSearch={handleSearch} />}
         </View>
@@ -41,35 +42,5 @@ const Home = ({ navigation }) => {
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
-  },
-  logoutButton: {
-    marginRight: 20,  
-  },
-  toggleSwitch: {
-    marginLeft: 20,
-  },
-  mapContainer: {
-    flex: 1,
-    width: '100%',
-    marginTop: 20, // Adjust this value to move the search bar higher
-  },
-});
 
 export default Home;

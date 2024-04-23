@@ -7,7 +7,7 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Details from "./screens/Details";
 import Signup from "./screens/Signup";
-import { FIREBASE_AUTH } from "../Firebase.config";
+import { FIREBASE_AUTH } from "../app/config/Firebase.config";
 
 const Stack = createNativeStackNavigator();
 

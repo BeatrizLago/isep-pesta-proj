@@ -1,76 +1,88 @@
-import { StyleSheet, View, Text, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState } from 'react'
-import{FIREBASE_AUTH} from '../../Firebase.config'
-import { createUserWithEmailAndPassword, getAuth, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  ActivityIndicator,
+  Button,
+  KeyboardAvoidingView,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from "react";
+import Styles from "../Components/Styles";
+import { FIREBASE_AUTH } from "../config/Firebase.config";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
-const Login = ({navigation}) => {
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
-const [loading, setLoading] = useState(false);
-const auth = FIREBASE_AUTH;
-
-const signInAnonymous = async () => {
+  const signInAnonymous = async () => {
     setLoading(true);
     try {
-        const response = await signInAnonymously(auth);
-        console.log("Anonymous response:",response);  
+      const response = await signInAnonymously(auth);
+      console.log("Anonymous response:", response);
     } catch (error) {
-        console.log(error);
-        alert('O Login falhou: ' + error.message);
+      console.log(error);
+      alert("O Login falhou: " + error.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}
+  };
 
-const signIn = async () => {
+  const signIn = async () => {
     setLoading(true);
     try {
-        const response = await signInWithEmailAndPassword(auth, email, password);
-        console.log("Login response:",response);  
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Login response:", response);
     } catch (error) {
-        console.log(error);
-        alert('O Login falhou: ' + error.message);
+      console.log(error);
+      alert("O Login falhou: " + error.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}
-
+  };
 
   return (
-    <View style= {styles.conatiner}>
-    <KeyboardAvoidingView behavior='padding'>
-      <TextInput style= {styles.input} value={email} placeholder='Email' autoCapitalize='none' onChangeText={(text) => setEmail(text.trim())}></TextInput>
-      <TextInput style= {styles.input} value={password} secureTextEntry={true} placeholder='Password' autoCapitalize='none' onChangeText={(text) => setPassword(text.trim())}></TextInput>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <>
-            <Button title='Login' onPress={signIn}/>
-            <Button title='Criar Conta' onPress={() => navigation.navigate('Signup')}/>
-            <Button title='Login Anonimo' onPress={signInAnonymous}/>
-        </>
-      )}
+    <View style={Styles.conatinerCredentials}>
+      <KeyboardAvoidingView behavior="padding">
+        <TextInput
+          style={Styles.inputCredentials}
+          value={email}
+          placeholder="Email"
+          autoCapitalize="none"
+          onChangeText={(text) => setEmail(text.trim())}
+        ></TextInput>
+        <TextInput
+          style={Styles.inputCredentials}
+          value={password}
+          secureTextEntry={true}
+          placeholder="Password"
+          autoCapitalize="none"
+          onChangeText={(text) => setPassword(text.trim())}
+        ></TextInput>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <>
+            <Button title="Login" onPress={signIn} />
+            <Button
+              title="Criar Conta"
+              onPress={() => navigation.navigate("Signup")}
+            />
+            <Button title="Login Anonimo" onPress={signInAnonymous} />
+          </>
+        )}
       </KeyboardAvoidingView>
     </View>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create({
-    conatiner: {
-        marginHorizontal : 20,
-        flex : 1,
-        justifyContent : 'center'
-    },
-    input:{
-        marginVertical: 4,
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#fff'
-    }
-});
-
-export default Login
+export default Login;
