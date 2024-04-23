@@ -21,17 +21,10 @@ const Home = ({ navigation }) => {
     setShowMap(!showMap);
   };
 
-
-  const handleLogout = () => {
-    FIREBASE_AUTH.signOut();
-  };
-
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={Styles.container}>
         <View style={Styles.topBar}>
-          <Button onPress={() => navigation.navigate('Details')} title='Abrir Detalhes'/>
-          <Button title="Logout" onPress={() => handleLogout()} style={Styles.logoutButton} />
           <ToggleSwitch showMap={showMap} toggleMap={toggleMap} style={Styles.toggleSwitch} />
         </View>
         <View style={Styles.mapContainerScreen}>

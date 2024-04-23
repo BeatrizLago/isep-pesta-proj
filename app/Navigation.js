@@ -7,9 +7,12 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Details from "./screens/Details";
 import Signup from "./screens/Signup";
+import Profile from "./screens/Profile";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FIREBASE_AUTH } from "../app/config/Firebase.config";
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 const InsideStack = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
@@ -18,8 +21,16 @@ function InsideLayout() {
   return (
     <InsideStack.Navigator>
       <InsideStack.Screen name="Home" component={Home} />
-      <InsideStack.Screen name="Details" component={Details} />
     </InsideStack.Navigator>
+  );
+}
+
+function TabLayout() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Inside" component={InsideLayout}  options={{headerShown : false}}/>
+      <Tab.Screen name="Profile" component={Profile} />
+    </Tab.Navigator>
   );
 }
 
@@ -47,8 +58,8 @@ const Navigation = () => {
       <Stack.Navigator initialRouteName="Login">
         {user ? (
           <Stack.Screen
-            name="Inside"
-            component={InsideLayout}
+            name="TabLayout"
+            component={TabLayout}
             options={{ headerShown: false }}
           />
         ) : (
