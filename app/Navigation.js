@@ -28,7 +28,11 @@ function InsideLayout() {
 function TabLayout() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Inside" component={InsideLayout}  options={{headerShown : false}}/>
+      <Tab.Screen
+        name="Inside"
+        component={InsideLayout}
+        options={{ headerShown: false }}
+      />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
