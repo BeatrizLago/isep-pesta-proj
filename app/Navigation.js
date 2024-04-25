@@ -5,23 +5,41 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
-import Details from "./screens/Details";
 import Signup from "./screens/Signup";
 import Profile from "./screens/Profile";
+import Configurations from "./screens/Configurations";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FIREBASE_AUTH } from "../app/config/Firebase.config";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const InsideStack = createNativeStackNavigator();
+const InsideMap = createNativeStackNavigator();
+const InsideProfile = createNativeStackNavigator();
+const InsideConfig = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
 
-function InsideLayout() {
+function MapLayout() {
   return (
-    <InsideStack.Navigator>
-      <InsideStack.Screen name="Home" component={Home} />
-    </InsideStack.Navigator>
+    <InsideMap.Navigator>
+      <InsideMap.Screen name="Home" component={Home} />
+    </InsideMap.Navigator>
+  );
+}
+
+function ProfileLayout() {
+  return (
+    <InsideProfile.Navigator>
+      <InsideProfile.Screen name="Profile" component={Profile} />
+    </InsideProfile.Navigator>
+  );
+}
+
+function ConfigLayout() {
+  return (
+    <InsideConfig.Navigator>
+      <InsideConfig.Screen name="Configurations" component={Configurations} />
+    </InsideConfig.Navigator>
   );
 }
 
@@ -29,11 +47,20 @@ function TabLayout() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Inside"
-        component={InsideLayout}
+        name="Mapa"
+        component={MapLayout}
         options={{ headerShown: false }}
       />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen
+        name="Perfil"
+        component={ProfileLayout}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Configurações"
+        component={ConfigLayout}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
