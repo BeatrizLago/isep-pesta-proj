@@ -30,13 +30,6 @@ const Home = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={Styles.container}>
-        <View style={Styles.topBar}>
-          <ToggleSwitch
-            showMap={showMap}
-            toggleMap={toggleMap}
-            style={Styles.toggleSwitch}
-          />
-        </View>
         <View style={Styles.mapContainerScreen}>
           {showMap && (
             <MapComponent

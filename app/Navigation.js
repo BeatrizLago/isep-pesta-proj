@@ -5,16 +5,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
+import List from "./screens/List";
 import Signup from "./screens/Signup";
 import Profile from "./screens/Profile";
 import Configurations from "./screens/Configurations";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FIREBASE_AUTH } from "../app/config/Firebase.config";
+import { Ionicons } from "@expo/vector-icons"; 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const InsideMap = createNativeStackNavigator();
+const InsideList = createNativeStackNavigator();
 const InsideProfile = createNativeStackNavigator();
 const InsideConfig = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
@@ -24,6 +27,14 @@ function MapLayout() {
     <InsideMap.Navigator>
       <InsideMap.Screen name="Home" component={Home} />
     </InsideMap.Navigator>
+  );
+}
+
+function ListLayout() {
+  return (
+    <InsideList.Navigator>
+      <InsideList.Screen name="List" component={List} />
+    </InsideList.Navigator>
   );
 }
 
@@ -45,10 +56,43 @@ function ConfigLayout() {
 
 function TabLayout() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Mapa') {
+            iconName = focused ? 'map' : 'map-outline'; 
+          } else if (route.name === 'Lista'){
+            iconName = focused ? 'list' : 'list-outline';
+          } else if (route.name === 'Perfil') {
+            iconName = focused ? 'person' : 'person-outline';
+          } else if (route.name === 'Configurações') {
+            iconName = focused ? 'settings' : 'settings-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarStyle: {
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+        },
+      })}
+      tabBarOptions={{
+        activeTintColor: 'blue', 
+        inactiveTintColor: 'gray', 
+        labelPosition: 'below-icon', 
+      }}
+    >
       <Tab.Screen
         name="Mapa"
         component={MapLayout}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Lista"
+        component={ListLayout}
         options={{ headerShown: false }}
       />
       <Tab.Screen
