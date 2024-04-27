@@ -9,7 +9,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapComponent from "../Components/MapComponent";
 import SearchBar from "../Components/SearchBar";
-import ToggleSwitch from "../Components/ToggleSwitch";
 import Styles from "../Components/Styles";
 import { FIREBASE_AUTH } from "../config/Firebase.config";
 

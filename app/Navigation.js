@@ -11,7 +11,7 @@ import Profile from "./screens/Profile";
 import Configurations from "./screens/Configurations";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FIREBASE_AUTH } from "../app/config/Firebase.config";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,29 +61,27 @@ function TabLayout() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === 'Mapa') {
-            iconName = focused ? 'map' : 'map-outline'; 
-          } else if (route.name === 'Lista'){
-            iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Perfil') {
-            iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'Configurações') {
-            iconName = focused ? 'settings' : 'settings-outline';
+          if (route.name === "Mapa") {
+            iconName = focused ? "map" : "map-outline";
+          } else if (route.name === "Lista") {
+            iconName = focused ? "list" : "list-outline";
+          } else if (route.name === "Perfil") {
+            iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "Configurações") {
+            iconName = focused ? "settings" : "settings-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarStyle: {
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         },
+        tabBarActiveTintColor: "blue",
+        tabBarInactiveTintColor: "gray",
+        tabBarLabelPosition: "below-icon",
       })}
-      tabBarOptions={{
-        activeTintColor: 'blue', 
-        inactiveTintColor: 'gray', 
-        labelPosition: 'below-icon', 
-      }}
     >
       <Tab.Screen
         name="Mapa"
