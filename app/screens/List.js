@@ -1,6 +1,6 @@
-import { View, Text, FlatList } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { fetchDataFromFirestore } from '../config/Firestore';
+import { View, Text, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { fetchDataFromFirestore } from "../config/Firestore";
 
 const List = () => {
   const [data, setData] = useState([]);
