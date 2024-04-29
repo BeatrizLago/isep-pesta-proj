@@ -13,10 +13,10 @@ const PlaceCard = ({ place }) => {
   return (
     <TouchableOpacity onPress={handlePress}>
       <View style={Styles.cardContainer}>
-        <Image source={{ uri: place.image }} style={Styles.image} />
+        <Image source={{ uri: place.imageURL }} style={Styles.image} resizeMode="contain"/>
         <View style={Styles.detailsContainer}>
           <Text style={Styles.name}>{place.name}</Text>
-          <Text style={Styles.location}>{place.location}</Text>
+          <Text style={Styles.location}>{place.address}</Text>
         </View>
       </View>
     </TouchableOpacity>
