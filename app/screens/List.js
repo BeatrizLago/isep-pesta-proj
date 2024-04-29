@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList } from "react-native";
-import { fetchDataFromFirestore } from "../config/Firestore";
-import PlaceCard from "../Components/PlaceCard" 
+import { fetchLocationsFromFirestore } from "../config/Firestore";
+import PlaceCard from "../Components/PlaceCard";
 
 const List = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedData = await fetchDataFromFirestore("locations");
+      const fetchedData = await fetchLocationsFromFirestore("locations");
       setData(fetchedData);
     };
 
@@ -19,7 +19,7 @@ const List = () => {
     <View>
       <FlatList
         data={data}
-        renderItem={({ item }) => <PlaceCard place={item} />} 
+        renderItem={({ item }) => <PlaceCard place={item} />}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>

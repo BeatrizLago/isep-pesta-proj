@@ -101,8 +101,13 @@ const Styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  location: {
+  address: {
     fontSize: 16,
+    color: "#666",
+    marginTop: 5,
+  },
+  acessLevel: {
+    fontSize: 14,
     color: "#666",
     marginTop: 5,
   },
