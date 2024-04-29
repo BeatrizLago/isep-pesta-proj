@@ -76,6 +76,36 @@ const Styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#fff",
   },
+  cardContainer: {
+    flexDirection: "column",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    elevation: 3,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    shadowOffset: { width: 1, height: 1 },
+    shadowColor: "#333",
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  detailsContainer: {
+    padding: 10,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  location: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 5,
+  },
 });
 
 export default Styles;

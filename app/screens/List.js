@@ -1,6 +1,7 @@
-import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
+import { View, FlatList } from "react-native";
 import { fetchDataFromFirestore } from "../config/Firestore";
+import PlaceCard from "../Components/PlaceCard" 
 
 const List = () => {
   const [data, setData] = useState([]);
@@ -18,11 +19,7 @@ const List = () => {
     <View>
       <FlatList
         data={data}
-        renderItem={({ item }) => (
-          <View>
-            <Text>{item.name}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => <PlaceCard place={item} />} 
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
