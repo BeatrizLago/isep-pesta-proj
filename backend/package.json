@@ -1,0 +1,12 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "Backend code for the project",
+    "type": "module",
+    "scripts": {
+      "start": "node serverDB.js"
+    },
+    "dependencies": {
+      "firebase-admin": "^10.0.1"
+    }
+  }
