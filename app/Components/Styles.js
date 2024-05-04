@@ -111,6 +111,17 @@ const Styles = StyleSheet.create({
     color: "#666",
     marginTop: 5,
   },
+  centerModal: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  centerModalBox: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+    height: "60%",
+  },
 });
 
 export default Styles;

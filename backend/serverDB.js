@@ -78,11 +78,16 @@ const initialData = [
     category: "Monumento",
     description: "",
     phoneNumber: "220145489",
+    email: "info@torredosclerigos.pt",
     acessibility: {
       parking: false,
       entrace: false,
       handicapBathroom: true,
       internalCirculation: true,
+    },
+    wheelchair: {
+      width: "",
+      height: "",
     },
     siteURL: "https://www.torredosclerigos.pt/pt/",
     imageURL:
@@ -98,38 +103,21 @@ const initialData = [
     category: "Lazer",
     description: "",
     phoneNumber: null,
+    email: "customercare@livrarialello.pt",
     acessibility: {
       parking: false,
       entrace: false,
       handicapBathroom: false,
       internalCirculation: false,
     },
+    wheelchair: {
+      width: "",
+      height: "",
+    },
     siteURL: "https://www.livrarialello.pt/",
     imageURL:
       "https://www.comerciocomhistoria.gov.pt/wp-content/uploads/import/listings/3351_imagem2.jpg",
     name: "Livraria Lello",
-  },
-  {
-    acessLevel: "",
-    address: {
-      city: "Porto",
-      street: "Praça de Almeida Garrett",
-    },
-    category: "",
-    description: "",
-    phoneNumber: "",
-    acessibility: {
-      parking: "",
-      entrace: "",
-      handicapBathroom: "",
-      internalCirculation: "",
-      visualAlarm: "",
-      writtenInfo: "",
-    },
-    siteURL: "https://www.torredosclerigos.pt/pt/",
-    imageURL:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2a/Estação_Ferroviária_de_Porto_-_São_Bento.JPG",
-    name: "Estação São Bento",
   },
   {
     acessLevel: "5",
@@ -140,11 +128,16 @@ const initialData = [
     category: "Monumento",
     description: "",
     phoneNumber: "223399000",
+    email: "turismo@cciporto.pt",
     acessibility: {
       parking: true,
       entrace: true,
       handicapBathroom: true,
       internalCirculation: true,
+    },
+    wheelchair: {
+      width: "",
+      height: "",
     },
     siteURL: "https://palaciodabolsa.com/",
     imageURL:

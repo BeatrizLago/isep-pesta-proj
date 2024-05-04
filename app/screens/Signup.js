@@ -17,6 +17,7 @@ import {
   updateCurrentUser,
   updateProfile,
 } from "firebase/auth";
+import { createUserInFirestore } from "../config/Firestore";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -41,6 +42,9 @@ const Signup = () => {
       await updateProfile(auth.currentUser, {
         displayName: displayName,
       });
+
+      await createUserInFirestore(auth.currentUser);
+
       console.log("Login response:", response);
       alert("Verifique o seu email");
     } catch (error) {
