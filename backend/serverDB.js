@@ -70,24 +70,23 @@ async function fetchDocuments(name) {
 
 const initialData = [
   {
-    acessLevel: "3",
+    acessLevel: "4",
     address: {
       city: "Porto",
       street: "Rua de São Filipe de Nery",
     },
     category: "Monumento",
-    description: "",
     phoneNumber: "220145489",
     email: "info@torredosclerigos.pt",
     acessibility: {
       parking: false,
-      entrace: false,
+      entrace: true,
       handicapBathroom: true,
       internalCirculation: true,
     },
     wheelchair: {
-      width: "",
-      height: "",
+      width: "100",
+      height: "100",
     },
     siteURL: "https://www.torredosclerigos.pt/pt/",
     imageURL:
@@ -101,7 +100,6 @@ const initialData = [
       street: "Rua das Carmelitas",
     },
     category: "Lazer",
-    description: "",
     phoneNumber: null,
     email: "customercare@livrarialello.pt",
     acessibility: {
@@ -120,24 +118,23 @@ const initialData = [
     name: "Livraria Lello",
   },
   {
-    acessLevel: "5",
+    acessLevel: "4",
     address: {
       city: "Porto",
       street: "Rua de Ferreira Borges",
     },
     category: "Monumento",
-    description: "",
     phoneNumber: "223399000",
     email: "turismo@cciporto.pt",
     acessibility: {
-      parking: true,
+      parking: false,
       entrace: true,
       handicapBathroom: true,
       internalCirculation: true,
     },
     wheelchair: {
-      width: "",
-      height: "",
+      width: "150",
+      height: "100",
     },
     siteURL: "https://palaciodabolsa.com/",
     imageURL:
