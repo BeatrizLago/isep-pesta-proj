@@ -1,13 +1,36 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
+import Styles from "../Components/Styles";
 
 const Details = ({ route }) => {
   const { place } = route.params;
 
   return (
-    <View>
-      <Text>{place.name}</Text>
-    </View>
+    <ScrollView style={Styles.detailsContainer}>
+      <Image source={{ uri: place.imageURL }} style={Styles.detailsImage}/>
+      <View style={Styles.detailsContent}>
+        <Text style={Styles.detailsTitle}>{place.name}</Text>
+        <Text style={Styles.detailsCategory}>{place.category}</Text>
+        <Text style={Styles.address}>
+          Endereço: {place.address ? `${place.address.street}, ${place.address.city}` : "Endereço não disponível"}
+        </Text>
+        <Text style={Styles.mbottom}>Telefone: {place.phoneNumber || "Telefone não disponível"}</Text>
+        <Text style={Styles.mbottom}>Email: {place.email || "Email não disponível"}</Text>
+        <Text style={Styles.detailsSubtitle}>Acessibilidade:</Text>
+        <Text>
+          Estacionamento Prioritário: {place.accessibility && place.accessibility.parking ? "Disponível" : "Não Disponível"}
+          {"\n"}Entrada: {place.accessibility && place.accessibility.entrance ? "Acessível" : "Não Acessível"}
+          {"\n"}Casa de Banho de Deficientes: {place.accessibility && place.accessibility.handicapBathroom ? "Disponível" : "Não Disponível"}
+          {"\n"}Circulação Interna: {place.accessibility && place.accessibility.internalCirculation ? "Acessível" : "Não Acessível"}
+        </Text>
+        <Text style={Styles.detailsSubtitle2}>Dimensões para Cadeiras de Rodas:</Text>
+        <Text style={Styles.mbottom}>
+          Largura: {place.wheelchair ? place.wheelchair.width : "Não Especificado"}
+          {"\n"}Altura: {place.wheelchair ? place.wheelchair.height : "Não Especificado"}
+        </Text>
+        <Text style={Styles.detailsSiteURL}>Website: {place.siteURL || "Nao disponível"}</Text>
+      </View>
+    </ScrollView>
   );
 };
 

@@ -21,7 +21,8 @@
     "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-maps": "^1.14.0",
-    "react-native-modal": "^13.0.1"
+    "react-native-modal": "^13.0.1",
+    "slider": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

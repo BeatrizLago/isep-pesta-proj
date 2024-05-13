@@ -41,7 +41,7 @@ const Styles = StyleSheet.create({
   mapContainerScreen: {
     flex: 1,
     width: "100%",
-    marginTop: 20, // Adjust this value to move the search bar higher
+    marginTop: 20, 
   },
   searchBar: {
     position: "absolute",
@@ -121,6 +121,41 @@ const Styles = StyleSheet.create({
     padding: 20,
     width: "80%",
     height: "60%",
+  },
+  detailsContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  detailsImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
+  },
+  detailsContent: {
+    padding: 20,
+  },
+  detailsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  detailsCategory: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  detailsSubtitle: {
+    fontSize: 18,
+  },  
+  detailsSubtitle2: {
+    fontSize: 18,
+    marginTop: 10
+  },   
+  mbottom: {
+    marginBottom: 10,
+  },
+  detailsSiteURL: {
+    marginBottom: 10,
+    color: "blue",
   },
 });
 
