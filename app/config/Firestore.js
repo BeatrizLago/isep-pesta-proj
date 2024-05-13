@@ -34,7 +34,7 @@ export const addToFirestore = async (name, data) => {
 // Function to update an existing user document in Firestore
 export const updateUserInFirestore = async (user) => {
   try {
-    const { uid, displayName, email } = user;
+    const { uid, displayName, email, width, height } = user;
 
     // Get a reference to the user document in Firestore
     const userRef = doc(collection(FIREBASE_DB, "users"), uid);
@@ -47,6 +47,10 @@ export const updateUserInFirestore = async (user) => {
       await updateDoc(userRef, {
         displayName,
         email,
+        wheelchair: {
+          width,
+          height,
+        },
       });
 
       return userRef.id; // Return the ID of the updated user document
@@ -56,6 +60,51 @@ export const updateUserInFirestore = async (user) => {
     }
   } catch (error) {
     console.error("Error updating user document: ", error);
+    return null;
+  }
+};
+
+// Function to update an existing wheelchair user document in Firestore
+export const updateUserWheelchairInFirestore = async (uid, user) => {
+  try {
+    const { wheelchair } = user; 
+    const { width, height } = wheelchair; 
+
+    // Get a reference to the user document in Firestore
+    const userRef = doc(collection(FIREBASE_DB, "users"), uid);
+
+    // Check if the user document exists
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      // Update existing user document
+      await updateDoc(userRef, {
+        wheelchair: {
+          width,
+          height,
+        },
+      });
+
+      return userRef.id; // Return the ID of the updated user document
+    } else {
+      console.error("User document does not exist for UID: ", uid);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error updating user wheelchair document: ", error);
+    return null;
+  }
+};
+
+// Function to fetch a specific user document from Firestore
+export const fetchUserFromFirestore = async (uid) => {
+  const userRef = doc(collection(FIREBASE_DB, "users"), uid);
+  const userDoc = await getDoc(userRef);
+
+  if (userDoc.exists()) {
+    return { id: userDoc.id, ...userDoc.data() };
+  } else {
+    console.error("User document does not exist for UID: ", uid);
     return null;
   }
 };
