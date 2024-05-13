@@ -32,9 +32,10 @@ export const addToFirestore = async (name, data) => {
 };
 
 // Function to update an existing user document in Firestore
-export const updateUserInFirestore = async (user) => {
+export const updateUserInFirestore = async (uid, user) => {
   try {
-    const { uid, displayName, email, width, height } = user;
+    const { displayName, email, wheelchair } = user;
+    const { width, height } = wheelchair;
 
     // Get a reference to the user document in Firestore
     const userRef = doc(collection(FIREBASE_DB, "users"), uid);
@@ -67,8 +68,8 @@ export const updateUserInFirestore = async (user) => {
 // Function to update an existing wheelchair user document in Firestore
 export const updateUserWheelchairInFirestore = async (uid, user) => {
   try {
-    const { wheelchair } = user; 
-    const { width, height } = wheelchair; 
+    const { wheelchair } = user;
+    const { width, height } = wheelchair;
 
     // Get a reference to the user document in Firestore
     const userRef = doc(collection(FIREBASE_DB, "users"), uid);
@@ -125,6 +126,10 @@ export const createUserInFirestore = async (user) => {
       await setDoc(userRef, {
         displayName,
         email,
+        wheelchair: {
+          width: null,
+          height: null,
+        },
       });
 
       return userRef.id; // Return the ID of the newly created user document
