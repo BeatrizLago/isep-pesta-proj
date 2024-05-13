@@ -18,10 +18,10 @@ const Details = ({ route }) => {
         <Text style={Styles.mbottom}>Email: {place.email || "Email não disponível"}</Text>
         <Text style={Styles.detailsSubtitle}>Acessibilidade:</Text>
         <Text>
-          Estacionamento Prioritário: {place.accessibility && place.accessibility.parking ? "Disponível" : "Não Disponível"}
-          {"\n"}Entrada: {place.accessibility && place.accessibility.entrance ? "Acessível" : "Não Acessível"}
-          {"\n"}Casa de Banho de Deficientes: {place.accessibility && place.accessibility.handicapBathroom ? "Disponível" : "Não Disponível"}
-          {"\n"}Circulação Interna: {place.accessibility && place.accessibility.internalCirculation ? "Acessível" : "Não Acessível"}
+          Estacionamento Prioritário: {place.accessibility?.parking ? "Disponível" : "Não Disponível"}
+          {"\n"}Entrada: {place.accessibility?.entrance ? "Acessível" : "Não Acessível"}
+          {"\n"}Casa de Banho de Deficientes: {place.accessibility?.handicapBathroom ? "Disponível" : "Não Disponível"}
+          {"\n"}Circulação Interna: {place.accessibility?.internalCirculation ? "Acessível" : "Não Acessível"}
         </Text>
         <Text style={Styles.detailsSubtitle2}>Dimensões para Cadeiras de Rodas:</Text>
         <Text style={Styles.mbottom}>

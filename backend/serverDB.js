@@ -70,7 +70,7 @@ async function fetchDocuments(name) {
 
 const initialData = [
   {
-    acessLevel: "4",
+    accessLevel: "4",
     address: {
       city: "Porto",
       street: "Rua de São Filipe de Nery",
@@ -78,9 +78,9 @@ const initialData = [
     category: "Monumento",
     phoneNumber: "220145489",
     email: "info@torredosclerigos.pt",
-    acessibility: {
+    accessibility: {
       parking: false,
-      entrace: true,
+      entrance: true,
       handicapBathroom: true,
       internalCirculation: true,
     },
@@ -94,7 +94,7 @@ const initialData = [
     name: "Torre dos clérigos",
   },
   {
-    acessLevel: "0",
+    accessLevel: "0",
     address: {
       city: "Porto",
       street: "Rua das Carmelitas",
@@ -102,9 +102,9 @@ const initialData = [
     category: "Lazer",
     phoneNumber: null,
     email: "customercare@livrarialello.pt",
-    acessibility: {
+    accessibility: {
       parking: false,
-      entrace: false,
+      entrance: false,
       handicapBathroom: false,
       internalCirculation: false,
     },
@@ -118,7 +118,7 @@ const initialData = [
     name: "Livraria Lello",
   },
   {
-    acessLevel: "4",
+    accessLevel: "4",
     address: {
       city: "Porto",
       street: "Rua de Ferreira Borges",
@@ -126,9 +126,9 @@ const initialData = [
     category: "Monumento",
     phoneNumber: "223399000",
     email: "turismo@cciporto.pt",
-    acessibility: {
+    accessibility: {
       parking: false,
-      entrace: true,
+      entrance: true,
       handicapBathroom: true,
       internalCirculation: true,
     },
