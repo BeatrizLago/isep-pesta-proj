@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { fetchFromFirestore } from "../config/Firestore";
 import PlaceCard from "../Components/PlaceCard";
+import ActivityLoader from "../Components/ActivityLoader";
 
 const List = () => {
   const [data, setData] = useState([]);
@@ -36,11 +37,7 @@ const List = () => {
   return (
     <View style={{ flex: 1 }}>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color="blue" />
-        </View>
+        <ActivityLoader />
       ) : (
         <>
           <TouchableOpacity

@@ -18,6 +18,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { createUserInFirestore } from "../config/Firestore";
+import ActivityLoader from "../Components/ActivityLoader";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -88,7 +89,7 @@ const Signup = () => {
           onChangeText={(text) => setPassword(text.trim())}
         ></TextInput>
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityLoader />
         ) : (
           <>
             <Button title="Criar Conta" onPress={signUp} />

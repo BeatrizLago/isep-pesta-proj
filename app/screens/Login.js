@@ -17,6 +17,7 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import ActivityLoader from "../Components/ActivityLoader";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -69,7 +70,7 @@ const Login = ({ navigation }) => {
           onChangeText={(text) => setPassword(text.trim())}
         ></TextInput>
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityLoader />
         ) : (
           <>
             <Button title="Login" onPress={signIn} />
