@@ -19,18 +19,18 @@
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+    "cors": "^2.8.5",
     "expo": "^50.0.1",
     "expo-linking": "~6.2.2",
     "expo-web-browser": "~12.8.1",
     "firebase": "^10.11.0",
+    "jest-expo": "~50.0.4",
     "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-maps": "^1.14.0",
     "react-native-modal": "^13.0.1",
-    "slider": "^1.0.4",
-    "jest-expo": "~50.0.4",
-    "jest": "^29.3.1"
+    "slider": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

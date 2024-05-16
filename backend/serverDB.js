@@ -153,6 +153,34 @@ const initialData = [
       "https://upload.wikimedia.org/wikipedia/commons/3/3b/BolsaValoresPorto.jpg",
     name: "Palácio da Bolsa",
   },
+  {
+    accessLevel: "4",
+    address: {
+      city: "Vila Nova de Gaia",
+      street: "Jardim do Morro, 4430-210 Vila Nova de Gaia",
+    },
+    category: "Lazer",
+    phoneNumber: "227878120",
+    email: "null",
+    accessibility: {
+      parking: false,
+      entrance: true,
+      handicapBathroom: false,
+      internalCirculation: true,
+    },
+    wheelchair: {
+      width: "0",
+      height: "0",
+    },
+    coordinates: {
+      latitude: "41.137187229957135",
+      longitude: "-8.609288111375953",
+    },
+    siteURL: "https://www.cm-gaia.pt/pt/",
+    imageURL:
+      "https://lh3.googleusercontent.com/p/AF1QipOtAkPl81DHXMNsSOv7AzgOZDU6oLkU3wk2gzlY=s1360-w1360-h1020",
+    name: "Jardim do Morro",
+  },
 ];
 
 async function initializeData(initialData) {
