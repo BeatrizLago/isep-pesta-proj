@@ -10,7 +10,7 @@ const PlaceCard = React.memo(({ place }) => {
     navigation.navigate("Details", { place });
   };
 
-  const { name, address, acessLevel, imageURL } = place;
+  const { name, address, accessLevel, imageURL } = place;
 
   return (
     <TouchableOpacity onPress={handlePress}>
@@ -28,7 +28,7 @@ const PlaceCard = React.memo(({ place }) => {
             </Text>
           )}
           <Text style={Styles.acessLevel}>
-            Nivel de acessibilidade: {acessLevel}
+            Nivel de acessibilidade: {accessLevel}
           </Text>
         </View>
       </View>

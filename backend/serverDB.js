@@ -88,6 +88,10 @@ const initialData = [
       width: "100",
       height: "100",
     },
+    coordinates: {
+      latitude: "41.145951771169486",
+      longitude: "-8.613813434187623",
+    },
     siteURL: "https://www.torredosclerigos.pt/pt/",
     imageURL:
       "https://upload.wikimedia.org/wikipedia/commons/c/ca/Vitoria-Igreja_e_Torre_dos_Clérigos_%281%29_%28cropped%29.jpg",
@@ -112,6 +116,10 @@ const initialData = [
       width: "",
       height: "",
     },
+    coordinates: {
+      latitude: "41.14684959713895",
+      longitude: "-8.614892646831137",
+    },
     siteURL: "https://www.livrarialello.pt/",
     imageURL:
       "https://www.comerciocomhistoria.gov.pt/wp-content/uploads/import/listings/3351_imagem2.jpg",
@@ -135,6 +143,10 @@ const initialData = [
     wheelchair: {
       width: "150",
       height: "100",
+    },
+    coordinates: {
+      latitude: "41.14139942001962",
+      longitude: "-8.61566840718015",
     },
     siteURL: "https://palaciodabolsa.com/",
     imageURL:
