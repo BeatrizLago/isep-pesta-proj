@@ -30,9 +30,13 @@
     "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-native": "0.73.2",
+    "react-native-dropdown-select-list": "^2.0.5",
     "react-native-maps": "^1.14.0",
     "react-native-modal": "^13.0.1",
-    "slider": "^1.0.4"
+    "react-native-multi-selectbox": "^1.5.0",
+    "react-native-picker-select": "^9.1.3",
+    "react-native-sectioned-multi-select": "^0.10.0",
+    "react-native-vector-icons": "^10.1.0",
     "slider": "^1.0.4"
   },
   "devDependencies": {

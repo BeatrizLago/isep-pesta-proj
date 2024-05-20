@@ -1,134 +1,167 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 
-function filterLocationsByAccessLevel(locations, chosenAccessLevel) {
-  return locations.filter(
-    (location) => location.accessLevel === chosenAccessLevel
-  );
-}
+const MyFilter = ({
+  data,
+  filters,
+  cities,
+  categories,
+  selectedFilters,
+  setFilteredData,
+  onFilterChange,
+}) => {
+  const handleFilterButtonClick = (selectedLevel, type) => {
+    const isCity = type === "cidade";
+    const isCategory = type === "categoria";
 
-function filterLocationsByCity(locations, chosenCity) {
-  return locations.filter((location) => location.address.city === chosenCity);
-}
-function filterLocationsByCategory(locations, chosenCategory) {
-  return locations.filter((location) => location.category === chosenCategory);
-}
-function filterLocationsByWheelchair(locations, wheelchair) {
-  return locations.filter((location) => {
-    return (
-      wheelchair.width <= location.wheelchair.width &&
-      wheelchair.height <= location.wheelchair.height
+    const otherFilters = selectedFilters.filter(
+      (filter) =>
+        !(isCity ? cities : isCategory ? categories : []).includes(filter)
     );
-  });
-}
 
-const MyFilter = ({ locations, onFilter }) => {
-  const [selectedAccessLevel, setSelectedAccessLevel] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [wheelchair, setWheelchair] = useState({ width: 50, height: 40 });
+    const newFilters =
+      isCity || isCategory
+        ? [...otherFilters, selectedLevel]
+        : selectedFilters.includes(selectedLevel)
+        ? selectedFilters.filter((el) => el !== selectedLevel)
+        : [...selectedFilters, selectedLevel];
 
-  const applyFilters = () => {
-    let filteredLocations = locations;
-
-    if (selectedAccessLevel) {
-      filteredLocations = filterLocationsByAccessLevel(
-        filteredLocations,
-        selectedAccessLevel
-      );
-    }
-    if (selectedCity) {
-      filteredLocations = filterLocationsByCity(
-        filteredLocations,
-        selectedCity
-      );
-    }
-    if (selectedCategory) {
-      filteredLocations = filterLocationsByCategory(
-        filteredLocations,
-        selectedCategory
-      );
-    }
-    if (wheelchair.width > 0 && wheelchair.height > 0) {
-      filteredLocations = filterLocationsByWheelchair(
-        filteredLocations,
-        wheelchair
-      );
-    }
-
-    onFilter(filteredLocations);
+    onFilterChange(newFilters);
   };
 
+  const isFilterSelected = (filter) => selectedFilters.includes(filter);
+
+  useEffect(() => {
+    const filteredData = selectedFilters.length
+      ? data.filter((item) => {
+          const match = (filters, key) => {
+            const value = key
+              .split(".")
+              .reduce((acc, part) => acc && acc[part], item);
+            return filters.length ? filters.includes(value?.toString()) : true;
+          };
+
+          return (
+            match(
+              selectedFilters.filter((f) => filters.includes(f)),
+              "accessLevel"
+            ) &&
+            match(
+              selectedFilters.filter((f) => cities.includes(f)),
+              "address.city"
+            ) &&
+            match(
+              selectedFilters.filter((f) => categories.includes(f)),
+              "category"
+            )
+          );
+        })
+      : data;
+
+    setFilteredData(filteredData);
+  }, [selectedFilters, data]);
+
+  const generateOptions = (items) => [
+    { key: "none", value: "Nenhum" },
+    ...items.map((item) => ({ key: item, value: item })),
+  ];
+
   return (
-    <View style={{ padding: 10 }}>
-      <Text>Filter by:</Text>
-      <TextInput
-        style={{
-          borderWidth: 1,
-          borderColor: "grey",
-          padding: 5,
-          marginBottom: 10,
-        }}
-        placeholder="Access Level"
-        value={selectedAccessLevel}
-        onChangeText={(text) => setSelectedAccessLevel(text)}
-      />
-      <TextInput
-        style={{
-          borderWidth: 1,
-          borderColor: "grey",
-          padding: 5,
-          marginBottom: 10,
-        }}
-        placeholder="City"
-        value={selectedCity}
-        onChangeText={(text) => setSelectedCity(text)}
-      />
-      <TextInput
-        style={{
-          borderWidth: 1,
-          borderColor: "grey",
-          padding: 5,
-          marginBottom: 10,
-        }}
-        placeholder="Category"
-        value={selectedCategory}
-        onChangeText={(text) => setSelectedCategory(text)}
-      />
-      <View style={{ flexDirection: "row", marginBottom: 10 }}>
-        <TextInput
-          style={{ flex: 1, borderWidth: 1, borderColor: "grey", padding: 5 }}
-          placeholder="Wheelchair Width"
-          keyboardType="numeric"
-          value={wheelchair.width.toString()}
-          onChangeText={(text) =>
-            setWheelchair({ ...wheelchair, width: parseInt(text) || 0 })
-          }
-        />
-        <TextInput
-          style={{
-            flex: 1,
-            borderWidth: 1,
-            borderColor: "grey",
-            padding: 5,
-            marginLeft: 10,
-          }}
-          placeholder="Wheelchair Height"
-          keyboardType="numeric"
-          value={wheelchair.height.toString()}
-          onChangeText={(text) =>
-            setWheelchair({ ...wheelchair, height: parseInt(text) || 0 })
-          }
+    <View>
+      <View style={styles.container}>
+        <FlatList
+          data={filters}
+          horizontal
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleFilterButtonClick(item, "filter")}
+              style={[
+                styles.filterButton,
+                isFilterSelected(item) && styles.selectedFilterButton,
+              ]}
+            >
+              <Text
+                style={
+                  isFilterSelected(item) ? styles.selectedFilterText : null
+                }
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          )}
         />
       </View>
-      <TouchableOpacity
-        onPress={() => applyFilters()}
-        style={{ backgroundColor: "blue", padding: 10, alignItems: "center" }}
-      >
-        <Text style={{ color: "white" }}>Apply Filters</Text>
-      </TouchableOpacity>
+      {["Cidade", "Categoria"].map((label) => (
+        <View key={label} style={styles.pickerContainer}>
+          <Text style={styles.label}>Selecione {label}:</Text>
+          <SelectList
+            setSelected={(value) =>
+              handleFilterButtonClick(value, label.toLowerCase())
+            }
+            data={generateOptions(label === "Cidade" ? cities : categories)}
+            placeholder={`Selecione uma ${label.toLowerCase()}`}
+            boxStyles={pickerSelectStyles.box}
+            dropdownStyles={pickerSelectStyles.dropdown}
+          />
+        </View>
+      ))}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginHorizontal: 5,
+  },
+  selectedFilterButton: {
+    backgroundColor: "#007bff",
+  },
+  selectedFilterText: {
+    color: "#fff",
+  },
+  pickerContainer: {
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  label: {
+    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  box: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+  },
+});
 
 export default MyFilter;
