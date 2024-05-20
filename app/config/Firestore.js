@@ -4,6 +4,8 @@ import {
   getDocs,
   addDoc,
   doc,
+  query,
+  where,
   updateDoc,
   getDoc,
   setDoc,
@@ -20,16 +22,6 @@ export const fetchFromFirestore = async (name) => {
   return data;
 };
 
-// Function to add data to Firestore
-export const addToFirestore = async (name, data) => {
-  try {
-    const docRef = await addDoc(collection(FIREBASE_DB, name), data);
-    return docRef.id;
-  } catch (error) {
-    console.error("Error adding document: ", error);
-    return null;
-  }
-};
 
 // Function to update an existing user document in Firestore
 export const updateUserInFirestore = async (uid, user) => {
@@ -62,6 +54,44 @@ export const updateUserInFirestore = async (uid, user) => {
   } catch (error) {
     console.error("Error updating user document: ", error);
     return null;
+  }
+};
+
+/*
+export const addReviewToFirestore = async (placeId, userId, review) => {
+  try {
+    const reviewRef = doc(FIREBASE_DB, `reviews/${placeId}/${userId}`);
+    await setDoc(reviewRef, review);
+    return reviewRef.id;
+  } catch (error) {
+    console.error("Error adding review: ", error);
+    return null;
+  }
+};*/
+
+export const addToFirestore = async (name, data) => {
+  try {
+    const docRef = await addDoc(collection(FIREBASE_DB, name), data);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    return null;
+  }
+};
+
+export const fetchReviewsFromFirestore = async (locationUUID) => {
+  try {
+    const reviewsRef = collection(FIREBASE_DB, "reviews");
+    const q = query(reviewsRef, where("locationUUID", "==", locationUUID));
+    const querySnapshot = await getDocs(q);
+    const reviews = [];
+    querySnapshot.forEach((doc) => {
+      reviews.push({ id: doc.id, ...doc.data() });
+    });
+    return reviews;
+  } catch (error) {
+    console.error("Error fetching reviews: ", error);
+    return [];
   }
 };
 

@@ -157,6 +157,23 @@ const Styles = StyleSheet.create({
     marginBottom: 10,
     color: "blue",
   },
+  reviewTextInput: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    marginVertical: 10,
+  },
+  reviewContainer: {
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    padding: 10,
+    marginVertical: 5,
+  },
+  loginPrompt: {
+    color: 'red',
+    marginVertical: 10,
+    textAlign: 'center',
+  },
 });
 
 export default Styles;
