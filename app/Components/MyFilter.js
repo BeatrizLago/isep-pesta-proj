@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  FlatList,
-  Switch,
-} from "react-native";
+import { View, TouchableOpacity, Text, FlatList, Switch } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import { FIREBASE_AUTH } from "../config/Firebase.config";
 import { fetchUserFromFirestore } from "../config/Firestore";
@@ -140,7 +134,9 @@ const MyFilter = ({
             >
               <Text
                 style={
-                  isFilterSelected(item) ? MyFilterSytle.selectedFilterText : null
+                  isFilterSelected(item)
+                    ? MyFilterSytle.selectedFilterText
+                    : null
                 }
               >
                 {item}
@@ -163,15 +159,17 @@ const MyFilter = ({
           />
         </View>
       ))}
-      <View style={MyFilterSytle.switchContainer}>
-        <Text style={MyFilterSytle.label}>
-          Filtrar por compatibilidade com cadeira de rodas
-        </Text>
-        <Switch
-          value={wheelchairFilterEnabled}
-          onValueChange={setWheelchairFilterEnabled}
-        />
-      </View>
+      {userWheelChair && userWheelChair.height && userWheelChair.width && (
+        <View style={MyFilterSytle.switchContainer}>
+          <Text style={MyFilterSytle.label}>
+            Filtrar por compatibilidade com cadeira de rodas
+          </Text>
+          <Switch
+            value={wheelchairFilterEnabled}
+            onValueChange={setWheelchairFilterEnabled}
+          />
+        </View>
+      )}
     </View>
   );
 };
