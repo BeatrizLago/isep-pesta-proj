@@ -8,6 +8,7 @@ import Home from "./screens/Home";
 import List from "./screens/List";
 import Signup from "./screens/Signup";
 import Details from "./screens/Details";
+import WriteReview from "./screens/WriteReview";
 import Profile from "./screens/Profile";
 import Configurations from "./screens/Configurations";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -36,6 +37,7 @@ function ListLayout() {
     <InsideList.Navigator>
       <InsideList.Screen name="List" component={List} />
       <InsideList.Screen name="Details" component={Details} />
+      <InsideList.Screen name="WriteReview" component={WriteReview} />
     </InsideList.Navigator>
   );
 }

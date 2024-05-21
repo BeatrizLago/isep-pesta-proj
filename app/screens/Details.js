@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, TextInput, Button, Linking, TouchableOpacity } from "react-native";
-import { fetchReviewsFromFirestore, addReviewToFirestore, addToFirestore } from "../config/Firestore";
+import { View, Text, Image, ScrollView, TextInput, Button, Linking, TouchableOpacity, Modal } from "react-native";
+import { fetchReviewsFromFirestore, addToFirestore } from "../config/Firestore";
 import Styles from "../Components/Styles";
 import { getAuth } from "firebase/auth"; // Import Firebase auth to get the current user
+import { Rating } from 'react-native-ratings'; // Import the Rating component
 
 const Details = ({ route, navigation }) => {
   const { place } = route.params;
   const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
+  const [visRating, setVisRating] = useState(false); // State for controlling the visibility of the modal
   const auth = getAuth();
   const currentUser = auth.currentUser; // Get the current authenticated user
-
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -21,7 +22,7 @@ const Details = ({ route, navigation }) => {
     loadReviews();
   }, [place.id]);
 
-  const handleAddReview = async () => {
+  const submitReview = async () => {
     if (!currentUser) {
       console.error("User must be logged in to submit a review");
       return;
@@ -31,11 +32,12 @@ const Details = ({ route, navigation }) => {
       rating: rating,
       userId: currentUser.uid,
       date: new Date().toISOString(),
-      locationUUID: place.id, // Ensure this field is included
+      locationUUID: place.id,
     };
     await addToFirestore("reviews", newReview);
     setReviewText("");
     setRating(0);
+    setVisRating(false); // Close the modal after submitting the review
     const updatedReviews = await fetchReviewsFromFirestore(place.id);
     setReviews(updatedReviews);
   };
@@ -79,20 +81,39 @@ const Details = ({ route, navigation }) => {
 
         {currentUser ? (
           <>
-            <TextInput
-              placeholder="Write a review"
-              value={reviewText}
-              onChangeText={setReviewText}
-              style={Styles.textInput}
-            />
-            <TextInput
-              placeholder="Rating (1-5)"
-              value={rating}
-              onChangeText={(text) => setRating(Number(text))}
-              style={Styles.textInput}
-              keyboardType="numeric"
-            />
-            <Button title="Submit Review" onPress={handleAddReview} />
+            <Button title="Write a Review" onPress={() => setVisRating(true)} />
+            <Modal visible={visRating} transparent={true}>
+              <View style={{backgroundColor:"#000000aa", flex:1}}>
+                <View style={Styles.ratingBarStyle}>
+                  <TextInput
+                    placeholder="Write a review"
+                    value={reviewText}
+                    onChangeText={setReviewText}
+                    style={Styles.textInput}
+                  />
+                  <Rating
+                    type='custom'
+                    ratingCount={5}
+                    imageSize={30}
+                    showRating
+                    startingValue={rating}
+                    onFinishRating={setRating}
+                  />
+                  <Button
+                    style={Styles.rateButtonStyle}
+                    color="blue"
+                    title={`Rate as: ${rating}`}
+                    onPress={submitReview}
+                  />
+                  <Button
+                    style={Styles.rateButtonStyle}
+                    color="red"
+                    title="Cancel"
+                    onPress={() => setVisRating(false)}
+                  />
+                </View>
+              </View>
+            </Modal>
           </>
         ) : (
           <Text style={Styles.loginPrompt}>Please log in to write a review.</Text>

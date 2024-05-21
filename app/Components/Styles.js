@@ -174,6 +174,22 @@ const Styles = StyleSheet.create({
     marginVertical: 10,
     textAlign: 'center',
   },
+  ratingBarStyle:{
+    backgroundColor:"lightgray",
+    top: 35,
+    width:90,
+    height:35,
+    alignItems:'center',
+    alignSelf:'center',
+    alignContent:'center',
+    borderRadius:50,
+    padding:5
+  },
+  rateButtonStyle:{
+    height:40,
+    top:10,
+    backgroundColor:"yellow",
+  },
 });
 
 export default Styles;

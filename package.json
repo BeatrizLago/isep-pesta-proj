@@ -36,6 +36,7 @@
     "react-native-modal": "^13.0.1",
     "react-native-multi-selectbox": "^1.5.0",
     "react-native-picker-select": "^9.1.3",
+    "react-native-ratings": "^8.1.0",
     "react-native-sectioned-multi-select": "^0.10.0",
     "react-native-vector-icons": "^10.1.0",
     "slider": "^1.0.4"
