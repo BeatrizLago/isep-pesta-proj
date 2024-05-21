@@ -1,5 +1,60 @@
 import { StyleSheet } from "react-native";
 
+export const MyFilterSytle = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginHorizontal: 5,
+  },
+  selectedFilterButton: {
+    backgroundColor: "#007bff",
+  },
+  selectedFilterText: {
+    color: "#fff",
+  },
+  pickerContainer: {
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  label: {
+    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+});
+
+export const MyFilterPickerSelectStyles = StyleSheet.create({
+  box: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+  },
+});
+
+
 const Styles = StyleSheet.create({
   mapContainer: {
     position: "absolute",
@@ -41,7 +96,7 @@ const Styles = StyleSheet.create({
   mapContainerScreen: {
     flex: 1,
     width: "100%",
-    marginTop: 20, 
+    marginTop: 20,
   },
   searchBar: {
     position: "absolute",
@@ -145,11 +200,11 @@ const Styles = StyleSheet.create({
   },
   detailsSubtitle: {
     fontSize: 18,
-  },  
+  },
   detailsSubtitle2: {
     fontSize: 18,
-    marginTop: 10
-  },   
+    marginTop: 10,
+  },
   mbottom: {
     marginBottom: 10,
   },
@@ -158,21 +213,21 @@ const Styles = StyleSheet.create({
     color: "blue",
   },
   reviewTextInput: {
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     padding: 10,
     marginVertical: 10,
   },
   reviewContainer: {
     borderWidth: 1,
-    borderColor: 'lightgray',
+    borderColor: "lightgray",
     padding: 10,
     marginVertical: 5,
   },
   loginPrompt: {
-    color: 'red',
+    color: "red",
     marginVertical: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

@@ -4,12 +4,12 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
-  StyleSheet,
   Switch,
 } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import { FIREBASE_AUTH } from "../config/Firebase.config";
 import { fetchUserFromFirestore } from "../config/Firestore";
+import { MyFilterSytle, MyFilterPickerSelectStyles } from "./Styles";
 
 const MyFilter = ({
   data,
@@ -125,7 +125,7 @@ const MyFilter = ({
 
   return (
     <View>
-      <View style={styles.container}>
+      <View style={MyFilterSytle.container}>
         <FlatList
           data={filters}
           horizontal
@@ -134,13 +134,13 @@ const MyFilter = ({
             <TouchableOpacity
               onPress={() => handleFilterButtonClick(item, "filter")}
               style={[
-                styles.filterButton,
-                isFilterSelected(item) && styles.selectedFilterButton,
+                MyFilterSytle.filterButton,
+                isFilterSelected(item) && MyFilterSytle.selectedFilterButton,
               ]}
             >
               <Text
                 style={
-                  isFilterSelected(item) ? styles.selectedFilterText : null
+                  isFilterSelected(item) ? MyFilterSytle.selectedFilterText : null
                 }
               >
                 {item}
@@ -150,21 +150,21 @@ const MyFilter = ({
         />
       </View>
       {["Cidade", "Categoria"].map((label) => (
-        <View key={label} style={styles.pickerContainer}>
-          <Text style={styles.label}>Selecione {label}:</Text>
+        <View key={label} style={MyFilterSytle.pickerContainer}>
+          <Text style={MyFilterSytle.label}>Selecione {label}:</Text>
           <SelectList
             setSelected={(value) =>
               handleFilterButtonClick(value, label.toLowerCase())
             }
             data={generateOptions(label === "Cidade" ? cities : categories)}
             placeholder={`Selecione uma ${label.toLowerCase()}`}
-            boxStyles={pickerSelectStyles.box}
-            dropdownStyles={pickerSelectStyles.dropdown}
+            boxStyles={MyFilterPickerSelectStyles.box}
+            dropdownStyles={MyFilterPickerSelectStyles.dropdown}
           />
         </View>
       ))}
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>
+      <View style={MyFilterSytle.switchContainer}>
+        <Text style={MyFilterSytle.label}>
           Filtrar por compatibilidade com cadeira de rodas
         </Text>
         <Switch
@@ -175,59 +175,5 @@ const MyFilter = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginHorizontal: 5,
-  },
-  selectedFilterButton: {
-    backgroundColor: "#007bff",
-  },
-  selectedFilterText: {
-    color: "#fff",
-  },
-  pickerContainer: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  label: {
-    marginBottom: 5,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  switchContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  box: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-  },
-});
 
 export default MyFilter;
