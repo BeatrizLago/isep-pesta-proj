@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { View, FlatList, TouchableOpacity, Text, Button } from "react-native";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { View, FlatList, TouchableOpacity, Text } from "react-native";
 import { fetchFromFirestore } from "../config/Firestore";
 import PlaceCard from "../Components/PlaceCard";
 import ActivityLoader from "../Components/ActivityLoader";
@@ -10,19 +10,9 @@ const List = () => {
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
-  const [showFilter, setShowFilter] = useState(false); // State to manage filter visibility
+  const [showFilter, setShowFilter] = useState(false);
 
-  const filters = ["0", "1", "2", "3", "4", "5"];
-  const categories = useMemo(
-    () => [...new Set(data.map((item) => item.category))],
-    [data]
-  );
-  const cities = useMemo(
-    () => [...new Set(data.map((item) => item.address.city))],
-    [data]
-  );
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const fetchedData = await fetchFromFirestore("locations");
@@ -33,20 +23,24 @@ const List = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     fetchData();
-  };
+  }, [fetchData]);
 
-  const clearFilters = () => {
-    setSelectedFilters([]); // Clear selected filters
-    setFilteredData(data); // Reset filtered data to original data
-  };
+  const clearFilters = useCallback(() => {
+    setSelectedFilters([]);
+    setFilteredData(data);
+  }, [data]);
+
+  const toggleFilter = useCallback(() => {
+    setShowFilter((prev) => !prev);
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -54,39 +48,42 @@ const List = () => {
         <ActivityLoader />
       ) : (
         <>
-          <TouchableOpacity
-            style={{ position: "absolute", top: 10, right: 10, zIndex: 1 }}
-            onPress={() => setShowFilter(!showFilter)} // Toggle filter visibility
+          <View
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              flexDirection: "row",
+              zIndex: 1,
+            }}
           >
-            <Text style={{ fontSize: 16, color: "blue" }}>
-              {showFilter ? "Close Filter" : "Open Filter"}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={toggleFilter}
+              style={{ marginRight: 10 }}
+            >
+              <Text style={{ fontSize: 16, color: "blue" }}>
+                {showFilter ? "Close Filter" : "Open Filter"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleRefresh}
+              style={{ marginRight: 10 }}
+            >
+              <Text style={{ fontSize: 16, color: "blue" }}>Refresh</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={clearFilters}>
+              <Text style={{ fontSize: 16, color: "red" }}>Clear Filters</Text>
+            </TouchableOpacity>
+          </View>
+
           {showFilter && (
             <MyFilter
               data={data}
-              filters={filters}
-              cities={cities}
-              categories={categories}
               selectedFilters={selectedFilters}
               setFilteredData={setFilteredData}
               onFilterChange={setSelectedFilters}
             />
           )}
-
-          <TouchableOpacity
-            style={{ position: "absolute", top: 10, right: 100, zIndex: 1 }}
-            onPress={handleRefresh}
-          >
-            <Text style={{ fontSize: 16, color: "blue" }}>Refresh</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ position: "absolute", top: 10, right: 190, zIndex: 1 }}
-            onPress={clearFilters} // Call clearFilters function when pressed
-          >
-            <Text style={{ fontSize: 16, color: "red" }}>Clear Filters</Text>
-          </TouchableOpacity>
 
           {filteredData.length > 0 ? (
             <FlatList

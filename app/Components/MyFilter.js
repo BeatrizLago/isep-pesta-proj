@@ -1,22 +1,55 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   TouchableOpacity,
   Text,
   FlatList,
   StyleSheet,
+  Switch,
 } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
+import { FIREBASE_AUTH } from "../config/Firebase.config";
+import { fetchUserFromFirestore } from "../config/Firestore";
 
 const MyFilter = ({
   data,
-  filters,
-  cities,
-  categories,
   selectedFilters,
   setFilteredData,
   onFilterChange,
 }) => {
+  const [userWheelChair, setUserWheelChair] = useState(null);
+  const [wheelchairFilterEnabled, setWheelchairFilterEnabled] = useState(false);
+
+  const filters = ["0", "1", "2", "3", "4", "5"];
+  const categories = useMemo(
+    () => [...new Set(data.map((item) => item.category))],
+    [data]
+  );
+  const cities = useMemo(
+    () => [...new Set(data.map((item) => item.address.city))],
+    [data]
+  );
+  const wheelchairData = useMemo(
+    () => [...new Set(data.map((item) => item.wheelchair))],
+    [data]
+  );
+
+  const fetchUserData = async () => {
+    try {
+      const currentUser = FIREBASE_AUTH.currentUser;
+      if (currentUser) {
+        const userData = await fetchUserFromFirestore(currentUser.uid);
+        setUserWheelChair(userData.wheelchair);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   const handleFilterButtonClick = (selectedLevel, type) => {
     const isCity = type === "cidade";
     const isCategory = type === "categoria";
@@ -48,6 +81,13 @@ const MyFilter = ({
             return filters.length ? filters.includes(value?.toString()) : true;
           };
 
+          const matchesWheelchair =
+            !wheelchairFilterEnabled ||
+            (userWheelChair &&
+              item.wheelchair &&
+              userWheelChair.height <= item.wheelchair.height &&
+              userWheelChair.width <= item.wheelchair.width);
+
           return (
             match(
               selectedFilters.filter((f) => filters.includes(f)),
@@ -60,13 +100,23 @@ const MyFilter = ({
             match(
               selectedFilters.filter((f) => categories.includes(f)),
               "category"
-            )
+            ) &&
+            matchesWheelchair
           );
         })
-      : data;
+      : data.filter((item) => {
+          const matchesWheelchair =
+            !wheelchairFilterEnabled ||
+            (userWheelChair &&
+              item.wheelchair &&
+              userWheelChair.height <= item.wheelchair.height &&
+              userWheelChair.width <= item.wheelchair.width);
+
+          return matchesWheelchair;
+        });
 
     setFilteredData(filteredData);
-  }, [selectedFilters, data]);
+  }, [selectedFilters, data, wheelchairFilterEnabled, userWheelChair]);
 
   const generateOptions = (items) => [
     { key: "none", value: "Nenhum" },
@@ -113,6 +163,15 @@ const MyFilter = ({
           />
         </View>
       ))}
+      <View style={styles.switchContainer}>
+        <Text style={styles.label}>
+          Filtrar por compatibilidade com cadeira de rodas
+        </Text>
+        <Switch
+          value={wheelchairFilterEnabled}
+          onValueChange={setWheelchairFilterEnabled}
+        />
+      </View>
     </View>
   );
 };
@@ -146,6 +205,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: "bold",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 10,
+    marginBottom: 10,
   },
 });
 

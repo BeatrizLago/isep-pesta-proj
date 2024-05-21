@@ -24,16 +24,6 @@ const Home = ({ navigation }) => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
 
-  const filters = ["0", "1", "2", "3", "4", "5"];
-  const categories = useMemo(
-    () => [...new Set(locations.map((item) => item.category))],
-    [locations]
-  );
-  const cities = useMemo(
-    () => [...new Set(locations.map((item) => item.address.city))],
-    [locations]
-  );
-
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
   useEffect(() => {
@@ -85,9 +75,6 @@ const Home = ({ navigation }) => {
             {showFilter && (
               <MyFilter
                 data={locations}
-                filters={filters}
-                cities={cities}
-                categories={categories}
                 selectedFilters={selectedFilters}
                 setFilteredData={setFilteredData}
                 onFilterChange={setSelectedFilters}
