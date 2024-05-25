@@ -7,14 +7,17 @@ import {
   Button,
   KeyboardAvoidingView,
 } from "react-native";
-import React, { useState } from "react";
-import {styles} from "./Login.styles";
+import React, { useEffect, useState } from "react";
+import { styles } from "./Login.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signInAnonymous, signIn } from "../../state/actions/authAction";
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.user);
+  const error = useSelector((state) => state.auth.error);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,7 @@ const Login = ({ navigation }) => {
     setLoading(true);
     try {
       dispatch(signInAnonymous());
+    } catch (e) {
     } finally {
       setLoading(false);
     }
@@ -32,10 +36,19 @@ const Login = ({ navigation }) => {
     setLoading(true);
     try {
       dispatch(signIn(email, password));
+    } catch (e) {
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      // Optionally, clear error after displaying it
+      // dispatch(clearError());
+    }
+  }, [error]);
 
   return (
     <View style={styles.conatinerCredentials}>

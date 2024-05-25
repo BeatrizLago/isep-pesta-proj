@@ -8,15 +8,16 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
-import {styles} from "./Signup.styles"
+import { styles } from "./Signup.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch } from "react-redux";
 import { signUp } from "../../state/actions/authAction";
-import { updateProfile } from "firebase/auth";
 import { createUser } from "../../state/actions/userAction";
+import { useNavigation } from "@react-navigation/native";
 
 const Signup = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -26,19 +27,11 @@ const Signup = () => {
   const signUpFunc = async () => {
     setLoading(true);
     try {
-      dispatch(signUp(email, password));
+      await dispatch(signUp(email, password, firstName, lastName));
+      await dispatch(createUser()); 
 
-      const displayName =
-        firstName && lastName ? `${firstName} ${lastName}` : email; // If firstName and lastName are undefined or empty, use email
-
-      await updateProfile(auth.currentUser, {
-        displayName: displayName,
-      });
-
-      dispatch(createUser());
-
-      console.log("Login response:", response);
       alert("Verifique o seu email");
+      navigation.navigate("Login");
     } catch (error) {
       console.error(error);
       alert("Criar a conta falhou: " + error.message);

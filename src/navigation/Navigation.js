@@ -121,13 +121,26 @@ function LoginLayout() {
 
 const Navigation = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.userInfo);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      console.log("user", user);
-      dispatch(fetchUser());
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      if (user) {
+        user.reload().then(() => {
+          if (user.emailVerified) {
+            console.log("user", user);
+            setUser(user);
+            dispatch(fetchUser());
+          } else {
+            setUser(null);
+          }
+        });
+      } else {
+        setUser(null);
+      }
     });
+
+    return () => unsubscribe();
   }, [dispatch]);
 
   return (

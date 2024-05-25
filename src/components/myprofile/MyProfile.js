@@ -8,9 +8,16 @@ const MyProfile = ({ user }) => {
         <View>
           <Text>Nome: {user.displayName}</Text>
           <Text>Email: {user.email}</Text>
-          <Text>Cadeira de rodas: </Text>
-          <Text>Largura: {user.wheelchair.width} cm</Text>
-          <Text>Altura: {user.wheelchair.height} cm</Text>
+          {user.wheelchair && (
+            <>
+              {user.wheelchair.width && (
+                <Text>Largura: {user.wheelchair.width} cm</Text>
+              )}
+              {user.wheelchair.height && (
+                <Text>Altura: {user.wheelchair.height} cm</Text>
+              )}
+            </>
+          )}
         </View>
       ) : (
         <Text>Loading user data...</Text>
