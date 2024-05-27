@@ -8,6 +8,7 @@ import Login from "../screens/login/Login";
 import Signup from "../screens/signup/Signup";
 import Home from "../screens/home/Home";
 import List from "../screens/list/List";
+import Details from "../screens/details/Details"
 import Configurations from "../../app/screens/Configurations";
 import Profile from "../screens/profile/Profile";
 import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
@@ -35,8 +36,7 @@ function ListLayout() {
   return (
     <InsideList.Navigator>
       <InsideList.Screen name="List" component={List} />
-      {/* <InsideList.Screen name="Details" component={Details} />
-      <InsideList.Screen name="WriteReview" component={WriteReview} /> */}
+       <InsideList.Screen name="Details" component={Details} />
     </InsideList.Navigator>
   );
 }
