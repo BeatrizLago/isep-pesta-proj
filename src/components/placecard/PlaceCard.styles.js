@@ -12,6 +12,7 @@ export const Styles = StyleSheet.create({
     shadowColor: "#333",
     shadowOpacity: 0.3,
     shadowRadius: 2,
+    overflow: "hidden",
   },
   image: {
     width: "100%",

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {Styles} from "./PlaceCard.styles";
+import { Styles } from "./PlaceCard.styles";
 
 const PlaceCard = React.memo(({ place }) => {
   const navigation = useNavigation();
@@ -18,7 +18,7 @@ const PlaceCard = React.memo(({ place }) => {
         <Image
           source={{ uri: imageURL }}
           style={Styles.image}
-          resizeMode="contain"
+          resizeMode="cover"
         />
         <View style={Styles.detailsContainer}>
           <Text style={Styles.name}>{name}</Text>

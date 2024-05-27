@@ -103,4 +103,35 @@ image: {
     top:10,
     backgroundColor:"yellow",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  textInput: {
+    width: "100%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  rating: {
+    marginBottom: 10,
+  },
+  ratingText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  button: {
+    marginVertical: 10,
+  },
 });

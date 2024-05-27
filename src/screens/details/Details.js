@@ -9,6 +9,7 @@ import {
   Linking,
   TouchableOpacity,
   Modal,
+  StyleSheet, // Import StyleSheet for defining styles
 } from "react-native";
 import {
   fetchReviewsFromFirestore,
@@ -110,25 +111,18 @@ const Details = ({ route, navigation }) => {
         <Text style={Styles.detailsSubtitle}>Reviews</Text>
         {reviews.map((review) => (
           <View key={review.id} style={Styles.reviewContainer}>
+            <Text>By: {review.userName}</Text>
             <Text>{review.text}</Text>
             <Text>Rating: {review.rating}/5</Text>
-            <Text>By: {review.userName}</Text>
-            <Text>Date: {new Date(review.date).toLocaleDateString()}</Text>
           </View>
         ))}
 
         {user ? (
           <>
-            <Button title="Write a Review" onPress={() => setVisRating(true)} />
+            <Button title="Escrever Review" onPress={() => setVisRating(true)} />
             <Modal visible={visRating} transparent={true}>
-              <View style={{ backgroundColor: "#000000aa", flex: 1 }}>
-                <View style={Styles.ratingBarStyle}>
-                  <TextInput
-                    placeholder="Write a review"
-                    value={reviewText}
-                    onChangeText={setReviewText}
-                    style={Styles.textInput}
-                  />
+              <View style={Styles.modalOverlay}>
+                <View style={Styles.modalContent}>
                   <Rating
                     type="custom"
                     ratingCount={5}
@@ -136,17 +130,24 @@ const Details = ({ route, navigation }) => {
                     showRating
                     startingValue={rating}
                     onFinishRating={setRating}
+                    style={Styles.rating}
+                  />
+                  <TextInput
+                    placeholder="Escrever review"
+                    value={reviewText}
+                    onChangeText={setReviewText}
+                    style={Styles.textInput}
                   />
                   <Button
-                    style={Styles.rateButtonStyle}
+                    style={Styles.button}
                     color="blue"
-                    title={`Rate as: ${rating}`}
+                    title="Submeter Review"
                     onPress={submitReview}
                   />
                   <Button
-                    style={Styles.rateButtonStyle}
+                    style={Styles.button}
                     color="red"
-                    title="Cancel"
+                    title="Cancelar"
                     onPress={() => setVisRating(false)}
                   />
                 </View>
