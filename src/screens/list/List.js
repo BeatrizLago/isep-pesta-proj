@@ -15,6 +15,7 @@ const List = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +53,12 @@ const List = () => {
     }
   }, [dispatch]);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    handleRefresh();
+    setRefreshing(false);
+  }, []);
+
   const clearFilters = useCallback(() => {
     setSelectedFilters([]);
     setFilteredData(data);
@@ -70,7 +77,7 @@ const List = () => {
           <View style={Styles.topBarHeader}>
             <TouchableOpacity
               style={Styles.topBarItem}
-              onPress={() => setShowFilter((prevShowFilter) => !prevShowFilter)}
+              onPress={() => toggleFilter()}
             >
               <View>
                 <Text style={Styles.filterText}>
@@ -100,6 +107,8 @@ const List = () => {
               data={filteredData}
               renderItem={({ item }) => <PlaceCard place={item} />}
               keyExtractor={(item, index) => index.toString()}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               contentContainerStyle={Styles.locationList}
             />
           ) : (
