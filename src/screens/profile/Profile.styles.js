@@ -8,7 +8,6 @@ export const Styles = StyleSheet.create({
     right: 20,
   },
   logoutButton: {
-    marginTop: 10,
     backgroundColor: "#FF0000",
   },
 });

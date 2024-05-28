@@ -6,6 +6,7 @@ export const Styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     marginBottom: 10,
+    padding: 10,
   },
   filterButton: {
     paddingVertical: 8,

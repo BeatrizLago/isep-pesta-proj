@@ -4,7 +4,8 @@ import PlaceCard from "../../components/placecard/PlaceCard";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
-import MyFilter from "../../components/myfilter/MyFilter"
+import MyFilter from "../../components/myfilter/MyFilter";
+import { Styles } from "./List.styles";
 
 const List = () => {
   const dispatch = useDispatch();
@@ -66,31 +67,21 @@ const List = () => {
         <ActivityLoader />
       ) : (
         <>
-          <View
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              flexDirection: "row",
-              zIndex: 1,
-            }}
-          >
+          <View style={Styles.topBarHeader}>
             <TouchableOpacity
-              onPress={toggleFilter}
-              style={{ marginRight: 10 }}
+              style={Styles.topBarItem}
+              onPress={() => setShowFilter((prevShowFilter) => !prevShowFilter)}
             >
-              <Text style={{ fontSize: 16, color: "blue" }}>
-                {showFilter ? "Close Filter" : "Open Filter"}
-              </Text>
+              <View>
+                <Text style={Styles.filterText}>
+                  {showFilter ? "Fechar Filtros" : "Abrir Filtros"}
+                </Text>
+              </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleRefresh}
-              style={{ marginRight: 10 }}
-            >
-              <Text style={{ fontSize: 16, color: "blue" }}>Refresh</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={clearFilters}>
-              <Text style={{ fontSize: 16, color: "red" }}>Clear Filters</Text>
+            <TouchableOpacity style={Styles.topBarItem1} onPress={clearFilters}>
+              <View>
+                <Text style={Styles.clearFilterText}>Limpar Filtros</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -109,6 +100,7 @@ const List = () => {
               data={filteredData}
               renderItem={({ item }) => <PlaceCard place={item} />}
               keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={Styles.locationList}
             />
           ) : (
             <Text style={{ textAlign: "center", marginTop: 20 }}>
