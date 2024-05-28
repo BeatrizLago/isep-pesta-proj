@@ -60,7 +60,6 @@ const Profile = () => {
   const handleLogout = () => {
     FIREBASE_AUTH.signOut();
   };
-
   return (
     <View style={{ flex: 1 }}>
       {loading || !user ? (

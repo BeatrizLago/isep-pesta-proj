@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Button, Text } from "react-native";
-import Modal from "react-native-modal";
+import { View, Button, Text, TouchableOpacity } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Styles } from "./MyWheelChair.styles";
 
 const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [width, setWidth] = useState(user.wheelchair.width);
   const [height, setHeight] = useState(user.wheelchair.height);
 
@@ -14,42 +13,43 @@ const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
     setHeight(user.wheelchair.height);
   }, [user]);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const toggleDropdown = () => {
+    setDropdownVisible(!isDropdownVisible);
   };
 
   const handleUpdate = () => {
     handleWheelchairUpdate(width, height);
-    toggleModal();
+    toggleDropdown();
   };
 
   return (
-    <View>
-      <Button title="Minha cadeira de rodas" onPress={toggleModal} />
-      <Modal isVisible={isModalVisible} style={Styles.centerModal}>
-        <View style={Styles.centerModalBox}>
+    <View style={Styles.container}>
+      <Button title="Minha cadeira de rodas" onPress={toggleDropdown} />
+      {isDropdownVisible && (
+        <View style={Styles.dropdown}>
           <Slider
-            style={{ width: "80%", alignSelf: "center" }}
+            style={Styles.slider}
             value={width}
             minimumValue={50}
             maximumValue={150}
             step={1}
             onValueChange={(value) => setWidth(value)}
           />
-          <Text>Largura: {width} cm</Text>
+          <Text style={Styles.text}>Largura: {width} cm</Text>
           <Slider
-            style={{ width: "80%", alignSelf: "center" }}
+            style={Styles.slider}
             value={height}
             minimumValue={40}
             maximumValue={100}
             step={1}
             onValueChange={(value) => setHeight(value)}
           />
-          <Text>Altura: {height} cm</Text>
-          <Button title="Atualizar dados" onPress={handleUpdate} />
-          <Button title="Hide modal" onPress={toggleModal} />
+          <Text style={Styles.text}>Altura: {height} cm</Text>
+          <TouchableOpacity style={Styles.button} onPress={handleUpdate}>
+            <Text style={Styles.buttonText}>Atualizar dados</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
+      )}
     </View>
   );
 };
