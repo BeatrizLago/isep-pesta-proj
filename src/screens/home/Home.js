@@ -13,6 +13,7 @@ import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilter from "../../components/myfilter/MyFilter";
+import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -59,6 +60,10 @@ const Home = ({ navigation }) => {
     setShowMap((prevShowMap) => !prevShowMap);
   }, []);
 
+  const toggleFilter = useCallback(() => {
+    setShowFilter((prev) => !prev);
+  }, []);
+
   const clearFilters = useCallback(() => {
     setSelectedFilters([]);
     setFilteredData(locations); // Reset filtered data to original data
@@ -71,14 +76,11 @@ const Home = ({ navigation }) => {
           <ActivityLoader />
         ) : (
           <>
-            <TouchableOpacity
-              style={{ position: "absolute", top: 10, right: 10, zIndex: 1 }}
-              onPress={() => setShowFilter((prevShowFilter) => !prevShowFilter)}
-            >
-              <Text style={{ fontSize: 16, color: "blue" }}>
-                {showFilter ? "Close Filter" : "Open Filter"}
-              </Text>
-            </TouchableOpacity>
+          <MyFilterButtons
+            toggleFilter={toggleFilter}
+            clearFilters={clearFilters}
+            showFilter={showFilter}
+          />
             {showFilter && (
               <MyFilter
                 data={locations}
@@ -88,13 +90,6 @@ const Home = ({ navigation }) => {
                 user={user}
               />
             )}
-
-            <TouchableOpacity
-              style={{ position: "absolute", top: 10, right: 190, zIndex: 1 }}
-              onPress={clearFilters}
-            >
-              <Text style={{ fontSize: 16, color: "red" }}>Clear Filters</Text>
-            </TouchableOpacity>
             <View style={Styles.mapContainerScreen}>
               {showMap && (
                 <MapComponent

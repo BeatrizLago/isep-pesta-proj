@@ -158,6 +158,7 @@ const MyFilter = ({
           />
         ))}
       </View> */}
+      <Text style={Styles.label}>Accessibilidade</Text>
       <View style={Styles.containerAccess}>
         {accessibility.map((item) => (
           <RadioButton
@@ -169,6 +170,7 @@ const MyFilter = ({
         ))}
       </View>
       <View style={Styles.divider} />
+      <Text style={Styles.label}>Categorias</Text>
       <View style={Styles.containerAccess}>
         {categories.map((item) => (
           <RadioButton

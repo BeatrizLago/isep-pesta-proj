@@ -5,6 +5,7 @@ import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilter from "../../components/myfilter/MyFilter";
+import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import { Styles } from "./List.styles";
 
 const List = () => {
@@ -79,23 +80,11 @@ const List = () => {
         <ActivityLoader />
       ) : (
         <>
-          <View style={Styles.bottomBarHeader}>
-            <TouchableOpacity
-              style={Styles.bottomBarItem}
-              onPress={() => toggleFilter()}
-            >
-              <View>
-                <Text style={Styles.filterText}>
-                  {showFilter ? "Fechar Filtros" : "Abrir Filtros"}
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={Styles.bottomBarItem1} onPress={clearFilters}>
-              <View>
-                <Text style={Styles.clearFilterText}>Limpar Filtros</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          <MyFilterButtons
+            toggleFilter={toggleFilter}
+            clearFilters={clearFilters}
+            showFilter={showFilter}
+          />
 
           {showFilter && (
             <MyFilter
