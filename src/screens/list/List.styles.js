@@ -5,13 +5,16 @@ export const Styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  topBarHeader: {
+  bottomBarHeader: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    position: "absolute",
     padding: 10,
+    width: "100%",
+    bottom: 0,
   },
-  topBarItem: {
+  bottomBarItem: {
     justifyContent: "center",
     flexDirection: "row",
     padding: 20,
@@ -20,7 +23,7 @@ export const Styles = StyleSheet.create({
     borderRadius: 50,
     width: "45%",
   },
-  topBarItem1: {
+  bottomBarItem1: {
     justifyContent: "center",
     flexDirection: "row",
     padding: 20,
@@ -38,20 +41,6 @@ export const Styles = StyleSheet.create({
     color: "white",
   },
 
-  bottomBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    padding: 10,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-  },
-  mapViewButton: {
-    padding: 10,
-  },
   filterButton: {
     padding: 10,
   },
@@ -59,12 +48,7 @@ export const Styles = StyleSheet.create({
     fontSize: 16,
     color: "#007BFF",
   },
-  mapContainer: {
-    position: "absolute",
-    bottom: 60,
-    left: 0,
-    right: 0,
-    top: 120, // Adjust to place map below the top bar
-    backgroundColor: "#fff",
+  locationList: {
+    paddingBottom: 70, 
   },
 });

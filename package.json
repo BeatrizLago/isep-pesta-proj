@@ -26,6 +26,7 @@
     "@reduxjs/toolkit": "^2.2.5",
     "cors": "^2.8.5",
     "expo": "^50.0.1",
+    "expo-linear-gradient": "^13.0.2",
     "expo-linking": "~6.2.2",
     "expo-web-browser": "~12.8.1",
     "firebase": "^10.12.1",

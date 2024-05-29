@@ -29,7 +29,7 @@ const List = () => {
       }
     };
 
-    if (data.length === 0) {
+    if (!data.length) {
       fetchData();
     } else {
       setLoading(false);
@@ -37,7 +37,7 @@ const List = () => {
   }, [dispatch, data.length]);
 
   useEffect(() => {
-    if (data.length > 0) {
+    if (data.length) {
       setFilteredData(data);
     }
   }, [data]);
@@ -55,9 +55,14 @@ const List = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    handleRefresh();
-    setRefreshing(false);
-  }, []);
+    try {
+      await handleRefresh();
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [handleRefresh]);
 
   const clearFilters = useCallback(() => {
     setSelectedFilters([]);
@@ -74,9 +79,9 @@ const List = () => {
         <ActivityLoader />
       ) : (
         <>
-          <View style={Styles.topBarHeader}>
+          <View style={Styles.bottomBarHeader}>
             <TouchableOpacity
-              style={Styles.topBarItem}
+              style={Styles.bottomBarItem}
               onPress={() => toggleFilter()}
             >
               <View>
@@ -85,7 +90,7 @@ const List = () => {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={Styles.topBarItem1} onPress={clearFilters}>
+            <TouchableOpacity style={Styles.bottomBarItem1} onPress={clearFilters}>
               <View>
                 <Text style={Styles.clearFilterText}>Limpar Filtros</Text>
               </View>
