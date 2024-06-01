@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Button } from "react-native";
+import { View, Button, TouchableOpacity, Text } from "react-native";
 import { Styles } from "./Profile.styles";
 import MyWheelChair from "../../components/mywheelchair/MyWheelChair";
 import MyProfile from "../../components/myprofile/MyProfile";
@@ -61,7 +61,7 @@ const Profile = () => {
     FIREBASE_AUTH.signOut();
   };
   return (
-    <View style={{ flex: 1 }}>
+    <View style={Styles.container}>
       {loading || !user ? (
         <ActivityLoader />
       ) : (
@@ -71,11 +71,9 @@ const Profile = () => {
             handleWheelchairUpdate={handleWheelchairUpdate}
             user={user}
           />
-          <Button
-            title="Logout"
-            onPress={handleLogout}
-            style={Styles.logoutButton}
-          />
+          <TouchableOpacity onPress={handleLogout} style={Styles.logoutButton}>
+            <Text style={Styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>

@@ -1,13 +1,19 @@
 import { StyleSheet } from "react-native";
 
 export const Styles = StyleSheet.create({
-  logoutButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+  container: {
+    flex: 1,
   },
   logoutButton: {
-    backgroundColor: "#FF0000",
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 5,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

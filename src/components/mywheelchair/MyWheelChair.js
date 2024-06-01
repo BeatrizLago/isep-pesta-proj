@@ -24,7 +24,9 @@ const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
 
   return (
     <View style={Styles.container}>
-      <Button title="Minha cadeira de rodas" onPress={toggleDropdown} />
+      <TouchableOpacity onPress={toggleDropdown} style={Styles.wheelchairButton}>
+        <Text style={Styles.wheelchairButtonText}>Minha cadeira de rodas</Text>
+      </TouchableOpacity>
       {isDropdownVisible && (
         <View style={Styles.dropdown}>
           <Slider
