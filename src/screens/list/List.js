@@ -7,6 +7,7 @@ import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilter from "../../components/myfilter/MyFilter";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import { Styles } from "./List.styles";
+import Collapsible from "react-native-collapsible";
 
 const List = () => {
   const dispatch = useDispatch();
@@ -18,24 +19,24 @@ const List = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await dispatch(fetchLocations());
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      await dispatch(fetchLocations());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch]);
 
+  useEffect(() => {
     if (!data.length) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [dispatch, data.length]);
+  }, [data.length, fetchData]);
 
   useEffect(() => {
     if (data.length) {
@@ -43,27 +44,16 @@ const List = () => {
     }
   }, [data]);
 
-  const handleRefresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      await dispatch(fetchLocations());
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch]);
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await handleRefresh();
+      await fetchData();
     } catch (error) {
       console.error("Error refreshing data:", error);
     } finally {
       setRefreshing(false);
     }
-  }, [handleRefresh]);
+  }, [fetchData]);
 
   const clearFilters = useCallback(() => {
     setSelectedFilters([]);
@@ -86,15 +76,14 @@ const List = () => {
             showFilter={showFilter}
           />
 
-          {showFilter && (
-            <MyFilter
-              data={data}
-              selectedFilters={selectedFilters}
-              setFilteredData={setFilteredData}
-              onFilterChange={setSelectedFilters}
-              user={user}
-            />
-          )}
+          <MyFilter
+            showFilter={showFilter}
+            data={data}
+            selectedFilters={selectedFilters}
+            setFilteredData={setFilteredData}
+            onFilterChange={setSelectedFilters}
+            user={user}
+          />
 
           {filteredData.length > 0 ? (
             <FlatList

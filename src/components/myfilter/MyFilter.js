@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, TouchableOpacity, Text, FlatList, Switch } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import { Styles } from "./MyFilter.styles";
+import Collapsible from "react-native-collapsible";
 
 const MyFilter = ({
+  showFilter,
   data,
   selectedFilters,
   setFilteredData,
@@ -147,8 +149,9 @@ const MyFilter = ({
   );
 
   return (
-    <View>
-      {/* <View style={Styles.containerLevel}>
+    <Collapsible collapsed={!showFilter}>
+      <View>
+        {/* <View style={Styles.containerLevel}>
         {filters.map((item) => (
           <RadioButton
             key={item}
@@ -158,56 +161,57 @@ const MyFilter = ({
           />
         ))}
       </View> */}
-      <Text style={Styles.label}>Accessibilidade</Text>
-      <View style={Styles.containerAccess}>
-        {accessibility.map((item) => (
-          <RadioButton
-            key={item.key}
-            label={item.label}
-            selected={isFilterSelected(item.key)}
-            onPress={() => handleFilterButtonClick(item.key, "filter")}
-          />
-        ))}
-      </View>
-      <View style={Styles.divider} />
-      <Text style={Styles.label}>Categorias</Text>
-      <View style={Styles.containerAccess}>
-        {categories.map((item) => (
-          <RadioButton
-            key={item}
-            label={item}
-            selected={isFilterSelected(item)}
-            onPress={() => handleFilterButtonClick(item, "filter")}
-          />
-        ))}
-      </View>
-      <View style={Styles.divider} />
-      {["Cidade"].map((label) => (
-        <View key={label} style={Styles.pickerContainer}>
-          <SelectList
-            setSelected={(value) =>
-              handleFilterButtonClick(value, label.toLowerCase())
-            }
-            data={generateOptions(label === "Cidade" ? cities : categories)}
-            placeholder={`Selecione uma ${label.toLowerCase()}`}
-            boxStyles={Styles.box}
-            dropdownStyles={Styles.dropdown}
-          />
+        <Text style={Styles.label}>Accessibilidade</Text>
+        <View style={Styles.containerAccess}>
+          {accessibility.map((item) => (
+            <RadioButton
+              key={item.key}
+              label={item.label}
+              selected={isFilterSelected(item.key)}
+              onPress={() => handleFilterButtonClick(item.key, "filter")}
+            />
+          ))}
         </View>
-      ))}
-      <View style={Styles.divider} />
-      {userWheelChair && userWheelChair.height && userWheelChair.width && (
-        <View style={Styles.switchContainer}>
-          <Text style={Styles.label}>
-            Filtrar por compatibilidade com cadeira de rodas
-          </Text>
-          <Switch
-            value={wheelchairFilterEnabled}
-            onValueChange={setWheelchairFilterEnabled}
-          />
+        <View style={Styles.divider} />
+        <Text style={Styles.label}>Categorias</Text>
+        <View style={Styles.containerAccess}>
+          {categories.map((item) => (
+            <RadioButton
+              key={item}
+              label={item}
+              selected={isFilterSelected(item)}
+              onPress={() => handleFilterButtonClick(item, "filter")}
+            />
+          ))}
         </View>
-      )}
-    </View>
+        <View style={Styles.divider} />
+        {["Cidade"].map((label) => (
+          <View key={label} style={Styles.pickerContainer}>
+            <SelectList
+              setSelected={(value) =>
+                handleFilterButtonClick(value, label.toLowerCase())
+              }
+              data={generateOptions(label === "Cidade" ? cities : categories)}
+              placeholder={`Selecione uma ${label.toLowerCase()}`}
+              boxStyles={Styles.box}
+              dropdownStyles={Styles.dropdown}
+            />
+          </View>
+        ))}
+        <View style={Styles.divider} />
+        {userWheelChair && userWheelChair.height && userWheelChair.width && (
+          <View style={Styles.switchContainer}>
+            <Text style={Styles.label}>
+              Filtrar por compatibilidade com cadeira de rodas
+            </Text>
+            <Switch
+              value={wheelchairFilterEnabled}
+              onValueChange={setWheelchairFilterEnabled}
+            />
+          </View>
+        )}
+      </View>
+    </Collapsible>
   );
 };
 

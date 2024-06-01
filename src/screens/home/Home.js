@@ -76,20 +76,19 @@ const Home = ({ navigation }) => {
           <ActivityLoader />
         ) : (
           <>
-          <MyFilterButtons
-            toggleFilter={toggleFilter}
-            clearFilters={clearFilters}
-            showFilter={showFilter}
-          />
-            {showFilter && (
-              <MyFilter
-                data={locations}
-                selectedFilters={selectedFilters}
-                setFilteredData={setFilteredData}
-                onFilterChange={setSelectedFilters}
-                user={user}
-              />
-            )}
+            <MyFilterButtons
+              toggleFilter={toggleFilter}
+              clearFilters={clearFilters}
+              showFilter={showFilter}
+            />
+            <MyFilter
+              showFilter={showFilter}
+              data={locations}
+              selectedFilters={selectedFilters}
+              setFilteredData={setFilteredData}
+              onFilterChange={setSelectedFilters}
+              user={user}
+            />
             <View style={Styles.mapContainerScreen}>
               {showMap && (
                 <MapComponent
