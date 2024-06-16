@@ -9,7 +9,7 @@ import Signup from "../screens/signup/Signup";
 import Home from "../screens/home/Home";
 import List from "../screens/list/List";
 import Details from "../screens/details/Details"
-import Configurations from "../../app/screens/Configurations";
+import Configurations from "../screens/configuration/Configurations";
 import Profile from "../screens/profile/Profile";
 import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
 import { useDispatch, useSelector } from "react-redux";

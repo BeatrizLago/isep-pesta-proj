@@ -1,24 +1,13 @@
 import { StyleSheet } from "react-native";
 
 export const Styles = StyleSheet.create({
-  mapContainer: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    right: 10,
-    width: "95%",
-    height: "80%",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
   map: {
     ...StyleSheet.absoluteFillObject,
   },
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    flexDirection: "column"
   },
   topBar: {
     flexDirection: "row",
@@ -35,6 +24,7 @@ export const Styles = StyleSheet.create({
   mapContainerScreen: {
     flex: 1,
     width: "100%",
-    marginTop: 20,
-  },
+    marginTop: 20, // Increase to desired padding
+    paddingTop: 20, // Add top padding
+  },  
 });
