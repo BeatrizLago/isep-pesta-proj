@@ -18,6 +18,7 @@ const Home = ({ navigation }) => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showMap, setShowMap] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
+  const [destination, setDestination] = useState(null);
 
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
@@ -46,9 +47,35 @@ const Home = ({ navigation }) => {
     }
   }, [locations]);
 
-  const handleSearch = useCallback(async (query) => {
-    // Your handleSearch logic here
-  }, []);
+  const handleSearch = useCallback(
+    (query) => {
+      if (query.trim() === "") {
+        setDestination(null);
+        setFilteredData(locations); // Reset to all locations if search query is empty
+        return;
+      }
+  
+      const searchResult = locations.find(
+        (location) =>
+          location.name.toLowerCase().includes(query.toLowerCase()) ||
+          location.address.street.toLowerCase().includes(query.toLowerCase()) ||
+          location.address.city.toLowerCase().includes(query.toLowerCase())
+      );
+  
+      if (searchResult) {
+        setDestination({
+          latitude: parseFloat(searchResult.coordinates.latitude),
+          longitude: parseFloat(searchResult.coordinates.longitude),
+          name: searchResult.name, // Add the name here
+        });
+        setFilteredData([searchResult]);
+      } else {
+        setDestination(null);
+        setFilteredData([]); // Reset to all locations if no match found
+      }
+    },
+    [locations]
+  );
 
   const toggleMap = useCallback(() => {
     setShowMap((prevShowMap) => !prevShowMap);
@@ -86,7 +113,7 @@ const Home = ({ navigation }) => {
             <View style={Styles.mapContainerScreen}>
               {showMap && (
                 <MapComponent
-                  destination={null}
+                  destination={destination}
                   portugalCenter={portugalCenter}
                   locations={filteredData}
                 />
