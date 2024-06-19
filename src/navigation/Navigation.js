@@ -159,6 +159,7 @@ const Navigation = () => {
             options={{ headerShown: false }}
           />
         )}
+        <Stack.Screen name="Details" component={Details} />
       </Stack.Navigator>
     </NavigationContainer>
   );

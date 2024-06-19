@@ -9,6 +9,20 @@ export const Styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexDirection: "column"
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // semi-transparent black background
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "90%",
+    maxHeight: "80%",
+  },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",

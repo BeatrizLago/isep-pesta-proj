@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const Styles = StyleSheet.create({
   searchBar: {
     position: "absolute",
-    top: 95,
+    top: 75,
     left: 20,
     right: 20,
     flexDirection: "row",

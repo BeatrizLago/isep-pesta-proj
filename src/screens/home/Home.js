@@ -90,6 +90,10 @@ const Home = ({ navigation }) => {
     setFilteredData(locations); // Reset filtered data to original data
   }, [locations]);
 
+  const closeModal = () => {
+    setSelectedPlace(null); // Close modal when backdrop is pressed
+  };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={Styles.container}>
