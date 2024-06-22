@@ -1,0 +1,13 @@
+{
+    "welcome": "Welcome",
+    "hello": "Hello",
+    "screens": {
+      "map": "Map",
+      "list": "List",
+      "profile": "Profile",
+      "configuration": "Configurations",
+      "details": "Details",
+      "login": "Login",
+      "signup": "Sign up"
+    }
+  }

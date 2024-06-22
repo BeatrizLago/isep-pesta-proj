@@ -1,0 +1,13 @@
+{
+    "welcome": "Bem-vindo",
+    "hello": "ola",
+    "screens": {
+      "map": "Mapa",
+      "list": "Lista",
+      "profile": "Perfil",
+      "configuration": "Configurações",
+      "details": "Detalhes",
+      "login": "Login",
+      "signup": "Registar"
+    }
+  }

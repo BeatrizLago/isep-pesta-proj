@@ -14,6 +14,7 @@ import Profile from "../screens/profile/Profile";
 import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../state/actions/userAction";
+import { useTranslation } from "react-i18next";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,54 +25,109 @@ const InsideProfile = createNativeStackNavigator();
 const InsideConfig = createNativeStackNavigator();
 const LoginStack = createNativeStackNavigator();
 
-function MapLayout() {
+const screens = {
+  Map: {
+    name: "Mapa",
+    component: Home,
+    options: (t) => ({ title: t("screens.map") }),
+    details: {
+      name: "DetalhesMapa",
+      component: Details,
+      options: (t) => ({ title: t("screens.details") }),
+    },
+  },
+  List: {
+    name: "Lista",
+    component: List,
+    options: (t) => ({ title: t("screens.list") }),
+    details: {
+      name: "DetalhesLista",
+      component: Details,
+      options: (t) => ({ title: t("screens.details") }),
+    },
+  },
+  Profile: {
+    name: "Perfil",
+    component: Profile,
+    options: (t) => ({ title: t("screens.profile") }),
+  },
+  Config: {
+    name: "Configurações",
+    component: Configurations,
+    options: (t) => ({ title: t("screens.configuration") }),
+  },
+  Config: {
+    name: "Configurações",
+    component: Configurations,
+    options: (t) => ({ title: t("screens.configuration") }),
+  },
+  Login: {
+    name: "Login",
+    component: Login,
+    options: (t) => ({ title: t("screens.login") }),
+    details: {
+      name: "Registar",
+      component: Signup,
+      options: (t) => ({ title: t("screens.signup") }),
+    },
+  },
+};
+
+function createNavigator(Navigator, screenConfig) {
+  const { t } = useTranslation();
   return (
-    <InsideMap.Navigator>
-      <InsideMap.Screen name="Mapa" component={Home} />
-      <InsideMap.Screen name="DetalhesMapa" component={Details} options={{ title: 'Detalhes'}}/>
-    </InsideMap.Navigator>
+    <Navigator.Navigator>
+      <Navigator.Screen
+        name={screenConfig.name}
+        component={screenConfig.component}
+        options={screenConfig.options(t)}
+      />
+      {screenConfig.details && (
+        <Navigator.Screen
+          name={screenConfig.details.name}
+          component={screenConfig.details.component}
+          options={screenConfig.details.options(t)}
+        />
+      )}
+    </Navigator.Navigator>
   );
+}
+
+function MapLayout() {
+  return createNavigator(InsideMap, screens.Map);
 }
 
 function ListLayout() {
-  return (
-    <InsideList.Navigator>
-      <InsideList.Screen name="Lista" component={List} />
-      <InsideList.Screen name="DetalhesLista" component={Details} options={{ title: 'Detalhes'}}/>
-    </InsideList.Navigator>
-  );
+  return createNavigator(InsideList, screens.List);
 }
 
 function ProfileLayout() {
-  return (
-    <InsideProfile.Navigator>
-      <InsideProfile.Screen name="Perfil" component={Profile} />
-    </InsideProfile.Navigator>
-  );
+  return createNavigator(InsideProfile, screens.Profile);
 }
 
 function ConfigLayout() {
-  return (
-    <InsideConfig.Navigator>
-      <InsideConfig.Screen name="Configurações" component={Configurations} />
-    </InsideConfig.Navigator>
-  );
+  return createNavigator(InsideConfig, screens.Config);
+}
+
+function LoginLayout() {
+  return createNavigator(LoginStack, screens.Login);
 }
 
 function TabLayout() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === "Mapa") {
+          if (route.name === "MapaTab") {
             iconName = focused ? "map" : "map-outline";
-          } else if (route.name === "Lista") {
+          } else if (route.name === "ListaTab") {
             iconName = focused ? "list" : "list-outline";
-          } else if (route.name === "Perfil") {
+          } else if (route.name === "PerfilTab") {
             iconName = focused ? "person" : "person-outline";
-          } else if (route.name === "Configurações") {
+          } else if (route.name === "ConfiguraçõesTab") {
             iconName = focused ? "settings" : "settings-outline";
           }
 
@@ -88,35 +144,26 @@ function TabLayout() {
       })}
     >
       <Tab.Screen
-        name="Mapa"
+        name="MapaTab"
         component={MapLayout}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: t("screens.map") }}
       />
       <Tab.Screen
-        name="Lista"
+        name="ListaTab"
         component={ListLayout}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: t("screens.list") }}
       />
       <Tab.Screen
-        name="Perfil"
+        name="PerfilTab"
         component={ProfileLayout}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: t("screens.profile") }}
       />
       <Tab.Screen
-        name="Configurações"
+        name="ConfiguraçõesTab"
         component={ConfigLayout}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: t("screens.configuration") }}
       />
     </Tab.Navigator>
-  );
-}
-
-function LoginLayout() {
-  return (
-    <LoginStack.Navigator>
-      <LoginStack.Screen name="Login" component={Login} />
-      <LoginStack.Screen name="Registar" component={Signup} />
-    </LoginStack.Navigator>
   );
 }
 
