@@ -7,7 +7,6 @@ export const Styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    flexDirection: "column"
   },
   modalOverlay: {
     flex: 1,
@@ -37,8 +36,7 @@ export const Styles = StyleSheet.create({
   },
   mapContainerScreen: {
     flex: 1,
-    width: "100%",
-    marginTop: 20, // Increase to desired padding
-    paddingTop: 20, // Add top padding
+    marginBottom: 70,
+    padding: 10,
   },  
 });

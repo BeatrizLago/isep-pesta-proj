@@ -54,14 +54,14 @@ const Home = ({ navigation }) => {
         setFilteredData(locations); // Reset to all locations if search query is empty
         return;
       }
-  
+
       const searchResult = locations.find(
         (location) =>
           location.name.toLowerCase().includes(query.toLowerCase()) ||
           location.address.street.toLowerCase().includes(query.toLowerCase()) ||
           location.address.city.toLowerCase().includes(query.toLowerCase())
       );
-  
+
       if (searchResult) {
         setDestination({
           latitude: parseFloat(searchResult.coordinates.latitude),
@@ -114,16 +114,16 @@ const Home = ({ navigation }) => {
               onFilterChange={setSelectedFilters}
               user={user}
             />
-            <View style={Styles.mapContainerScreen}>
-              {showMap && (
+            {showMap && (
+              <View style={Styles.mapContainerScreen}>
+                <SearchBar handleSearch={handleSearch} />
                 <MapComponent
                   destination={destination}
                   portugalCenter={portugalCenter}
                   locations={filteredData}
                 />
-              )}
-              {showMap && <SearchBar handleSearch={handleSearch} />}
-            </View>
+              </View>
+            )}
           </>
         )}
       </View>
