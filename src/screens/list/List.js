@@ -7,9 +7,10 @@ import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilter from "../../components/myfilter/MyFilter";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import { Styles } from "./List.styles";
-import Collapsible from "react-native-collapsible";
+import { useTranslation } from "react-i18next";
 
 const List = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const data = useSelector((state) => state.location.locations);
   const user = useSelector((state) => state.user.userInfo);
@@ -74,6 +75,7 @@ const List = () => {
             toggleFilter={toggleFilter}
             clearFilters={clearFilters}
             showFilter={showFilter}
+            t={t}
           />
 
           <MyFilter

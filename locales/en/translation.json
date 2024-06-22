@@ -2,6 +2,13 @@
     "welcome": "Welcome",
     "hello": "Hello",
     "loading": "Loading",
+    "components": {
+      "myFiltersButtons":{
+        "open": "Open Filters",
+        "close": "Close Filters",
+        "reset": "Reset Filters"
+      }
+    },
     "screens": {
       "map": {
         "title": "Map"

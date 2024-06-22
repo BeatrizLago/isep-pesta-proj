@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { Styles } from "./MyFilterButton.style";
 
-const MyFilterButtons = ({toggleFilter, clearFilters, showFilter}) => {
+const MyFilterButtons = ({toggleFilter, clearFilters, showFilter, t}) => {
 
   return (
     <View style={Styles.bottomBarHeader}>
@@ -12,13 +12,13 @@ const MyFilterButtons = ({toggleFilter, clearFilters, showFilter}) => {
       >
         <View>
           <Text style={Styles.filterText}>
-            {showFilter ? "Fechar Filtros" : "Abrir Filtros"}
+            {showFilter ? t("components.myFiltersButtons.close") : t("components.myFiltersButtons.open")}
           </Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity style={Styles.bottomBarItem1} onPress={clearFilters}>
         <View>
-          <Text style={Styles.clearFilterText}>Limpar Filtros</Text>
+          <Text style={Styles.clearFilterText}>{t("components.myFiltersButtons.reset")}</Text>
         </View>
       </TouchableOpacity>
     </View>

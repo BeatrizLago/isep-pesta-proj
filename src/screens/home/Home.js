@@ -8,8 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
+import { useTranslation } from "react-i18next";
+
 
 const Home = ({ navigation }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.location.locations);
   const user = useSelector((state) => state.user.userInfo);
@@ -105,6 +108,7 @@ const Home = ({ navigation }) => {
               toggleFilter={toggleFilter}
               clearFilters={clearFilters}
               showFilter={showFilter}
+              t={t}
             />
             <MyFilter
               showFilter={showFilter}

@@ -2,6 +2,13 @@
     "welcome": "Bem-vindo",
     "hello": "ola",
     "loading": "A carregar",
+    "components": {
+      "myFiltersButtons":{
+        "open": "Abrir Filtros",
+        "close": "Fechar Filtros",
+        "reset": "Limpar Filtros"
+      }
+    },
     "screens": {
       "map": {
         "title": "Mapa"
