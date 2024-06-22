@@ -10,9 +10,12 @@ import {
   updateUserWheelchair,
 } from "../../state/actions/userAction";
 import { FIREBASE_AUTH } from "../../services/firebase/firebaseConfig";
+import { useTranslation } from "react-i18next";
+
 
 const Profile = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
 
@@ -66,13 +69,14 @@ const Profile = () => {
         <ActivityLoader />
       ) : (
         <>
-          <MyProfile user={user} />
+          <MyProfile user={user} t={t}/>
           <MyWheelChair
             handleWheelchairUpdate={handleWheelchairUpdate}
             user={user}
+            t={t}
           />
           <TouchableOpacity onPress={handleLogout} style={Styles.logoutButton}>
-            <Text style={Styles.logoutButtonText}>Logout</Text>
+            <Text style={Styles.logoutButtonText}> {t("screens.profile.logoutButton")} </Text>
           </TouchableOpacity>
         </>
       )}

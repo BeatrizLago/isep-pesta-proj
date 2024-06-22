@@ -1,26 +1,26 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const MyProfile = ({ user }) => {
+const MyProfile = ({ user, t }) => {
   return (
     <View>
       {user ? (
         <View>
-          <Text>Nome: {user.displayName}</Text>
-          <Text>Email: {user.email}</Text>
+          <Text>{t("screens.profile.name")}: {user.displayName}</Text>
+          <Text>{t("screens.profile.email")}: {user.email}</Text>
           {user.wheelchair && (
             <>
               {user.wheelchair.width && (
-                <Text>Largura: {user.wheelchair.width} cm</Text>
+                <Text>{t("screens.profile.width")}: {user.wheelchair.width} cm</Text>
               )}
               {user.wheelchair.height && (
-                <Text>Altura: {user.wheelchair.height} cm</Text>
+                <Text>{t("screens.profile.height")}: {user.wheelchair.height} cm</Text>
               )}
             </>
           )}
         </View>
       ) : (
-        <Text>Loading user data...</Text>
+        <Text>{t("loading")}</Text>
       )}
     </View>
   );

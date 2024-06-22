@@ -3,7 +3,9 @@ import { View, Button, Text, TouchableOpacity } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Styles } from "./MyWheelChair.styles";
 
-const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
+
+const MyWheelChair = ({ handleWheelchairUpdate, user, t }) => {
+  
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [width, setWidth] = useState(user.wheelchair.width);
   const [height, setHeight] = useState(user.wheelchair.height);
@@ -25,7 +27,7 @@ const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
   return (
     <View style={Styles.container}>
       <TouchableOpacity onPress={toggleDropdown} style={Styles.wheelchairButton}>
-        <Text style={Styles.wheelchairButtonText}>Minha cadeira de rodas</Text>
+        <Text style={Styles.wheelchairButtonText}>{t("screens.profile.myWheelchairButton")}</Text>
       </TouchableOpacity>
       {isDropdownVisible && (
         <View style={Styles.dropdown}>
@@ -37,7 +39,7 @@ const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
             step={1}
             onValueChange={(value) => setWidth(value)}
           />
-          <Text style={Styles.text}>Largura: {width} cm</Text>
+          <Text style={Styles.text}>{t("screens.profile.width")}: {width} cm</Text>
           <Slider
             style={Styles.slider}
             value={height}
@@ -46,9 +48,9 @@ const MyWheelChair = ({ handleWheelchairUpdate, user }) => {
             step={1}
             onValueChange={(value) => setHeight(value)}
           />
-          <Text style={Styles.text}>Altura: {height} cm</Text>
+          <Text style={Styles.text}>{t("screens.profile.height")}: {height} cm</Text>
           <TouchableOpacity style={Styles.button} onPress={handleUpdate}>
-            <Text style={Styles.buttonText}>Atualizar dados</Text>
+            <Text style={Styles.buttonText}>{t("screens.profile.myWheelchairUpdateButton")}</Text>
           </TouchableOpacity>
         </View>
       )}

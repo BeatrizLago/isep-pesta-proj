@@ -1,13 +1,35 @@
 {
     "welcome": "Bem-vindo",
     "hello": "ola",
+    "loading": "A carregar",
     "screens": {
-      "map": "Mapa",
-      "list": "Lista",
-      "profile": "Perfil",
-      "configuration": "Configurações",
-      "details": "Detalhes",
-      "login": "Login",
-      "signup": "Registar"
+      "map": {
+        "title": "Mapa"
+      },
+      "list": {
+        "title": "Lista"
+      },
+      "profile": {
+        "title": "Perfil",
+        "name": "Nome",
+        "email": "Email",
+        "width": "Largura",
+        "height": "Altura",
+        "myWheelchairButton": "Minha cadeira de rodas",
+        "myWheelchairUpdateButton": "Atualizar dados",
+        "logoutButton": "Sair"
+      } ,
+      "configuration": {
+        "title":"Configurações"
+      },
+      "details": {
+        "title":"Detalhes"
+      },
+      "login": {
+        "title": "Login"
+      },
+      "signup": {
+        "title": "Registar"
+      }
     }
   }

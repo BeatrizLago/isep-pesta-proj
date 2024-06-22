@@ -1,13 +1,35 @@
 {
     "welcome": "Welcome",
     "hello": "Hello",
+    "loading": "Loading",
     "screens": {
-      "map": "Map",
-      "list": "List",
-      "profile": "Profile",
-      "configuration": "Configurations",
-      "details": "Details",
-      "login": "Login",
-      "signup": "Sign up"
+      "map": {
+        "title": "Map"
+      },
+      "list": {
+        "title": "List"
+      },
+      "profile": {
+        "title": "Profile",
+        "name": "Name",
+        "email": "Email",
+        "width": "Width",
+        "height": "Height",
+        "myWheelchairButton": "My wheelchair",
+        "myWheelchairUpdateButton": "Update data",
+        "logoutButton": "Logout"
+      } ,
+      "configuration": {
+        "title":"Configurations"
+      },
+      "details": {
+        "title":"Details"
+      },
+      "login": {
+        "title": "Login"
+      },
+      "signup": {
+        "title": "Sign Up"
+      }
     }
   }

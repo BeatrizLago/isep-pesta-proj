@@ -29,46 +29,41 @@ const screens = {
   Map: {
     name: "Mapa",
     component: Home,
-    options: (t) => ({ title: t("screens.map") }),
+    options: (t) => ({ title: t("screens.map.title") }),
     details: {
       name: "DetalhesMapa",
       component: Details,
-      options: (t) => ({ title: t("screens.details") }),
+      options: (t) => ({ title: t("screens.details.title") }),
     },
   },
   List: {
     name: "Lista",
     component: List,
-    options: (t) => ({ title: t("screens.list") }),
+    options: (t) => ({ title: t("screens.list.title") }),
     details: {
       name: "DetalhesLista",
       component: Details,
-      options: (t) => ({ title: t("screens.details") }),
+      options: (t) => ({ title: t("screens.details.title") }),
     },
   },
   Profile: {
     name: "Perfil",
     component: Profile,
-    options: (t) => ({ title: t("screens.profile") }),
+    options: (t) => ({ title: t("screens.profile.title") }),
   },
   Config: {
     name: "Configurações",
     component: Configurations,
-    options: (t) => ({ title: t("screens.configuration") }),
-  },
-  Config: {
-    name: "Configurações",
-    component: Configurations,
-    options: (t) => ({ title: t("screens.configuration") }),
+    options: (t) => ({ title: t("screens.configuration.title") }),
   },
   Login: {
     name: "Login",
     component: Login,
-    options: (t) => ({ title: t("screens.login") }),
+    options: (t) => ({ title: t("screens.login.title") }),
     details: {
       name: "Registar",
       component: Signup,
-      options: (t) => ({ title: t("screens.signup") }),
+      options: (t) => ({ title: t("screens.signup.title") }),
     },
   },
 };
@@ -146,22 +141,25 @@ function TabLayout() {
       <Tab.Screen
         name="MapaTab"
         component={MapLayout}
-        options={{ headerShown: false, title: t("screens.map") }}
+        options={{ headerShown: false, title: t("screens.map.title") }}
       />
       <Tab.Screen
         name="ListaTab"
         component={ListLayout}
-        options={{ headerShown: false, title: t("screens.list") }}
+        options={{ headerShown: false, title: t("screens.list.title") }}
       />
       <Tab.Screen
         name="PerfilTab"
         component={ProfileLayout}
-        options={{ headerShown: false, title: t("screens.profile") }}
+        options={{ headerShown: false, title: t("screens.profile.title") }}
       />
       <Tab.Screen
         name="ConfiguraçõesTab"
         component={ConfigLayout}
-        options={{ headerShown: false, title: t("screens.configuration") }}
+        options={{
+          headerShown: false,
+          title: t("screens.configuration.title"),
+        }}
       />
     </Tab.Navigator>
   );
