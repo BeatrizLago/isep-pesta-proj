@@ -8,7 +8,7 @@ import Login from "../screens/login/Login";
 import Signup from "../screens/signup/Signup";
 import Home from "../screens/home/Home";
 import List from "../screens/list/List";
-import Details from "../screens/details/Details"
+import Details from "../screens/details/Details";
 import Configurations from "../screens/configuration/Configurations";
 import Profile from "../screens/profile/Profile";
 import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
@@ -27,7 +27,8 @@ const LoginStack = createNativeStackNavigator();
 function MapLayout() {
   return (
     <InsideMap.Navigator>
-      <InsideMap.Screen name="Home" component={Home} />
+      <InsideMap.Screen name="Mapa" component={Home} />
+      <InsideMap.Screen name="DetalhesMapa" component={Details} options={{ title: 'Detalhes'}}/>
     </InsideMap.Navigator>
   );
 }
@@ -35,8 +36,8 @@ function MapLayout() {
 function ListLayout() {
   return (
     <InsideList.Navigator>
-      <InsideList.Screen name="List" component={List} />
-       <InsideList.Screen name="Details" component={Details} />
+      <InsideList.Screen name="Lista" component={List} />
+      <InsideList.Screen name="DetalhesLista" component={Details} options={{ title: 'Detalhes'}}/>
     </InsideList.Navigator>
   );
 }
@@ -44,7 +45,7 @@ function ListLayout() {
 function ProfileLayout() {
   return (
     <InsideProfile.Navigator>
-      <InsideProfile.Screen name="Profile" component={Profile} />
+      <InsideProfile.Screen name="Perfil" component={Profile} />
     </InsideProfile.Navigator>
   );
 }
@@ -52,7 +53,7 @@ function ProfileLayout() {
 function ConfigLayout() {
   return (
     <InsideConfig.Navigator>
-      <InsideConfig.Screen name="Configurations" component={Configurations} />
+      <InsideConfig.Screen name="Configurações" component={Configurations} />
     </InsideConfig.Navigator>
   );
 }
@@ -114,7 +115,7 @@ function LoginLayout() {
   return (
     <LoginStack.Navigator>
       <LoginStack.Screen name="Login" component={Login} />
-      <LoginStack.Screen name="Signup" component={Signup} />
+      <LoginStack.Screen name="Registar" component={Signup} />
     </LoginStack.Navigator>
   );
 }
@@ -159,7 +160,6 @@ const Navigation = () => {
             options={{ headerShown: false }}
           />
         )}
-        <Stack.Screen name="Details" component={Details} />
       </Stack.Navigator>
     </NavigationContainer>
   );

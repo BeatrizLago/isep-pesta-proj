@@ -8,7 +8,7 @@ const LocationDetail = ({ location, onClose }) => {
   const navigation = useNavigation();
 
   const handlePress = () => {
-    navigation.navigate('Details', { place: location });
+    navigation.navigate('DetalhesMapa', { place: location });
     onClose(); // Close the LocationDetail component
   };
 

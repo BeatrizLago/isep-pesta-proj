@@ -75,7 +75,7 @@ const Login = ({ navigation }) => {
             <Button title="Login" onPress={signInFunc} />
             <Button
               title="Criar Conta"
-              onPress={() => navigation.navigate("Signup")}
+              onPress={() => navigation.navigate("Registar")}
             />
             <Button title="Login Anonimo" onPress={signInAnonymousFunc} />
           </>

@@ -8,7 +8,7 @@ const PlaceCard = React.memo(({ place }) => {
   const navigation = useNavigation();
 
   const handlePress = () => {
-    navigation.navigate("Details", { place });
+    navigation.navigate("DetalhesLista", { place });
   };
 
   const { name, address, accessLevel, imageURL } = place;
