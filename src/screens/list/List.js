@@ -98,7 +98,7 @@ const List = () => {
             />
           ) : (
             <Text style={{ textAlign: "center", marginTop: 20 }}>
-              Não foram encontrados dados correspondentes
+              {t("screens.list.notFound")}
             </Text>
           )}
         </>

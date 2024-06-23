@@ -18,8 +18,11 @@ import {
 import { Styles } from "./Details.styles";
 import { Rating } from "react-native-ratings"; // Import the Rating component
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+
 
 const Details = ({ route, navigation }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { place } = route.params;
   const [reviewText, setReviewText] = useState("");

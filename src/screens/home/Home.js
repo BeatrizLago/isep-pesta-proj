@@ -10,7 +10,6 @@ import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
 import { useTranslation } from "react-i18next";
 
-
 const Home = ({ navigation }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -120,7 +119,7 @@ const Home = ({ navigation }) => {
             />
             {showMap && (
               <View style={Styles.mapContainerScreen}>
-                <SearchBar handleSearch={handleSearch} />
+                <SearchBar handleSearch={handleSearch} t={t} />
                 <MapComponent
                   destination={destination}
                   portugalCenter={portugalCenter}

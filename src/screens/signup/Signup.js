@@ -14,8 +14,10 @@ import { useDispatch } from "react-redux";
 import { signUp } from "../../state/actions/authAction";
 import { createUser } from "../../state/actions/userAction";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 
 const Signup = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -30,11 +32,11 @@ const Signup = () => {
       await dispatch(signUp(email, password, firstName, lastName));
       await dispatch(createUser()); 
 
-      alert("Verifique o seu email");
+      alert(t("screens.signup.alert"));
       navigation.navigate("Login");
     } catch (error) {
       console.error(error);
-      alert("Criar a conta falhou: " + error.message);
+      alert(t("screens.signup.alertError") + error.message);
     } finally {
       setLoading(false);
     }
@@ -46,21 +48,21 @@ const Signup = () => {
         <TextInput
           style={styles.inputCredentials}
           value={firstName}
-          placeholder="First Name"
+          placeholder={t("screens.signup.firstName")}
           autoCapitalize="none"
           onChangeText={(text) => setFirstName(text.trim())}
         ></TextInput>
         <TextInput
           style={styles.inputCredentials}
           value={lastName}
-          placeholder="Last Name"
+          placeholder={t("screens.signup.lastName")}
           autoCapitalize="none"
           onChangeText={(text) => setLastName(text.trim())}
         ></TextInput>
         <TextInput
           style={styles.inputCredentials}
           value={email}
-          placeholder="Email"
+          placeholder={t("screens.signup.email")}
           autoCapitalize="none"
           onChangeText={(text) => setEmail(text.trim())}
         ></TextInput>
@@ -68,7 +70,7 @@ const Signup = () => {
           style={styles.inputCredentials}
           value={password}
           secureTextEntry={true}
-          placeholder="Password"
+          placeholder={t("screens.signup.password")}
           autoCapitalize="none"
           onChangeText={(text) => setPassword(text.trim())}
         ></TextInput>
@@ -76,7 +78,7 @@ const Signup = () => {
           <ActivityLoader />
         ) : (
           <>
-            <Button title="Criar Conta" onPress={signUpFunc} />
+            <Button title={t("screens.signup.signup")} onPress={signUpFunc} />
           </>
         )}
       </KeyboardAvoidingView>

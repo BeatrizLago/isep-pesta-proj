@@ -7,6 +7,9 @@
         "open": "Abrir Filtros",
         "close": "Fechar Filtros",
         "reset": "Limpar Filtros"
+      },
+      "searchBar": {
+        "text": "Procurar destino"
       }
     },
     "screens": {
@@ -14,7 +17,8 @@
         "title": "Mapa"
       },
       "list": {
-        "title": "Lista"
+        "title": "Lista",
+        "notFound": "Não foram encontrados dados correspondentes"
       },
       "profile": {
         "title": "Perfil",
@@ -33,10 +37,22 @@
         "title":"Detalhes"
       },
       "login": {
-        "title": "Login"
+        "title": "Login",
+        "email": "Email",
+        "password": "Palavra-passe",
+        "login": "Entrar",
+        "signup": "Registar",
+        "anonyLogin": "Login anónimo"
       },
       "signup": {
-        "title": "Registar"
+        "title": "Registar",
+        "firstName": "Primeiro nome",
+        "lastName": "Último nome",
+        "email": "Email",
+        "password": "Palavra-passe",
+        "signup": "Criar conta",
+        "alert": "Verifique o seu email",
+        "alertError": "Criar a conta falhou: "
       }
     }
   }

@@ -7,6 +7,9 @@
         "open": "Open Filters",
         "close": "Close Filters",
         "reset": "Reset Filters"
+      },
+      "searchBar": {
+        "text": "Search destination"
       }
     },
     "screens": {
@@ -14,7 +17,8 @@
         "title": "Map"
       },
       "list": {
-        "title": "List"
+        "title": "List",
+        "notFound": "No corresponding data found"
       },
       "profile": {
         "title": "Profile",
@@ -33,10 +37,22 @@
         "title":"Details"
       },
       "login": {
-        "title": "Login"
+        "title": "Login",
+        "email": "Email",
+        "password": "Password",
+        "login": "Login",
+        "signup": "Sign up",
+        "anonyLogin": "Anonymous login"
       },
       "signup": {
-        "title": "Sign Up"
+        "title": "Sign Up",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "password": "Password",
+        "signup": "Sign up",
+        "alert": "Check your email",
+        "alertError": "Failed to create account: "
       }
     }
   }
