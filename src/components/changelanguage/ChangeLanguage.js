@@ -24,6 +24,7 @@ const ChangeLanguage = () => {
 
   return (
     <View style={Styles.container}>
+      <Text style={Styles.text}>Escolha a Linguagem:</Text>
       <View style={Styles.flagsContainer}>
         <TouchableOpacity onPress={() => changeLang("pt")}>
           <Image

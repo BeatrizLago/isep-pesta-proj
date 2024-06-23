@@ -28,7 +28,7 @@
         "height": "Altura",
         "myWheelchairButton": "Minha cadeira de rodas",
         "myWheelchairUpdateButton": "Atualizar dados",
-        "logoutButton": "Sair"
+        "logoutButton": "Terminar Sessão"
       } ,
       "configuration": {
         "title":"Configurações"

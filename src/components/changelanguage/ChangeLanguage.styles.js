@@ -2,12 +2,18 @@ import { StyleSheet } from "react-native";
 
 export const Styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 100
+    marginTop: 25,
+    flexDirection: "column"
+  },
+  text: {
+    fontWeight: "bold",
+    color: "#000",
+    fontSize: 20,
   },
   flagsContainer: {
+    marginTop:10,
     flexDirection: "row",
   },
   image: {
