@@ -10,6 +10,9 @@
       },
       "searchBar": {
         "text": "Search destination"
+      },
+      "changeLanguage": {
+        "text": "Select a Language"
       }
     },
     "screens": {
