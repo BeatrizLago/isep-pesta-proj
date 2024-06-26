@@ -6,7 +6,8 @@ import MapView, { Marker } from 'react-native-maps';
 import LocationDetail from '../locationDetail/locationDetail';
 import { Styles } from './MapComponent.styles';
 
-const MapComponent = ({ destination, locations }) => {
+
+const MapComponent = ({ destination, locations, t }) => {
   const mapRef = useRef(null);
   const portoCoords = {
     latitude: 41.1579,
@@ -72,6 +73,7 @@ const MapComponent = ({ destination, locations }) => {
             <LocationDetail
               location={selectedLocation}
               onClose={() => setSelectedLocation(null)}
+              t = {t} 
             />
           </View>
         </TouchableWithoutFeedback>

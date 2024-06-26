@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image } from "react-native";
 import {Styles} from "./MyProfile.styles"
-import { capitalizeWords } from "../../services/firebase/utils";
+import { capitalizeWords } from "../../utils/utils";
 
 const MyProfile = ({ user, t }) => {
   return (
@@ -21,14 +21,20 @@ const MyProfile = ({ user, t }) => {
             {user.wheelchair && (
               <View style={Styles.wheelchairContainer}>
                 <Image source={require("../../assets/wheelchair.png")} style={Styles.wheelchairPicture} />
-                  <View style={Styles.wheelchairInfoContainer}>
-                {user.wheelchair.width && (
-                  <Text>{t("screens.profile.width")}: {user.wheelchair.width} cm</Text>
-                )}
-                {user.wheelchair.height && (
-                  <Text>{t("screens.profile.height")}: {user.wheelchair.height} cm</Text>
-                )}
-                  </View>
+                <View style={Styles.wheelchairInfoContainer}>
+                  {user.wheelchair.width && (
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={Styles.infoText}>{t("screens.profile.width")}:</Text>
+                      <Text style= {{fontSize: 16}}> {user.wheelchair.width} cm</Text>
+                    </View>
+                  )}
+                  {user.wheelchair.height && (
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={Styles.infoText}>{t("screens.profile.height")}:</Text>
+                      <Text style= {{fontSize: 16}}> {user.wheelchair.height} cm</Text>
+                    </View>
+                  )}
+                </View>
               </View>
             )}
           </View>

@@ -8,6 +8,9 @@
         "close": "Fechar Filtros",
         "reset": "Limpar Filtros"
       },
+      "locationDetail":{
+        "details": "Ver detalhes"
+      },
       "searchBar": {
         "text": "Procurar destino"
       }
