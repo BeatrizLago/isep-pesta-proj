@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, Button, PermissionsAndroid, Platform } from "react-native";
 import { Styles } from "./MyProfile.styles";
-import { capitalizeWords } from "../../services/firebase/utils";
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch } from "react-redux";
 import { fetchUser, updateUserPhotoURL, uploadImageToFirebase } from "../../state/actions/userAction";
+import { capitalizeWords } from "../../utils/utils";
 
 
 const MyProfile = ({ user, t }) => {
