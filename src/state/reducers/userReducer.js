@@ -9,6 +9,7 @@ const userReducer = (state = initialState, action) => {
     case "FETCH_USER_SUCCESS":
     case "UPDATE_USER_SUCCESS":
     case "UPDATE_USER_WHEELCHAIR_SUCCESS":
+    case "UPDATE_USER_PHOTO_SUCCESS":
       return { ...state, userInfo: action.payload, error: null };
     case "CREATE_USER_FAILURE":
     case "FETCH_USER_FAILURE":
@@ -17,6 +18,7 @@ const userReducer = (state = initialState, action) => {
     case "CREATE_USER_EXISTS":
     case "FETCH_USER_NOT_FOUND":
     case "UPDATE_USER_NOT_FOUND":
+    case "UPDATE_USER_PHOTO_FAILURE":
       return { ...state, userInfo: null, error: action.error };
     case "FETCH_USERS_SUCCESS":
       return { ...state, users: action.payload, error: null };
