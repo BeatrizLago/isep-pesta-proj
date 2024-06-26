@@ -13,6 +13,9 @@
       },
       "searchBar": {
         "text": "Procurar destino"
+      },
+      "changeLanguage": {
+        "text": "Escolha a Linguagem"
       }
     },
     "screens": {
