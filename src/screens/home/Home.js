@@ -124,6 +124,7 @@ const Home = ({ navigation }) => {
                   destination={destination}
                   portugalCenter={portugalCenter}
                   locations={filteredData}
+                  t = {t}
                 />
               </View>
             )}

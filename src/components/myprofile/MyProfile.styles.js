@@ -55,5 +55,10 @@ export const Styles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-      }
+      },
+      infoText: {
+        fontWeight: "bold",
+        fontSize: 18,
+      },
+
   });
