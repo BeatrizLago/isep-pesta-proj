@@ -4,7 +4,7 @@
     "loading": "A carregar",
     "components": {
       "myFiltersButtons":{
-        "open": "Abrir Filtros",
+        "open": "Filtros",
         "close": "Fechar Filtros",
         "reset": "Limpar Filtros"
       },

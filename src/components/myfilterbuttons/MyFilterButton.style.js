@@ -5,6 +5,10 @@ export const Styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  buttonContainer:{
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   bottomBarHeader: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -19,7 +23,7 @@ export const Styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
     zIndex: 1,
-    backgroundColor: "#6c6c67",
+    backgroundColor: "#0077b6",
     borderRadius: 50,
     width: "45%",
   },
@@ -28,15 +32,17 @@ export const Styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
     zIndex: 1,
-    backgroundColor: "#6c6c67",
+    backgroundColor: "#0077b6",
     borderRadius: 50,
     width: "45%",
   },
   filterText: {
+    marginLeft:5,
     fontSize: 16,
     color: "white",
   },
   clearFilterText: {
+    marginLeft: 5,
     fontSize: 16,
     color: "white",
   },

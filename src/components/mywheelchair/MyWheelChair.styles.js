@@ -8,7 +8,7 @@ export const Styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
   },
   wheelchairButton: {
-    backgroundColor: "#6c6c67",
+    backgroundColor: "#0077b6",
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
