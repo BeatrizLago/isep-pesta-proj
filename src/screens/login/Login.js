@@ -90,7 +90,7 @@ const Login = ({ navigation }) => {
               title={t("screens.login.anonyLogin")}
               onPress={signInAnonymousFunc}
             />
-            <ChangeLanguage/>
+            <ChangeLanguage t={t} />
           </>
         )}
       </KeyboardAvoidingView>

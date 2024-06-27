@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Button, TouchableOpacity, Text } from "react-native";
+import { View, Button, TouchableOpacity, Text, ScrollView } from "react-native";
 import { Styles } from "./Profile.styles";
 import MyWheelChair from "../../components/mywheelchair/MyWheelChair";
 import MyProfile from "../../components/myprofile/MyProfile";
@@ -11,7 +11,6 @@ import {
   updateUserPhotoURL,
   uploadImageToFirebase,
 } from "../../state/actions/userAction";
-import { FIREBASE_AUTH } from "../../services/firebase/firebaseConfig";
 import { useTranslation } from "react-i18next";
 
 const Profile = () => {
@@ -67,31 +66,25 @@ const Profile = () => {
     await dispatch(fetchUser());
   };
 
-  const handleLogout = () => {
-    FIREBASE_AUTH.signOut();
-  };
+
   return (
     <View style={Styles.container}>
       {loading || !user ? (
         <ActivityLoader />
       ) : (
         <>
-          <MyProfile
-            user={user}
-            handleUserPhotoUpdate={handleUserPhotoUpdate}
-            t={t}
-          />
-          <MyWheelChair
-            handleWheelchairUpdate={handleWheelchairUpdate}
-            user={user}
-            t={t}
-          />
-          <TouchableOpacity onPress={handleLogout} style={Styles.logoutButton}>
-            <Text style={Styles.logoutButtonText}>
-              {" "}
-              {t("screens.profile.logoutButton")}{" "}
-            </Text>
-          </TouchableOpacity>
+          <ScrollView>
+            <MyProfile
+              user={user}
+              handleUserPhotoUpdate={handleUserPhotoUpdate}
+              t={t}
+            />
+            <MyWheelChair
+              handleWheelchairUpdate={handleWheelchairUpdate}
+              user={user}
+              t={t}
+            />
+          </ScrollView>
         </>
       )}
     </View>
