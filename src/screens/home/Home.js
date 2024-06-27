@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import MapComponent from "../../components/map/MapComponent";
 import SearchBar from "../../components/searchbar/SearchBar";
@@ -9,6 +9,8 @@ import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
 import { useTranslation } from "react-i18next";
+import { ThemeContext } from "../../context/ThemeContext";
+import { lightTheme, darkTheme } from "../../utils/themes";
 
 const Home = ({ navigation }) => {
   const { t } = useTranslation();
@@ -21,6 +23,9 @@ const Home = ({ navigation }) => {
   const [showMap, setShowMap] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
   const [destination, setDestination] = useState(null);
+  const { theme } = useContext(ThemeContext);
+
+  const currentTheme = theme === 'light' ? lightTheme : darkTheme;
 
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
@@ -98,7 +103,7 @@ const Home = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={Styles.container}>
+      <View style={[Styles.container ,  { backgroundColor: currentTheme.background }]}>
         {loading ? (
           <ActivityLoader />
         ) : (
@@ -119,7 +124,7 @@ const Home = ({ navigation }) => {
             />
             {showMap && (
               <View style={Styles.mapContainerScreen}>
-                <SearchBar handleSearch={handleSearch} t={t} />
+                <SearchBar handleSearch={handleSearch} t={t} theme={currentTheme}/>
                 <MapComponent
                   destination={destination}
                   portugalCenter={portugalCenter}
