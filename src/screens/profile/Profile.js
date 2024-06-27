@@ -8,10 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchUser,
   updateUserWheelchair,
+  updateUserPhotoURL,
+  uploadImageToFirebase,
 } from "../../state/actions/userAction";
 import { FIREBASE_AUTH } from "../../services/firebase/firebaseConfig";
 import { useTranslation } from "react-i18next";
-
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -60,6 +61,12 @@ const Profile = () => {
     [dispatch, user]
   );
 
+  const handleUserPhotoUpdate = async (url) => {
+    const imageUrl = await uploadImageToFirebase(url);
+    await dispatch(updateUserPhotoURL(imageUrl));
+    await dispatch(fetchUser());
+  };
+
   const handleLogout = () => {
     FIREBASE_AUTH.signOut();
   };
@@ -69,14 +76,21 @@ const Profile = () => {
         <ActivityLoader />
       ) : (
         <>
-          <MyProfile user={user} t={t}/>
+          <MyProfile
+            user={user}
+            handleUserPhotoUpdate={handleUserPhotoUpdate}
+            t={t}
+          />
           <MyWheelChair
             handleWheelchairUpdate={handleWheelchairUpdate}
             user={user}
             t={t}
           />
           <TouchableOpacity onPress={handleLogout} style={Styles.logoutButton}>
-            <Text style={Styles.logoutButtonText}> {t("screens.profile.logoutButton")} </Text>
+            <Text style={Styles.logoutButtonText}>
+              {" "}
+              {t("screens.profile.logoutButton")}{" "}
+            </Text>
           </TouchableOpacity>
         </>
       )}
