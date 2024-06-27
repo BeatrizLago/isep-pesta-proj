@@ -69,48 +69,66 @@ const Details = ({ t }) => {
         <Text style={Styles.detailsTitle}>{place.name}</Text>
         <Text style={Styles.detailsCategory}>{place.category}</Text>
         <Text style={Styles.address}>
-          Endereço:{" "}
+          {t("screens.details.address")}:{" "}
           {place.address
             ? `${place.address.street}, ${place.address.city}`
-            : "Endereço não disponível"}
+            : t("screens.details.notAvailable")}
         </Text>
         <Text style={Styles.mbottom}>
-          Telefone: {place.phoneNumber || "Telefone não disponível"}
+          {t("screens.details.telephone")}:{" "}
+          {place.phoneNumber || t("screens.details.notAvailable")}
         </Text>
         <Text style={Styles.mbottom}>
-          Email: {place.email || "Email não disponível"}
+          {t("screens.details.email")}:{" "}
+          {place.email || t("screens.details.notAvailable")}
         </Text>
-        <Text style={Styles.detailsSubtitle}>Acessibilidade:</Text>
+        <Text style={Styles.detailsSubtitle}>
+          {t("screens.details.accessibility")}:
+        </Text>
         <Text>
-          Estacionamento Prioritário:{" "}
-          {place.accessibility?.parking ? "Disponível" : "Não Disponível"}
-          {"\n"}Entrada:{" "}
-          {place.accessibility?.entrance ? "Acessível" : "Não Acessível"}
-          {"\n"}Casa de Banho de Deficientes:{" "}
+          {t("screens.details.parking")}:{" "}
+          {place.accessibility?.parking
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
+          {"\n"}
+          {t("screens.details.entrance")}:{" "}
+          {place.accessibility?.entrance
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
+          {"\n"}
+          {t("screens.details.handicapBathroom")}:{" "}
           {place.accessibility?.handicapBathroom
-            ? "Disponível"
-            : "Não Disponível"}
-          {"\n"}Circulação Interna:{" "}
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
+          {"\n"}
+          {t("screens.details.internalCirculation")}:{" "}
           {place.accessibility?.internalCirculation
-            ? "Acessível"
-            : "Não Acessível"}
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
         </Text>
         <Text style={Styles.detailsSubtitle2}>
-          Dimensões para Cadeiras de Rodas:
+          {t("screens.details.wheelchair")}
         </Text>
         <Text style={Styles.mbottom}>
-          Largura:{" "}
-          {place.wheelchair ? place.wheelchair.width : "Não Especificado"}
-          {"\n"}Altura:{" "}
-          {place.wheelchair ? place.wheelchair.height : "Não Especificado"}
+          {t("screens.details.width")}:{" "}
+          {place.wheelchair.width != null
+            ? `${place.wheelchair.width} cm`
+            : t("screens.details.notAvailable")}
+          {"\n"}
+          {t("screens.details.height")}:{" "}
+          {place.wheelchair.height != null
+            ? `${place.wheelchair.height} cm`
+            : t("screens.details.notAvailable")}
         </Text>
         <TouchableOpacity onPress={() => Linking.openURL(place.siteURL)}>
           <Text style={Styles.detailsSiteURL}>
-            Website: {place.siteURL || "Nao disponível"}
+            Website: {place.siteURL || t("screens.details.notAvailable")}
           </Text>
         </TouchableOpacity>
 
-        <Text style={Styles.detailsSubtitle}>Reviews</Text>
+        <Text style={Styles.detailsSubtitle}>
+          {t("screens.details.reviews")}
+        </Text>
         {reviews.map((review) => (
           <View key={review.id} style={Styles.reviewContainer}>
             <Text>By: {review.userName}</Text>
@@ -122,7 +140,7 @@ const Details = ({ t }) => {
         {user ? (
           <>
             <Button
-              title="Escrever Review"
+              title={t("screens.details.writeReview")}
               onPress={() => setVisRating(true)}
             />
             <Modal visible={visRating} transparent={true}>

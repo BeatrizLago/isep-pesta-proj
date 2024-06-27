@@ -19,7 +19,7 @@
       },
       "myFilters":{
         "parking": "Parking",
-        "entrance": "Entrance",
+        "entrance": "Accessible Entrance",
         "handicapBathroom": "Bathroom",
         "internalCirculation": "Internal Circulation",
         "accessibility": "Accessibility",
@@ -52,7 +52,22 @@
         "title":"Configurations"
       },
       "details": {
-        "title":"Details"
+        "title":"Details",
+        "address" : "Address",
+        "telephone" : "Telephone",
+        "email": "Email",
+        "accessibility": "Accessibility",
+        "parking": "Parking",
+        "entrance": "Accessible Entrance",
+        "handicapBathroom": "Bathroom",
+        "internalCirculation": "Internal Circulation",
+        "available": "Available",
+        "notAvailable": "Not Available",
+        "wheelchair": "Wheelchair Dimensions",
+        "width": "Width",
+        "height": "Height",
+        "reviews": "Reviews",
+        "writeReview": "Write a Review"
       },
       "login": {
         "title": "Login",
