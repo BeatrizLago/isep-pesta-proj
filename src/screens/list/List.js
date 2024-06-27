@@ -85,6 +85,7 @@ const List = () => {
             setFilteredData={setFilteredData}
             onFilterChange={setSelectedFilters}
             user={user}
+            t={t}
           />
 
           {filteredData.length > 0 ? (

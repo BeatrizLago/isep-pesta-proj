@@ -16,6 +16,12 @@
       },
       "changeLanguage": {
         "text": "Escolha a Linguagem"
+      },
+      "myFilters":{
+        "accessibility": "Acessibilidade",
+        "category": "Categoria",
+        "city": "Selecione uma Cidade",
+        "wheelchair": "Filtrar por cadeira de rodas"
       }
     },
     "screens": {
