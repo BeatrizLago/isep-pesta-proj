@@ -1,32 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, Button, PermissionsAndroid, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Button,
+  PermissionsAndroid,
+  Platform,
+} from "react-native";
 import { Styles } from "./MyProfile.styles";
-import * as ImagePicker from 'expo-image-picker';
-import { useDispatch } from "react-redux";
-import { fetchUser, updateUserPhotoURL, uploadImageToFirebase } from "../../state/actions/userAction";
+import * as ImagePicker from "expo-image-picker";
 import { capitalizeWords } from "../../utils/utils";
 
-
-const MyProfile = ({ user, t }) => {
-  const dispatch = useDispatch();
-  const [imageUri, setImageUri] = useState(null);
-
-
+const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
 
     console.log(result);
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-      const imageUrl = await uploadImageToFirebase(result.assets[0].uri);
-      await dispatch(updateUserPhotoURL(imageUrl));
-      await dispatch(fetchUser());
+      handleUserPhotoUpdate(result.assets[0].uri);
     }
   };
 
