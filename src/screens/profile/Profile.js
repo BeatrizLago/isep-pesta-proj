@@ -61,11 +61,17 @@ const Profile = () => {
   );
 
   const handleUserPhotoUpdate = async (url) => {
-    const imageUrl = await uploadImageToFirebase(url);
-    await dispatch(updateUserPhotoURL(imageUrl));
-    await dispatch(fetchUser());
+    setLoading(true);
+    try {
+      const imageUrl = await uploadImageToFirebase(url);
+      await dispatch(updateUserPhotoURL(imageUrl));
+      await dispatch(fetchUser());
+    } catch (e) {
+      console.error("Error updating user photo:", error);
+    } finally {
+      setLoading(false);
+    }
   };
-
 
   return (
     <View style={Styles.container}>
