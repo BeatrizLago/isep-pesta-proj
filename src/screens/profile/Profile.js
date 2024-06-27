@@ -11,11 +11,9 @@ import {
   updateUserPhotoURL,
   uploadImageToFirebase,
 } from "../../state/actions/userAction";
-import { useTranslation } from "react-i18next";
 
-const Profile = () => {
+const Profile = ({t}) => {
   const dispatch = useDispatch();
-  const { t } = useTranslation();
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
 

@@ -13,13 +13,12 @@ import { styles } from "./Login.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { signInAnonymous, signIn } from "../../state/actions/authAction";
-import { useTranslation } from "react-i18next";
-import i18n from "../../../i18n";
 import ChangeLanguage from "../../components/changelanguage/ChangeLanguage";
+import { useNavigation } from "@react-navigation/native";
 
-const Login = ({ navigation }) => {
-  const { t } = useTranslation();
+const Login = ({ t }) => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const auth = useSelector((state) => state.auth.user);
   const error = useSelector((state) => state.auth.error);
 
@@ -45,10 +44,6 @@ const Login = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const changeLang = (lang) => {
-    i18n.changeLanguage(lang);
   };
 
   useEffect(() => {

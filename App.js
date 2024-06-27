@@ -5,10 +5,13 @@ import Navigation from "./src/navigation/Navigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18next from "i18next";
 import { ThemeProvider } from "./src/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const store = configureStore();
 
 const App = () => {
+  const { t } = useTranslation();
+
   React.useEffect(() => {
     const loadLanguage = async () => {
       try {
@@ -27,7 +30,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <Navigation />
+        <Navigation t={t} />
       </ThemeProvider>
     </Provider>
   );

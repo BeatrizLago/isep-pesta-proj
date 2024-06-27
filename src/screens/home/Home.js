@@ -8,12 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
-import { useTranslation } from "react-i18next";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../utils/themes";
 
-const Home = ({ navigation }) => {
-  const { t } = useTranslation();
+const Home = ({ t }) => {
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.location.locations);
   const user = useSelector((state) => state.user.userInfo);

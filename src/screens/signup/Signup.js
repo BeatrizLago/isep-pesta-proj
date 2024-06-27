@@ -14,10 +14,8 @@ import { useDispatch } from "react-redux";
 import { signUp } from "../../state/actions/authAction";
 import { createUser } from "../../state/actions/userAction";
 import { useNavigation } from "@react-navigation/native";
-import { useTranslation } from "react-i18next";
 
-const Signup = () => {
-  const { t } = useTranslation();
+const Signup = ({ t }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -30,7 +28,7 @@ const Signup = () => {
     setLoading(true);
     try {
       await dispatch(signUp(email, password, firstName, lastName));
-      await dispatch(createUser()); 
+      await dispatch(createUser());
 
       alert(t("screens.signup.alert"));
       navigation.navigate("Login");

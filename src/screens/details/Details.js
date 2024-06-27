@@ -18,12 +18,11 @@ import {
 import { Styles } from "./Details.styles";
 import { Rating } from "react-native-ratings"; // Import the Rating component
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
+import { useRoute } from "@react-navigation/native";
 
-
-const Details = ({ route, navigation }) => {
-  const { t } = useTranslation();
+const Details = ({ t }) => {
   const dispatch = useDispatch();
+  const route = useRoute();
   const { place } = route.params;
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
@@ -122,7 +121,10 @@ const Details = ({ route, navigation }) => {
 
         {user ? (
           <>
-            <Button title="Escrever Review" onPress={() => setVisRating(true)} />
+            <Button
+              title="Escrever Review"
+              onPress={() => setVisRating(true)}
+            />
             <Modal visible={visRating} transparent={true}>
               <View style={Styles.modalOverlay}>
                 <View style={Styles.modalContent}>

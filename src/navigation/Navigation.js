@@ -68,48 +68,48 @@ const screens = {
   },
 };
 
-function createNavigator(Navigator, screenConfig) {
-  const { t } = useTranslation();
+function createNavigator(Navigator, screenConfig, t) {
   return (
     <Navigator.Navigator>
       <Navigator.Screen
         name={screenConfig.name}
-        component={screenConfig.component}
         options={screenConfig.options(t)}
-      />
+      >
+        {() => <screenConfig.component t={t} />}
+      </Navigator.Screen>
       {screenConfig.details && (
         <Navigator.Screen
           name={screenConfig.details.name}
-          component={screenConfig.details.component}
           options={screenConfig.details.options(t)}
-        />
+        >
+          {() => <screenConfig.details.component t={t} />}
+        </Navigator.Screen>
       )}
     </Navigator.Navigator>
   );
 }
 
-function MapLayout() {
-  return createNavigator(InsideMap, screens.Map);
+function MapLayout({ t }) {
+  return createNavigator(InsideMap, screens.Map, t);
 }
 
-function ListLayout() {
-  return createNavigator(InsideList, screens.List);
+function ListLayout({ t }) {
+  return createNavigator(InsideList, screens.List, t);
 }
 
-function ProfileLayout() {
-  return createNavigator(InsideProfile, screens.Profile);
+function ProfileLayout({ t }) {
+  return createNavigator(InsideProfile, screens.Profile, t);
 }
 
-function ConfigLayout() {
-  return createNavigator(InsideConfig, screens.Config);
+function ConfigLayout({ t }) {
+  return createNavigator(InsideConfig, screens.Config, t);
 }
 
-function LoginLayout() {
-  return createNavigator(LoginStack, screens.Login);
+function LoginLayout({ t }) {
+  return createNavigator(LoginStack, screens.Login, t);
 }
 
-function TabLayout() {
-  const { t } = useTranslation();
+function TabLayout({ t }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -140,32 +140,36 @@ function TabLayout() {
     >
       <Tab.Screen
         name="MapaTab"
-        component={MapLayout}
         options={{ headerShown: false, title: t("screens.map.title") }}
-      />
+      >
+        {() => <MapLayout t={t} />}
+      </Tab.Screen>
       <Tab.Screen
         name="ListaTab"
-        component={ListLayout}
         options={{ headerShown: false, title: t("screens.list.title") }}
-      />
+      >
+        {() => <ListLayout t={t} />}
+      </Tab.Screen>
       <Tab.Screen
         name="PerfilTab"
-        component={ProfileLayout}
         options={{ headerShown: false, title: t("screens.profile.title") }}
-      />
+      >
+        {() => <ProfileLayout t={t} />}
+      </Tab.Screen>
       <Tab.Screen
         name="ConfiguraçõesTab"
-        component={ConfigLayout}
         options={{
           headerShown: false,
           title: t("screens.configuration.title"),
         }}
-      />
+      >
+        {() => <ConfigLayout t={t} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
 
-const Navigation = () => {
+const Navigation = ({ t }) => {
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
 
@@ -193,17 +197,13 @@ const Navigation = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         {user ? (
-          <Stack.Screen
-            name="Test"
-            component={TabLayout}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="Test" options={{ headerShown: false }}>
+            {() => <TabLayout t={t} />}
+          </Stack.Screen>
         ) : (
-          <Stack.Screen
-            name="LoginHome"
-            component={LoginLayout}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="LoginHome" options={{ headerShown: false }}>
+            {() => <LoginLayout t={t} />}
+          </Stack.Screen>
         )}
       </Stack.Navigator>
     </NavigationContainer>

@@ -3,14 +3,12 @@ import { View, Text, StyleSheet, Button, TouchableOpacity, Switch } from "react-
 import ChangeLanguage from "../../components/changelanguage/ChangeLanguage";
 import { Styles } from "./Configurations.styles";
 import { FIREBASE_AUTH } from "../../services/firebase/firebaseConfig";
-import { useTranslation } from "react-i18next";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../utils/themes";
 
 
 
-const Configurations = () => {
-  const { t } = useTranslation();
+const Configurations = ({t}) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
   const isDarkTheme = theme === 'dark';
