@@ -18,10 +18,16 @@ const MyFilter = ({
 
   const filters = ["0", "1", "2", "3", "4", "5"];
   const accessibility = [
-    { key: "parking", label: "Estacionamento" },
-    { key: "entrance", label: "Entrada" },
-    { key: "handicapBathroom", label: "Casa de banho" },
-    { key: "internalCirculation", label: "Circulação Interna" },
+    { key: "parking", label: t("components.myFilters.parking") },
+    { key: "entrance", label: t("components.myFilters.entrance") },
+    {
+      key: "handicapBathroom",
+      label: t("components.myFilters.handicapBathroom"),
+    },
+    {
+      key: "internalCirculation",
+      label: t("components.myFilters.internalCirculation"),
+    },
   ];
   const categories = useMemo(
     () => [...new Set(data.map((item) => item.category))],
@@ -132,7 +138,7 @@ const MyFilter = ({
   }, [selectedFilters, data, wheelchairFilterEnabled, userWheelChair]);
 
   const generateOptions = (items) => [
-    { key: "none", value: "Nenhum" },
+    { key: "none", value: t("components.myFilters.notFound") },
     ...items.map((item) => ({ key: item, value: item })),
   ];
 
@@ -162,7 +168,9 @@ const MyFilter = ({
           />
         ))}
       </View> */}
-        <Text style={Styles.label}>{t("components.myFilters.accessibility")}</Text>
+        <Text style={Styles.label}>
+          {t("components.myFilters.accessibility")}
+        </Text>
         <View style={Styles.containerAccess}>
           {accessibility.map((item) => (
             <RadioButton
@@ -203,7 +211,7 @@ const MyFilter = ({
         {userWheelChair && userWheelChair.height && userWheelChair.width && (
           <View style={Styles.switchContainer}>
             <Text style={Styles.label}>
-            {t("components.myFilters.wheelchair")}
+              {t("components.myFilters.wheelchair")}
             </Text>
             <Switch
               value={wheelchairFilterEnabled}

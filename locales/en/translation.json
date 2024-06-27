@@ -18,10 +18,15 @@
         "text": "Select a Language"
       },
       "myFilters":{
+        "parking": "Parking",
+        "entrance": "Entrance",
+        "handicapBathroom": "Bathroom",
+        "internalCirculation": "Internal Circulation",
         "accessibility": "Accessibility",
         "category": "Category",
         "city": "Select a City",
-        "wheelchair": "Filter by wheelchair"
+        "wheelchair": "Filter by wheelchair",
+        "notFound": "None"
       }
     },
     "screens": {
