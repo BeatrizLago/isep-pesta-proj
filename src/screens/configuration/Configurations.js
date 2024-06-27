@@ -1,19 +1,25 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import ChangeLanguage from "../../components/changelanguage/ChangeLanguage";
-import { ThemeContext } from "../../context/ThemeContext";
-import { lightTheme, darkTheme } from "../../utils/themes";
-import {Styles} from './Configurations.styles'
+import { Styles } from "./Configurations.styles";
+import { FIREBASE_AUTH } from "../../services/firebase/firebaseConfig";
+import { useTranslation } from "react-i18next";
 
 const Configurations = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
-  const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+  const { t } = useTranslation();
+
+  const handleLogout = () => {
+    FIREBASE_AUTH.signOut();
+  };
 
   return (
-    <View style={[Styles.container, { backgroundColor: currentTheme.background }]}>
-      <ChangeLanguage />
-      <Text style={{ color: currentTheme.text }}>Configurations Screen</Text>
-      <Button title="Toggle Theme" onPress={toggleTheme} />
+    <View>
+      <ChangeLanguage t={t} />
+      <TouchableOpacity onPress={handleLogout} style={Styles.logoutButton}>
+        <Text style={Styles.logoutButtonText}>
+          {t("screens.profile.logoutButton")}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };

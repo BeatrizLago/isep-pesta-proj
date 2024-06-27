@@ -121,6 +121,7 @@ const Home = ({ navigation }) => {
               setFilteredData={setFilteredData}
               onFilterChange={setSelectedFilters}
               user={user}
+              t={t}
             />
             {showMap && (
               <View style={Styles.mapContainerScreen}>

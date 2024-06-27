@@ -16,6 +16,17 @@
       },
       "changeLanguage": {
         "text": "Escolha a Linguagem"
+      },
+      "myFilters":{
+        "parking": "Estacionamento",
+        "entrance": "Entrada",
+        "handicapBathroom": "Casa de Banho",
+        "internalCirculation": "Circulação interna",
+        "accessibility": "Acessibilidade",
+        "category": "Categoria",
+        "city": "Selecione uma Cidade",
+        "wheelchair": "Filtrar por cadeira de rodas",
+        "notFound": "Nenhum"
       }
     },
     "screens": {

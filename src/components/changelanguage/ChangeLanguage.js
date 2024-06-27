@@ -2,11 +2,9 @@ import { View, Text, Button, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { Styles } from "./ChangeLanguage.styles";
 import i18n from "../../../i18n";
-import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ChangeLanguage = () => {
-  const { t } = useTranslation();
+const ChangeLanguage = ({t}) => {
 
   const changeLang = (lang) => {
     i18n.changeLanguage(lang);

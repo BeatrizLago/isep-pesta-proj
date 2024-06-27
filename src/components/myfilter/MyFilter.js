@@ -11,16 +11,23 @@ const MyFilter = ({
   setFilteredData,
   onFilterChange,
   user,
+  t,
 }) => {
   const [userWheelChair, setUserWheelChair] = useState(null);
   const [wheelchairFilterEnabled, setWheelchairFilterEnabled] = useState(false);
 
   const filters = ["0", "1", "2", "3", "4", "5"];
   const accessibility = [
-    { key: "parking", label: "Estacionamento" },
-    { key: "entrance", label: "Entrada" },
-    { key: "handicapBathroom", label: "Casa de banho" },
-    { key: "internalCirculation", label: "Circulação Interna" },
+    { key: "parking", label: t("components.myFilters.parking") },
+    { key: "entrance", label: t("components.myFilters.entrance") },
+    {
+      key: "handicapBathroom",
+      label: t("components.myFilters.handicapBathroom"),
+    },
+    {
+      key: "internalCirculation",
+      label: t("components.myFilters.internalCirculation"),
+    },
   ];
   const categories = useMemo(
     () => [...new Set(data.map((item) => item.category))],
@@ -131,7 +138,7 @@ const MyFilter = ({
   }, [selectedFilters, data, wheelchairFilterEnabled, userWheelChair]);
 
   const generateOptions = (items) => [
-    { key: "none", value: "Nenhum" },
+    { key: "none", value: t("components.myFilters.notFound") },
     ...items.map((item) => ({ key: item, value: item })),
   ];
 
@@ -161,7 +168,9 @@ const MyFilter = ({
           />
         ))}
       </View> */}
-        <Text style={Styles.label}>Accessibilidade</Text>
+        <Text style={Styles.label}>
+          {t("components.myFilters.accessibility")}
+        </Text>
         <View style={Styles.containerAccess}>
           {accessibility.map((item) => (
             <RadioButton
@@ -173,7 +182,7 @@ const MyFilter = ({
           ))}
         </View>
         <View style={Styles.divider} />
-        <Text style={Styles.label}>Categorias</Text>
+        <Text style={Styles.label}>{t("components.myFilters.category")}</Text>
         <View style={Styles.containerAccess}>
           {categories.map((item) => (
             <RadioButton
@@ -192,7 +201,7 @@ const MyFilter = ({
                 handleFilterButtonClick(value, label.toLowerCase())
               }
               data={generateOptions(label === "Cidade" ? cities : categories)}
-              placeholder={`Selecione uma ${label.toLowerCase()}`}
+              placeholder={t("components.myFilters.city")}
               boxStyles={Styles.box}
               dropdownStyles={Styles.dropdown}
             />
@@ -202,7 +211,7 @@ const MyFilter = ({
         {userWheelChair && userWheelChair.height && userWheelChair.width && (
           <View style={Styles.switchContainer}>
             <Text style={Styles.label}>
-              Filtrar por compatibilidade com cadeira de rodas
+              {t("components.myFilters.wheelchair")}
             </Text>
             <Switch
               value={wheelchairFilterEnabled}
