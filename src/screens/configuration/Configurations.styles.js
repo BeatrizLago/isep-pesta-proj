@@ -3,8 +3,7 @@ import { StyleSheet } from "react-native";
 export const Styles = StyleSheet.create({
     container: {
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: 20,
+      justifyContent: 'flex-start',
       height: "100%"
     },
     button: {
@@ -28,6 +27,22 @@ export const Styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
         fontWeight: "bold",
+      },
+      switchContainer: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: 20,
+      },
+      switchLabel: {
+        fontSize: 20,
+        marginRight: 10,
+        fontWeight: "bold",
+      },
+      separator: {
+        width: '100%',
+        height: 2, 
+        backgroundColor: 'black',
+        marginVertical: 10, 
       },
   });
 

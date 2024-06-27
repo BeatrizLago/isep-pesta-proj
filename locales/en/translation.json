@@ -39,6 +39,7 @@
       },
       "profile": {
         "title": "Profile",
+        "darkTheme": "Dark Theme",
         "name": "Name",
         "email": "Email",
         "width": "Width",
