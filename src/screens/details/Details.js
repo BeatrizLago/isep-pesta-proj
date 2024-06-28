@@ -16,7 +16,7 @@ import {
   addReviewToFirestore,
 } from "../../state/actions/reviewsAction";
 import { Styles } from "./Details.styles";
-import { Rating } from "react-native-ratings"; // Import the Rating component
+import { Rating } from "react-native-ratings"; 
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
 
@@ -26,7 +26,7 @@ const Details = ({ t }) => {
   const { place } = route.params;
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
-  const [visRating, setVisRating] = useState(false); // State for controlling the visibility of the modal
+  const [visRating, setVisRating] = useState(false); 
   const user = useSelector((state) => state.user.userInfo);
   const reviews = useSelector((state) => state.review.reviews);
 
@@ -58,7 +58,7 @@ const Details = ({ t }) => {
     await dispatch(addReviewToFirestore(newReview));
     setReviewText("");
     setRating(0);
-    setVisRating(false); // Close the modal after submitting the review
+    setVisRating(false); 
     await dispatch(fetchReviewsFromFirestore(place.id));
   };
 
