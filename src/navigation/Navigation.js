@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
@@ -14,7 +14,7 @@ import Profile from "../screens/profile/Profile";
 import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../state/actions/userAction";
-import { useTranslation } from "react-i18next";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -172,6 +172,7 @@ function TabLayout({ t }) {
 const Navigation = ({ t }) => {
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
+  const { currentTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
@@ -194,7 +195,16 @@ const Navigation = ({ t }) => {
   }, [dispatch]);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={{
+        colors: {
+          background: currentTheme.background,
+          border: currentTheme.background,
+          card: currentTheme.background,
+          text: currentTheme.text,
+        },
+      }}
+    >
       <Stack.Navigator initialRouteName="Login">
         {user ? (
           <Stack.Screen name="Test" options={{ headerShown: false }}>

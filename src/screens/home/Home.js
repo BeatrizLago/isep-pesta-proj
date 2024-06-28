@@ -8,8 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
-import { ThemeContext } from "../../context/ThemeContext";
-import { lightTheme, darkTheme } from "../../utils/themes";
 
 const Home = ({ t }) => {
   const dispatch = useDispatch();
@@ -21,9 +19,6 @@ const Home = ({ t }) => {
   const [showMap, setShowMap] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
   const [destination, setDestination] = useState(null);
-  const { theme } = useContext(ThemeContext);
-
-  const currentTheme = theme === 'light' ? lightTheme : darkTheme;
 
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
@@ -101,7 +96,7 @@ const Home = ({ t }) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={[Styles.container ,  { backgroundColor: currentTheme.background }]}>
+      <View style={{ flex: 1 }}>
         {loading ? (
           <ActivityLoader />
         ) : (
@@ -123,12 +118,15 @@ const Home = ({ t }) => {
             />
             {showMap && (
               <View style={Styles.mapContainerScreen}>
-                <SearchBar handleSearch={handleSearch} t={t} theme={currentTheme}/>
+                <SearchBar
+                  handleSearch={handleSearch}
+                  t={t}
+                />
                 <MapComponent
                   destination={destination}
                   portugalCenter={portugalCenter}
                   locations={filteredData}
-                  t = {t}
+                  t={t}
                 />
               </View>
             )}

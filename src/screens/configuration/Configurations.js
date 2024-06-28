@@ -21,7 +21,7 @@ const Configurations = ({t}) => {
     <View style={[Styles.container, { backgroundColor: currentTheme.background }]}>
       <ChangeLanguage t={t} />
       <View style={Styles.switchContainer}>
-        <Text style={Styles.switchLabel}>{t("screens.profile.darkTheme")}</Text>
+        <Text style={[Styles.switchLabel, { color: currentTheme.text }]}>{t("screens.profile.darkTheme")}</Text>
         <Switch
           value={isDarkTheme}
           onValueChange={toggleTheme}

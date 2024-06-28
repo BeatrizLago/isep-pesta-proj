@@ -3,13 +3,12 @@ import React from "react";
 import { StyleSheet, View, TextInput } from "react-native";
 import {Styles} from "./searchBar.styles";
 
-const SearchBar = ({ handleSearch, t, theme }) => {
+const SearchBar = ({ handleSearch, t }) => {
   return (
     <View style={Styles.searchBar}>
       <TextInput
-        style={[Styles.inputSearchBar, { borderColor: theme.text, backgroundColor: theme.background, color: theme.text  }]}
+        style={[Styles.inputSearchBar]}
         placeholder= {t("components.searchBar.text")}
-        placeholderTextColor={theme.text}
         onChangeText={(text) => handleSearch(text)}
       />
     </View>
