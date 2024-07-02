@@ -67,7 +67,11 @@
         "width": "Largura",
         "height": "Altura",
         "reviews": "Comentários",
-        "writeReview": "Escreva um Comentário"
+        "writeReview": "Escreva um Comentário",
+        "writeReviewPlaceholder": "Escreva o seu comentário aqui",
+        "submitReview": "Submeter",
+        "cancel": "cancelar",
+        "rating":"Nota"
       },
       "login": {
         "title": "Login",

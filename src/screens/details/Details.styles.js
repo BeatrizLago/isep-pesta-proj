@@ -1,107 +1,75 @@
 import { StyleSheet } from "react-native";
 
 export const Styles = StyleSheet.create({
-image: {
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  image: {
     width: "100%",
     height: 200,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    marginBottom: 10,
   },
-  detailsContainer: {
-    padding: 10,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  address: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 5,
-  },
-  acessLevel: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 5,
-  },
-  centerModal: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centerModalBox: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    width: "80%",
-    height: "60%",
-  },
-  detailsContainer: {
-    flex: 1,
+  content: {
+    padding: 15,
     backgroundColor: "#fff",
+    borderRadius: 10,
+    margin: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  detailsImage: {
-    width: "100%",
-    height: 200,
-    resizeMode: "cover",
-  },
-  detailsContent: {
-    padding: 20,
-  },
-  detailsTitle: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#333",
   },
-  detailsCategory: {
+  category: {
     fontSize: 18,
     marginBottom: 10,
+    color: "#666",
   },
-  detailsSubtitle: {
+  subtitle: {
     fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 5,
+    color: "#444",
   },
-  detailsSubtitle2: {
-    fontSize: 18,
-    marginTop: 10,
+  text: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 5,
   },
-  mbottom: {
+  link: {
+    color: "#1e90ff",
+    textDecorationLine: "underline",
     marginBottom: 10,
-  },
-  detailsSiteURL: {
-    marginBottom: 10,
-    color: "blue",
-  },
-  reviewTextInput: {
-    borderColor: "gray",
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 10,
   },
   reviewContainer: {
-    borderWidth: 1,
-    borderColor: "lightgray",
-    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
     marginVertical: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  loginPrompt: {
-    color: "red",
-    marginVertical: 10,
-    textAlign: "center",
+  reviewText: {
+    fontSize: 16,
+    color: "#333",
   },
-  ratingBarStyle:{
-    backgroundColor:"lightgray",
-    top: 35,
-    width:90,
-    height:35,
-    alignItems:'center',
-    alignSelf:'center',
-    alignContent:'center',
-    borderRadius:50,
-    padding:5
-  },
-  rateButtonStyle:{
-    height:40,
-    top:10,
-    backgroundColor:"yellow",
+  reviewAuthor: {
+    fontSize: 14,
+    color: "#999",
+    marginBottom: 5,
   },
   modalOverlay: {
     flex: 1,
@@ -110,28 +78,56 @@ image: {
     alignItems: "center",
   },
   modalContent: {
-    width: 300,
+    width: "90%",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  ratingText: {
+    fontSize: 16,
+    marginRight: 10,
   },
   textInput: {
     width: "100%",
-    height: 40,
+    height: 100,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 5,
+    textAlignVertical: "top", 
   },
-  rating: {
-    marginBottom: 10,
-  },
-  ratingText: {
-    fontSize: 18,
-    marginBottom: 20,
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   button: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  loginPrompt: {
+    color: "red",
     marginVertical: 10,
+    textAlign: "center",
   },
 });

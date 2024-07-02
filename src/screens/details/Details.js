@@ -9,7 +9,7 @@ import {
   Linking,
   TouchableOpacity,
   Modal,
-  StyleSheet, // Import StyleSheet for defining styles
+  StyleSheet, 
 } from "react-native";
 import {
   fetchReviewsFromFirestore,
@@ -63,29 +63,29 @@ const Details = ({ t }) => {
   };
 
   return (
-    <ScrollView style={Styles.detailsContainer}>
-      <Image source={{ uri: place.imageURL }} style={Styles.detailsImage} />
-      <View style={Styles.detailsContent}>
-        <Text style={Styles.detailsTitle}>{place.name}</Text>
-        <Text style={Styles.detailsCategory}>{place.category}</Text>
-        <Text style={Styles.address}>
+    <ScrollView style={Styles.container}>
+      <Image source={{ uri: place.imageURL }} style={Styles.image} />
+      <View style={Styles.content}>
+        <Text style={Styles.title}>{place.name}</Text>
+        <Text style={Styles.category}>{place.category}</Text>
+        <Text style={Styles.text}>
           {t("screens.details.address")}:{" "}
           {place.address
             ? `${place.address.street}, ${place.address.city}`
             : t("screens.details.notAvailable")}
         </Text>
-        <Text style={Styles.mbottom}>
+        <Text style={Styles.text}>
           {t("screens.details.telephone")}:{" "}
           {place.phoneNumber || t("screens.details.notAvailable")}
         </Text>
-        <Text style={Styles.mbottom}>
+        <Text style={Styles.text}>
           {t("screens.details.email")}:{" "}
           {place.email || t("screens.details.notAvailable")}
         </Text>
-        <Text style={Styles.detailsSubtitle}>
+        <Text style={Styles.subtitle}>
           {t("screens.details.accessibility")}:
         </Text>
-        <Text>
+        <Text style={Styles.text}>
           {t("screens.details.parking")}:{" "}
           {place.accessibility?.parking
             ? t("screens.details.available")
@@ -106,10 +106,10 @@ const Details = ({ t }) => {
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
         </Text>
-        <Text style={Styles.detailsSubtitle2}>
+        <Text style={Styles.subtitle}>
           {t("screens.details.wheelchair")}
         </Text>
-        <Text style={Styles.mbottom}>
+        <Text style={Styles.text}>
           {t("screens.details.width")}:{" "}
           {place.wheelchair.width != null
             ? `${place.wheelchair.width} cm`
@@ -121,22 +121,20 @@ const Details = ({ t }) => {
             : t("screens.details.notAvailable")}
         </Text>
         <TouchableOpacity onPress={() => Linking.openURL(place.siteURL)}>
-          <Text style={Styles.detailsSiteURL}>
+          <Text style={Styles.link}>
             Website: {place.siteURL || t("screens.details.notAvailable")}
           </Text>
         </TouchableOpacity>
-
-        <Text style={Styles.detailsSubtitle}>
+        <Text style={Styles.subtitle}>
           {t("screens.details.reviews")}
         </Text>
         {reviews.map((review) => (
           <View key={review.id} style={Styles.reviewContainer}>
-            <Text>By: {review.userName}</Text>
-            <Text>{review.text}</Text>
-            <Text>Rating: {review.rating}/5</Text>
+            <Text style={Styles.reviewAuthor}>By: {review.userName}</Text>
+            <Text style={Styles.reviewText}>{review.text}</Text>
+            <Text style={Styles.reviewText}>Rating: {review.rating}/5</Text>
           </View>
         ))}
-
         {user ? (
           <>
             <Button
@@ -146,36 +144,44 @@ const Details = ({ t }) => {
             <Modal visible={visRating} transparent={true}>
               <View style={Styles.modalOverlay}>
                 <View style={Styles.modalContent}>
-                  <Rating
-                    type="custom"
-                    ratingCount={5}
-                    imageSize={30}
-                    showRating
-                    startingValue={rating}
-                    onFinishRating={setRating}
-                    style={Styles.rating}
-                  />
+                  <Text style={Styles.modalTitle}>{t("screens.details.writeReview")}</Text>
+                  <View style={Styles.ratingContainer}>
+                    <Text style={Styles.ratingText}>{t("screens.details.rating")}:</Text>
+                    <Rating
+                      type="custom"
+                      ratingCount={5}
+                      imageSize={30}
+                      //showRating
+                      startingValue={rating}
+                      onFinishRating={setRating}
+                      style={Styles.rating}
+                    />
+                  </View>
                   <TextInput
-                    placeholder="Escrever review"
+                    placeholder={t("screens.details.writeReviewPlaceholder")}
                     value={reviewText}
                     onChangeText={setReviewText}
                     style={Styles.textInput}
+                    multiline
                   />
-                  <Button
-                    style={Styles.button}
-                    color="blue"
-                    title="Submeter Review"
-                    onPress={submitReview}
-                  />
-                  <Button
-                    style={Styles.button}
-                    color="red"
-                    title="Cancelar"
-                    onPress={() => setVisRating(false)}
-                  />
+                  <View style={Styles.buttonContainer}>
+                    <Button
+                      style={Styles.button}
+                      color="blue"
+                      title={t("screens.details.submitReview")}
+                      onPress={submitReview}
+                    />
+                    <Button
+                      style={Styles.button}
+                      color="red"
+                      title={t("screens.details.cancel")}
+                      onPress={() => setVisRating(false)}
+                    />
+                  </View>
                 </View>
               </View>
             </Modal>
+
           </>
         ) : (
           <Text style={Styles.loginPrompt}>
@@ -185,6 +191,6 @@ const Details = ({ t }) => {
       </View>
     </ScrollView>
   );
-};
+}; 
 
 export default Details;
