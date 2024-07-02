@@ -19,6 +19,7 @@ import { Styles } from "./Details.styles";
 import { Rating } from "react-native-ratings"; 
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
+import { capitalizeWords } from "../../utils/utils";
 
 const Details = ({ t }) => {
   const dispatch = useDispatch();
@@ -145,9 +146,9 @@ const Details = ({ t }) => {
         </Text>
         {reviews.map((review) => (
           <View key={review.id} style={Styles.reviewContainer}>
-            <Text style={Styles.reviewAuthor}>By: {review.userName}</Text>
+            <Text style={Styles.reviewAuthor}>{t("screens.details.By")}: {capitalizeWords(review.userName)}</Text>
             <Text style={Styles.reviewText}>{review.text}</Text>
-            <Text style={Styles.reviewText}>Rating: {review.rating}/5</Text>
+            <Text style={Styles.reviewText}>{t("screens.details.rating")}: {review.rating}/5</Text>
           </View>
         ))}
         {user ? (

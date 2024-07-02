@@ -68,8 +68,9 @@ export const Styles = StyleSheet.create({
   },
   reviewAuthor: {
     fontSize: 14,
-    color: "#999",
+    //color: "#999",
     marginBottom: 5,
+    fontWeight:"bold",
   },
   modalOverlay: {
     flex: 1,

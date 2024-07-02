@@ -70,7 +70,8 @@
         "width": "Width",
         "height": "Height",
         "reviews": "Reviews",
-        "writeReview": "Write a Review"
+        "writeReview": "Write a Review",
+        "By":"By"
       },
       "login": {
         "title": "Login",

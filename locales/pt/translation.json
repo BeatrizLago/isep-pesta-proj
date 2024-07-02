@@ -74,7 +74,8 @@
         "writeReviewPlaceholder": "Escreva o seu comentário aqui",
         "submitReview": "Submeter",
         "cancel": "cancelar",
-        "rating":"Nota"
+        "rating":"Nota",
+        "By":"Por"
       },
       "login": {
         "title": "Login",
