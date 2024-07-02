@@ -105,6 +105,21 @@ const Details = ({ t }) => {
           {place.accessibility?.internalCirculation
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
+            {"\n"}
+          {t("screens.details.signLanguage")}:{" "}
+          {place.accessibility?.signLanguage
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
+            {"\n"}
+          {t("screens.details.visualAlarms")}:{" "}
+          {place.accessibility?.visualAlarms
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
+            {"\n"}
+          {t("screens.details.writtenDescriptions")}:{" "}
+          {place.accessibility?.writtenDescriptions
+            ? t("screens.details.available")
+            : t("screens.details.notAvailable")}
         </Text>
         <Text style={Styles.subtitle}>
           {t("screens.details.wheelchair")}
