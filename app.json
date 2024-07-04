@@ -1,5 +1,6 @@
 {
   "expo": {
-    "scheme": "samlfirebaseexample"
+    "name": "Coach App",
+    "slug": "Coach App"
   }
 }
