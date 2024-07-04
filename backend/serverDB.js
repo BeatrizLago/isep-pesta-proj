@@ -103,6 +103,9 @@ const createPlace = ({
     entrance,
     handicapBathroom,
     internalCirculation,
+    visualAlarms,
+    signLanguage,
+    writtenDescriptions,
   },
   wheelchair: {
     width: wheelchairWidth,
@@ -193,7 +196,7 @@ const initialData = [
     street: "Jardim do Morro, 4430-210",
     category: "Lazer",
     phoneNumber: "227878120",
-    email: "null",
+    email: "geral@cm-gaia.pt",
     parking: false,
     entrance: true,
     handicapBathroom: false,
