@@ -71,7 +71,8 @@
         "height": "Height",
         "reviews": "Reviews",
         "writeReview": "Write a Review",
-        "By":"By"
+        "By":"By",
+        "directions":"Get Directions"
       },
       "login": {
         "title": "Login",

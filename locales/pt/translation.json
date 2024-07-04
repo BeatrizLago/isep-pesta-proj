@@ -75,7 +75,8 @@
         "submitReview": "Submeter",
         "cancel": "cancelar",
         "rating":"Nota",
-        "By":"Por"
+        "By":"Por",
+        "directions":"Obter Direções"
       },
       "login": {
         "title": "Login",

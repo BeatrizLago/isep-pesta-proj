@@ -20,6 +20,8 @@ import { Rating } from "react-native-ratings";
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
 import { capitalizeWords } from "../../utils/utils";
+import { FontAwesome } from "react-native-vector-icons";
+
 
 const Details = ({ t }) => {
   const dispatch = useDispatch();
@@ -54,6 +56,7 @@ const Details = ({ t }) => {
       locationUUID: place.id,
     };
 
+    
     console.log(newReview);
 
     await dispatch(addReviewToFirestore(newReview));
@@ -61,6 +64,12 @@ const Details = ({ t }) => {
     setRating(0);
     setVisRating(false); 
     await dispatch(fetchReviewsFromFirestore(place.id));
+  };
+
+  const handleDirections = () => {
+    const { latitude, longitude } = place.coordinates;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${place.coordinates.latitude},${place.coordinates.longitude}`;
+    Linking.openURL(url);
   };
 
   return (
@@ -140,6 +149,10 @@ const Details = ({ t }) => {
           <Text style={Styles.link}>
             Website: {place.siteURL || t("screens.details.notAvailable")}
           </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDirections} style={Styles.directionsButton}>
+          <FontAwesome name="location-arrow" size={20} color="#fff" style={{ marginRight: 10 }} />
+          <Text style={Styles.buttonText}>{t("screens.details.directions")}</Text>
         </TouchableOpacity>
         <Text style={Styles.subtitle}>
           {t("screens.details.reviews")}

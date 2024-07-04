@@ -131,4 +131,18 @@ export const Styles = StyleSheet.create({
     marginVertical: 10,
     textAlign: "center",
   },
+  directionsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
