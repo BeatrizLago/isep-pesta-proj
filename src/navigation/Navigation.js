@@ -108,8 +108,7 @@ function ConfigLayout({ t }) {
 function LoginLayout({ t }) {
   return createNavigator(LoginStack, screens.Login, t);
 }
-
-function TabLayout({ t }) {
+function TabLayout({ t, user }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -150,12 +149,14 @@ function TabLayout({ t }) {
       >
         {() => <ListLayout t={t} />}
       </Tab.Screen>
-      <Tab.Screen
-        name="PerfilTab"
-        options={{ headerShown: false, title: t("screens.profile.title") }}
-      >
-        {() => <ProfileLayout t={t} />}
-      </Tab.Screen>
+      {!user.isAnonymous && (
+        <Tab.Screen
+          name="PerfilTab"
+          options={{ headerShown: false, title: t("screens.profile.title") }}
+        >
+          {() => <ProfileLayout t={t} />}
+        </Tab.Screen>
+      )}
       <Tab.Screen
         name="ConfiguraçõesTab"
         options={{
@@ -178,7 +179,11 @@ const Navigation = ({ t }) => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
       if (user) {
         user.reload().then(() => {
-          if (user.emailVerified) {
+          if (user.isAnonymous) {
+            console.log("user", user);
+            setUser(user);
+          }
+          else if (user.emailVerified) {
             console.log("user", user);
             setUser(user);
             dispatch(fetchUser());
@@ -208,7 +213,7 @@ const Navigation = ({ t }) => {
       <Stack.Navigator initialRouteName="Login">
         {user ? (
           <Stack.Screen name="Test" options={{ headerShown: false }}>
-            {() => <TabLayout t={t} />}
+            {() => <TabLayout t={t} user={user} />}
           </Stack.Screen>
         ) : (
           <Stack.Screen name="LoginHome" options={{ headerShown: false }}>

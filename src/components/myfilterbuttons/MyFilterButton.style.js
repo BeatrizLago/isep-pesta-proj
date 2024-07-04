@@ -5,9 +5,10 @@ export const Styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  buttonContainer:{
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    zIndex: 2, 
   },
   bottomBarHeader: {
     flexDirection: "row",
@@ -17,12 +18,13 @@ export const Styles = StyleSheet.create({
     padding: 10,
     width: "100%",
     bottom: 0,
+    zIndex: 1,
   },
   bottomBarItem: {
     justifyContent: "center",
     flexDirection: "row",
     padding: 20,
-    zIndex: 1,
+    zIndex: 2,
     backgroundColor: "#0077b6",
     borderRadius: 50,
     width: "45%",
@@ -31,13 +33,13 @@ export const Styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     padding: 20,
-    zIndex: 1,
+    zIndex: 2,
     backgroundColor: "#0077b6",
     borderRadius: 50,
     width: "45%",
   },
   filterText: {
-    marginLeft:5,
+    marginLeft: 5,
     fontSize: 16,
     color: "white",
   },
@@ -46,7 +48,6 @@ export const Styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-
   filterButton: {
     padding: 10,
   },
@@ -58,3 +59,4 @@ export const Styles = StyleSheet.create({
     paddingBottom: 70,
   },
 });
+ 
