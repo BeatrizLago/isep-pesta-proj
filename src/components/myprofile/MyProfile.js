@@ -37,9 +37,7 @@ const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
               style={Styles.profilePicture}
             />
             <Button title="Pick an image from gallery" onPress={pickImage} />
-            <Text style={Styles.profileName}>
-              {capitalizeWords(user.displayName)}
-            </Text>
+            <Text style={Styles.profileName}>{user.displayName}</Text>
           </View>
           <View style={Styles.separator} />
           <View style={Styles.infoContainer}>

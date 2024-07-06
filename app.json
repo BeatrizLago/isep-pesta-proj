@@ -1,6 +1,16 @@
 {
   "expo": {
     "name": "Coach App",
-    "slug": "Coach App"
+    "extra": {
+      "eas": {
+        "projectId": "e24fdf83-472c-4ae3-9a31-75fa3b9ec63c"
+      }
+    },
+    "android": {
+      "package": "android.package"
+    },
+    "ios": {
+      "bundleIdentifier": "iosapp"
+    }
   }
 }

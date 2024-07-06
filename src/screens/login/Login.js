@@ -29,7 +29,7 @@ const Login = ({ t }) => {
   const signInAnonymousFunc = async () => {
     setLoading(true);
     try {
-      dispatch(signInAnonymous());
+     await dispatch(signInAnonymous());
     } catch (e) {
     } finally {
       setLoading(false);
@@ -39,7 +39,7 @@ const Login = ({ t }) => {
   const signInFunc = async () => {
     setLoading(true);
     try {
-      dispatch(signIn(email, password));
+      await dispatch(signIn(email, password));
     } catch (e) {
     } finally {
       setLoading(false);

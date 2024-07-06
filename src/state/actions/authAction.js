@@ -15,7 +15,10 @@ export const signIn = (email, password) => async (dispatch) => {
       email,
       password
     );
-    dispatch({ type: "SIGN_IN_SUCCESS", payload: response.user });
+    
+    const updatedUser = response.user;
+
+    dispatch({ type: "SIGN_IN_SUCCESS", payload: updatedUser });
   } catch (error) {
     dispatch({ type: "SIGN_IN_FAILURE", error });
   }
