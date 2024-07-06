@@ -28,6 +28,18 @@ const MyFilter = ({
       key: "internalCirculation",
       label: t("components.myFilters.internalCirculation"),
     },
+    {
+      key: "signLanguage",
+      label: t("components.myFilters.signLanguage"),
+    },
+    {
+      key: "visualAlarms",
+      label: t("components.myFilters.visualAlarms"),
+    },
+    {
+      key: "writtenDescriptions",
+      label: t("components.myFilters.writtenDescriptions"),
+    },
   ];
   const categories = useMemo(
     () => [...new Set(data.map((item) => item.category))],

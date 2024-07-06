@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
@@ -15,6 +15,7 @@ import { FIREBASE_AUTH } from "../services/firebase/firebaseConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../state/actions/userAction";
 import { ThemeContext } from "../context/ThemeContext";
+import { getCurrentUser } from "../state/actions/authAction";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -175,29 +176,42 @@ const Navigation = ({ t }) => {
   const [user, setUser] = useState(null);
   const { currentTheme } = useContext(ThemeContext);
 
+  const fetchUserData = useCallback(
+    async (user) => {
+      try {
+        await user.reload();
+        if (user.isAnonymous) {
+          console.log("Anonymous user", user);
+          dispatch(fetchUser());
+          setUser(user);
+        } else if (user.emailVerified) {
+          console.log("Verified user", user);
+          setUser(user);
+          dispatch(fetchUser());
+        } else {
+          console.log("User not verified");
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Error reloading user:", error);
+        setUser(null);
+      }
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
       if (user) {
-        user.reload().then(() => {
-          if (user.isAnonymous) {
-            console.log("user", user);
-            setUser(user);
-          }
-          else if (user.emailVerified) {
-            console.log("user", user);
-            setUser(user);
-            dispatch(fetchUser());
-          } else {
-            setUser(null);
-          }
-        });
+        fetchUserData(user);
       } else {
+        console.log("No user logged in");
         setUser(null);
       }
     });
 
     return () => unsubscribe();
-  }, [dispatch]);
+  }, [fetchUserData]);
 
   return (
     <NavigationContainer
