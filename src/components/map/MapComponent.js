@@ -1,5 +1,3 @@
-// MapComponent.js
-
 import React, { useRef, useEffect, useState } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
