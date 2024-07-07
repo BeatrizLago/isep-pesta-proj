@@ -145,4 +145,7 @@ export const Styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  accessibilityIcon: {
+    marginLeft: 5,
+  },
 });
