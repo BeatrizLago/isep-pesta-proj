@@ -22,7 +22,6 @@ import { useRoute } from "@react-navigation/native";
 import { capitalizeWords } from "../../utils/utils";
 import { FontAwesome } from "react-native-vector-icons";
 
-
 const Details = ({ t }) => {
   const dispatch = useDispatch();
   const route = useRoute();
@@ -56,7 +55,6 @@ const Details = ({ t }) => {
       locationUUID: place.id,
     };
 
-    
     console.log(newReview);
 
     await dispatch(addReviewToFirestore(newReview));
@@ -70,6 +68,17 @@ const Details = ({ t }) => {
     const { latitude, longitude } = place.coordinates;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
     Linking.openURL(url);
+  };
+
+  const renderAccessibilityIcon = (isAccessible) => {
+    return (
+      <FontAwesome
+        name={isAccessible ? "check-circle" : "times-circle"}
+        size={20}
+        color={isAccessible ? "green" : "red"}
+        style={Styles.accessibilityIcon}
+      />
+    );
   };
 
   return (
@@ -100,36 +109,43 @@ const Details = ({ t }) => {
           {place.accessibility?.parking
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
+            {renderAccessibilityIcon(place.accessibility?.parking)}
           {"\n"}
           {t("screens.details.entrance")}:{" "}
           {place.accessibility?.entrance
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
+            {renderAccessibilityIcon(place.accessibility?.entrance)}
           {"\n"}
           {t("screens.details.handicapBathroom")}:{" "}
           {place.accessibility?.handicapBathroom
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
+            {renderAccessibilityIcon(place.accessibility?.handicapBathroom)}
           {"\n"}
           {t("screens.details.internalCirculation")}:{" "}
           {place.accessibility?.internalCirculation
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {"\n"}
+            {renderAccessibilityIcon(place.accessibility?.internalCirculation)}
+          {"\n"}
           {t("screens.details.signLanguage")}:{" "}
           {place.accessibility?.signLanguage
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {"\n"}
+            {renderAccessibilityIcon(place.accessibility?.signLanguage)}
+          {"\n"}
           {t("screens.details.visualAlarms")}:{" "}
           {place.accessibility?.visualAlarms
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {"\n"}
+            {renderAccessibilityIcon(place.accessibility?.visualAlarms)}
+          {"\n"}
           {t("screens.details.writtenDescriptions")}:{" "}
           {place.accessibility?.writtenDescriptions
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
+            {renderAccessibilityIcon(place.accessibility?.writtenDescriptions)}
         </Text>
         <Text style={Styles.subtitle}>
           {t("screens.details.wheelchair")}
@@ -210,7 +226,6 @@ const Details = ({ t }) => {
                 </View>
               </View>
             </Modal>
-
           </>
         ) : (
           <Text style={Styles.loginPrompt}>
@@ -220,6 +235,6 @@ const Details = ({ t }) => {
       </View>
     </ScrollView>
   );
-}; 
+};
 
 export default Details;

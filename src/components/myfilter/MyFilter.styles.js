@@ -42,7 +42,7 @@ export const Styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     margin: 5,
-    width: "45%"
+    width: "100%"
   },
   radioCircle: {
     height: 24,
@@ -91,6 +91,7 @@ export const Styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
     elevation: 3,
+    width: "100%",
   },
   switchContainer: {
     flexDirection: "row",

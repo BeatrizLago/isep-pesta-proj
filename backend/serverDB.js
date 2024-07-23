@@ -305,6 +305,28 @@ const initialData = [
     imageURL: "https://parquebiologico.pt/images/ParqueBiologico/parque.jpg",
     name: "Parque Biológico de Gaia",
   }),
+  createPlace({
+    accessLevel: "5",
+    city: "Vila Nova de Gaia",
+    street: "Rua Diogo Macedo 220, 4400-107",
+    category: "Hotel",
+    phoneNumber: "223747500",
+    email: "reservas@hiportogaia.com",
+    parking: true,
+    entrance: true,
+    handicapBathroom: true,
+    internalCirculation: true,
+    visualAlarms: false,
+    signLanguage: true,
+    writtenDescriptions: true,
+    wheelchairWidth: null,
+    wheelchairHeight: null,
+    latitude: "41.124155863569406",
+    longitude: "-8.614771052639991",
+    siteURL: "https://www.hiportogaia.com/",
+    imageURL: "https://digital.ihg.com/is/image/ihg/holiday-inn-vila-nova-de-gaia-8923410574-4x3",
+    name: "Holiday Inn Porto Gaia",
+  }),
 ];
 
 async function initializeData(initialData) {
