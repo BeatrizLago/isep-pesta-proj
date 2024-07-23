@@ -1,9 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, TouchableWithoutFeedback } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import LocationDetail from '../locationDetail/locationDetail';
-import { Styles } from './MapComponent.styles';
+import React, { useRef, useEffect, useState } from "react";
+import { View, TouchableWithoutFeedback, Button, Platform } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE, UrlTile } from "react-native-maps";
+import LocationDetail from "../locationDetail/locationDetail";
+import { Styles } from "./MapComponent.styles";
+import * as Location from "expo-location";
+import ActivityLoader from "../activityloader/ActivityLoader";
+import Mapbox from "@rnmapbox/maps";
 
+Mapbox.setAccessToken(
+  "sk.eyJ1IjoiMTIwMTEzMiIsImEiOiJjbHl5bDc5ZnUxZmZ3MmpzMGkxeDk2NGh5In0.pdYLJDr9jpkELX-UuuoPOA"
+);
 
 const MapComponent = ({ destination, locations, t }) => {
   const mapRef = useRef(null);
@@ -12,70 +18,110 @@ const MapComponent = ({ destination, locations, t }) => {
     longitude: -8.6291,
   };
 
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
-    if (destination && mapRef.current) {
+    const requestLocationPermission = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    };
+
+    requestLocationPermission();
+  }, []);
+
+  const handleZoomToUserLocation = () => {
+    if (location && mapRef.current) {
       mapRef.current.animateToRegion(
         {
-          ...destination,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         },
         1000
       );
     }
-  }, [destination]);
+  };
 
   const handleMapPress = () => {
-    setSelectedLocation(null); // Close LocationDetail on map press
+    setSelectedLocation(null);
   };
 
   const handleMarkerPress = (location) => {
-    setSelectedLocation(location); // Show LocationDetail on marker press
+    setSelectedLocation(location);
   };
 
   return (
-    <View style={Styles.mapContainer}>
-      <MapView
-        ref={mapRef}
-        style={Styles.map}
-        initialRegion={{
-          latitude: portoCoords.latitude,
-          longitude: portoCoords.longitude,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        }}
-        onPress={handleMapPress} // Handle map press to close LocationDetail
-      >
-        {destination && (
-          <Marker coordinate={destination} title={destination.name} />
-        )}
-        {locations &&
-          locations.map((location) => (
-            <Marker
-              key={location.id}
-              coordinate={{
-                latitude: parseFloat(location.coordinates.latitude),
-                longitude: parseFloat(location.coordinates.longitude),
-              }}
-              title={location.name}
-              onPress={() => handleMarkerPress(location)}
-            />
-          ))}
-      </MapView>
+    // <View style={Styles.mapContainer}>
+    //   {location ? (
+    //     <>
+    //       <MapView
+    //         ref={mapRef}
+    //         style={Styles.map}
+    //         showsUserLocation={true}
+    //         initialRegion={{
+    //           latitude: location.coords.latitude,
+    //           longitude: location.coords.longitude,
+    //           latitudeDelta: 0.1,
+    //           longitudeDelta: 0.1,
+    //         }}
+    //         onPress={handleMapPress}
+    //       >
+    //         <UrlTile
+    //           urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    //           maximumZ={19}
+    //         />
+    //         {locations &&
+    //           locations.map((loc) => (
+    //             <Marker
+    //               key={loc.id}
+    //               coordinate={{
+    //                 latitude: parseFloat(loc.coordinates.latitude),
+    //                 longitude: parseFloat(loc.coordinates.longitude),
+    //               }}
+    //               title={loc.name}
+    //               onPress={() => handleMarkerPress(loc)}
+    //             />
+    //           ))}
+    //       </MapView>
+    //       {Platform.OS === "ios" && (
+    //         <View style={Styles.buttonContainer}>
+    //           <Button
+    //             title="Zoom to My Location"
+    //             onPress={handleZoomToUserLocation}
+    //           />
+    //         </View>
+    //       )}
+    //     </>
+    //   ) : (
+    //     <ActivityLoader />
+    //   )}
 
-      {selectedLocation && (
-        <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
-          <View style={Styles.locationDetailOverlay}>
-            <LocationDetail
-              location={selectedLocation}
-              onClose={() => setSelectedLocation(null)}
-              t = {t} 
-            />
-          </View>
-        </TouchableWithoutFeedback>
-      )}
+    //   {selectedLocation && (
+    //     <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
+    //       <View style={Styles.locationDetailOverlay}>
+    //         <LocationDetail
+    //           location={selectedLocation}
+    //           onClose={() => setSelectedLocation(null)}
+    //           t={t}
+    //         />
+    //       </View>
+    //     </TouchableWithoutFeedback>
+    //   )}
+    // </View>
+
+    <View>
+      <View>
+        <Mapbox.MapView />
+      </View>
     </View>
   );
 };

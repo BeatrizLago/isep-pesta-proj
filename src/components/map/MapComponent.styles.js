@@ -11,4 +11,12 @@ export const Styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  userLocation: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+  },
 });

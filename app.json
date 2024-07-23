@@ -1,16 +1,53 @@
 {
   "expo": {
     "name": "Coach App",
-    "extra": {
-      "eas": {
-        "projectId": "e24fdf83-472c-4ae3-9a31-75fa3b9ec63c"
+    "slug": "coach-app-slug",
+    "version": "1.0.0",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.4.0"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show your current position on the map.",
+        "NSLocationAlwaysUsageDescription": "We need your location to show your current position on the map even when the app is in the background.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow to use your location",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.1201132.coachappslug",
+      "config": {
+        "googleMapsApiKey": "AIzaSyC3r_xoHo2oDrv8Hbg1obXt1JWlDMipKQU"
       }
     },
     "android": {
-      "package": "android.package"
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "INTERNET"
+      ],
+      "package": "com.example"
     },
-    "ios": {
-      "bundleIdentifier": "iosapp"
+    "extra": {
+      "eas": {
+        "projectId": "4ee36c11-7853-40c5-a086-ddcb42a516a6"
+      }
     }
   }
 }

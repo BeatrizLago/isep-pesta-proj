@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
-import MapComponent from "../../components/map/MapComponent";
+import MapComponent from "../../components/map/MapComponent"
 import SearchBar from "../../components/searchbar/SearchBar";
 import { Styles } from "./Home.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
