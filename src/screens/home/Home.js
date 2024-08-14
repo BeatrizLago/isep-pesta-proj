@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
-import MapComponent from "../../components/map/MapComponent"
+import MapComponent from "../../components/map/MapComponent";
 import SearchBar from "../../components/searchbar/SearchBar";
 import { Styles } from "./Home.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
@@ -8,10 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
+import { fetchDirections } from "../../state/actions/directionsAction";
 
 const Home = ({ t }) => {
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.location.locations);
+  const directions = useSelector((state) => state.direction.directions);
+  const error = useSelector((state) => state.direction.error);
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
@@ -21,6 +24,18 @@ const Home = ({ t }) => {
   const [destination, setDestination] = useState(null);
 
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
+
+  useEffect(() => {
+    const test = async () => {
+      const coordinates = [
+        [-8.61489264, 41.14684],
+        [-8.6138, 41.145951],
+      ]; // Correct format
+      await dispatch(fetchDirections(coordinates));
+      console.log("Directions:", JSON.stringify(directions));
+    };
+    test();
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,12 +133,10 @@ const Home = ({ t }) => {
             />
             {showMap && (
               <View style={Styles.mapContainerScreen}>
-                <SearchBar
-                  handleSearch={handleSearch}
-                  t={t}
-                />
+                <SearchBar handleSearch={handleSearch} t={t} />
                 <MapComponent
                   destination={destination}
+                  directions={directions}
                   portugalCenter={portugalCenter}
                   locations={filteredData}
                   t={t}
