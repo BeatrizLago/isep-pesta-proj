@@ -12,7 +12,7 @@ import {
   uploadImageToFirebase,
 } from "../../state/actions/userAction";
 
-const Profile = ({t}) => {
+const Profile = ({ t }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
@@ -70,7 +70,6 @@ const Profile = ({t}) => {
       setLoading(false);
     }
   };
-
   return (
     <View style={Styles.container}>
       {loading || !user ? (
@@ -83,11 +82,14 @@ const Profile = ({t}) => {
               handleUserPhotoUpdate={handleUserPhotoUpdate}
               t={t}
             />
-            <MyWheelChair
-              handleWheelchairUpdate={handleWheelchairUpdate}
-              user={user}
-              t={t}
-            />
+
+            {user.deficiency === "wheelchair" && (
+              <MyWheelChair
+                handleWheelchairUpdate={handleWheelchairUpdate}
+                user={user}
+                t={t}
+              />
+            )}
           </ScrollView>
         </>
       )}

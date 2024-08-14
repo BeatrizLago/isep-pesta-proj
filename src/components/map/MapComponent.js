@@ -20,7 +20,7 @@ const MapComponent = ({ destination, directions, locations, t }) => {
     if (directions) {
       const decodedCoordinates = polyline
         .decode(directions.routes[0].geometry)
-        .map(([longitude, latitude]) => ({ longitude, latitude }));
+        .map(([latitude, longitude]) => ({ latitude, longitude }));
 
       setRouteCoordinates(decodedCoordinates);
     }

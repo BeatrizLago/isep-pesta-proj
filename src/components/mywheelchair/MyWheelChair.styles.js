@@ -19,6 +19,14 @@ export const Styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  wheelchairPicture: {
+    width: 75,
+    height: 75,
+    //borderRadius: 150 / 2,
+    //overflow: "hidden",
+    //borderWidth: 3,
+    //borderColor: "black"
+  },
   wheelchairButtonText: {
     color: "white",
     fontSize: 18,

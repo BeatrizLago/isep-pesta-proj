@@ -2,7 +2,7 @@ import { openRouteService } from "../../services/openRoute/openRouteConfig";
 
 export const fetchDirections = (coordinates) => async (dispatch) => {
   try {
-    const response = await openRouteService.post("/v2/directions/driving-car", {
+    const response = await openRouteService.post("/v2/directions/wheelchair", {
       coordinates: coordinates,
     });
     

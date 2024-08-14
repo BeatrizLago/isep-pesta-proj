@@ -14,7 +14,9 @@ import { capitalizeWords } from "../../utils/utils";
 
 const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
   const askGalleryPermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(true);
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(
+      true
+    );
     if (status !== "granted") {
       Alert.alert(
         "Permission Required",
@@ -55,7 +57,10 @@ const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
               source={{ uri: user.photoURL }}
               style={Styles.profilePicture}
             />
-            <Button title={t("screens.profile.imagePicker")} onPress={pickImage} />
+            <Button
+              title={t("screens.profile.imagePicker")}
+              onPress={pickImage}
+            />
             <Text style={Styles.profileName}>{user.displayName}</Text>
           </View>
           <View style={Styles.separator} />
@@ -68,10 +73,6 @@ const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
             </View>
             {user.wheelchair && (
               <View style={Styles.wheelchairContainer}>
-                <Image
-                  source={require("../../assets/wheelchair.png")}
-                  style={Styles.wheelchairPicture}
-                />
                 <View style={Styles.wheelchairInfoContainer}>
                   {user.wheelchair.width && (
                     <Text>

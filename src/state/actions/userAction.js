@@ -27,7 +27,7 @@ export const fetchUsers = () => async (dispatch) => {
   }
 };
 
-export const createUser = () => async (dispatch) => {
+export const createUser = (deficiency) => async (dispatch) => {
   try {
     const { uid, displayName, email, photoURL } = FIREBASE_AUTH.currentUser;
     const userRef = doc(collection(FIREBASE_DB, "users"), uid);
@@ -38,6 +38,7 @@ export const createUser = () => async (dispatch) => {
         displayName,
         email,
         photoURL,
+        deficiency: deficiency,
         wheelchair: { width: null, height: null },
       });
       dispatch({
@@ -129,6 +130,33 @@ export const updateUserPhotoURL = (url) => async (dispatch) => {
     if (userDoc.exists()) {
       await updateDoc(userRef, {
         photoURL: url,
+      });
+
+      dispatch({
+        type: "UPDATE_USER_SUCCESS",
+        payload: { id: userDoc.id, photoURL: url, ...userDoc.data() },
+      });
+    } else {
+      console.error("User document does not exist for UID: ", uid);
+      dispatch({ type: "UPDATE_USER_NOT_FOUND", error: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error updating user document: ", error);
+    dispatch({ type: "UPDATE_USER_FAILURE", error });
+  }
+};
+
+export const updateUserDeficiency = (deficiency) => async (dispatch) => {
+  try {
+    const userRef = doc(
+      collection(FIREBASE_DB, "users"),
+      FIREBASE_AUTH.currentUser.uid
+    );
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      await updateDoc(userRef, {
+        deficiency: deficiency,
       });
 
       dispatch({
