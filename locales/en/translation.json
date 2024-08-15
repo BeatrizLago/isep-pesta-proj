@@ -92,6 +92,8 @@
         "lastName": "Last name",
         "email": "Email",
         "password": "Password",
+        "selectDeficiency": "Select deficiency",
+        "chooseDeficiency": "Choose deficiency",
         "signup": "Sign up",
         "alert": "Check your email",
         "alertError": "Failed to create account: "

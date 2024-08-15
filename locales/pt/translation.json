@@ -96,6 +96,8 @@
         "lastName": "Último nome",
         "email": "Email",
         "password": "Palavra-passe",
+        "selectDeficiency": "Selecionar deficiencia",
+        "chooseDeficiency": "Escolha deficiencia",
         "signup": "Criar conta",
         "alert": "Verifique o seu email",
         "alertError": "Criar a conta falhou: "
