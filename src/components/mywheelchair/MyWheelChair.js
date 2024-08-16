@@ -24,6 +24,20 @@ const MyWheelChair = ({ handleWheelchairUpdate, user, t }) => {
 
   return (
     <View style={Styles.container}>
+      <View style={Styles.wheelchairContainer}>
+        <View style={Styles.wheelchairInfoContainer}>
+          {user.wheelchair.width && (
+            <Text>
+              {t("screens.profile.width")}: {user.wheelchair.width} cm
+            </Text>
+          )}
+          {user.wheelchair.height && (
+            <Text>
+              {t("screens.profile.height")}: {user.wheelchair.height} cm
+            </Text>
+          )}
+        </View>
+      </View>
       <Image
         source={require("../../assets/wheelchair.png")}
         style={Styles.wheelchairPicture}

@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Styles } from "./MyProfile.styles";
+import { Avatar } from '@rneui/themed';
 import * as ImagePicker from "expo-image-picker";
 import { capitalizeWords } from "../../utils/utils";
 
@@ -53,14 +54,14 @@ const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
       {user ? (
         <View>
           <View style={Styles.container}>
-            <Image
+            <Avatar
+              rounded
+              showEditButton
+              size="xlarge"
               source={{ uri: user.photoURL }}
-              style={Styles.profilePicture}
-            />
-            <Button
-              title={t("screens.profile.imagePicker")}
-              onPress={pickImage}
-            />
+            >
+              <Avatar.Accessory size={50} onPress={pickImage} />
+            </Avatar>
             <Text style={Styles.profileName}>{user.displayName}</Text>
           </View>
           <View style={Styles.separator} />
@@ -71,22 +72,6 @@ const MyProfile = ({ user, handleUserPhotoUpdate, t }) => {
               </Text>
               <Text style={Styles.emailText}>{user.email}</Text>
             </View>
-            {user.wheelchair && (
-              <View style={Styles.wheelchairContainer}>
-                <View style={Styles.wheelchairInfoContainer}>
-                  {user.wheelchair.width && (
-                    <Text>
-                      {t("screens.profile.width")}: {user.wheelchair.width} cm
-                    </Text>
-                  )}
-                  {user.wheelchair.height && (
-                    <Text>
-                      {t("screens.profile.height")}: {user.wheelchair.height} cm
-                    </Text>
-                  )}
-                </View>
-              </View>
-            )}
           </View>
         </View>
       ) : (

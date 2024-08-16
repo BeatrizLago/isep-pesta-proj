@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
-import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+} from "react-native";
 import MapComponent from "../../components/map/MapComponent";
-import SearchBar from "../../components/searchbar/SearchBar";
+import { SearchBar } from "@rneui/themed";
 import { Styles } from "./Home.styles";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +27,7 @@ const Home = ({ t }) => {
   const [showMap, setShowMap] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
   const [destination, setDestination] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
@@ -30,7 +36,7 @@ const Home = ({ t }) => {
       const coordinates = [
         [-8.61489264, 41.14684],
         [-8.6138, 41.145951],
-      ]; // Correct format
+      ];
       await dispatch(fetchDirections(coordinates));
       console.log("Directions:", JSON.stringify(directions));
     };
@@ -64,29 +70,33 @@ const Home = ({ t }) => {
 
   const handleSearch = useCallback(
     (query) => {
+      setSearchQuery(query);
+
       if (query.trim() === "") {
         setDestination(null);
-        setFilteredData(locations); // Reset to all locations if search query is empty
+        setFilteredData(locations);
         return;
       }
 
-      const searchResult = locations.find(
+      const searchResults = locations.filter(
         (location) =>
-          location.name.toLowerCase().includes(query.toLowerCase()) ||
-          location.address.street.toLowerCase().includes(query.toLowerCase()) ||
-          location.address.city.toLowerCase().includes(query.toLowerCase())
+          location.name.toLowerCase().startsWith(query.toLowerCase()) ||
+          location.address.street
+            .toLowerCase()
+            .startsWith(query.toLowerCase()) ||
+          location.address.city.toLowerCase().startsWith(query.toLowerCase())
       );
 
-      if (searchResult) {
+      setFilteredData(searchResults);
+
+      if (searchResults.length > 0) {
         setDestination({
-          latitude: parseFloat(searchResult.coordinates.latitude),
-          longitude: parseFloat(searchResult.coordinates.longitude),
-          name: searchResult.name, // Add the name here
+          latitude: parseFloat(searchResults[0].coordinates.latitude),
+          longitude: parseFloat(searchResults[0].coordinates.longitude),
+          name: searchResults[0].name,
         });
-        setFilteredData([searchResult]);
       } else {
         setDestination(null);
-        setFilteredData([]); // Reset to all locations if no match found
       }
     },
     [locations]
@@ -110,43 +120,52 @@ const Home = ({ t }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={{ flex: 1 }}>
-        {loading ? (
-          <ActivityLoader />
-        ) : (
-          <>
-            <MyFilterButtons
-              toggleFilter={toggleFilter}
-              clearFilters={clearFilters}
-              showFilter={showFilter}
-              t={t}
-            />
-            <MyFilter
-              showFilter={showFilter}
-              data={locations}
-              selectedFilters={selectedFilters}
-              setFilteredData={setFilteredData}
-              onFilterChange={setSelectedFilters}
-              user={user}
-              t={t}
-            />
-            {showMap && (
-              <View style={Styles.mapContainerScreen}>
-                <SearchBar handleSearch={handleSearch} t={t} />
-                <MapComponent
-                  destination={destination}
-                  directions={directions}
-                  portugalCenter={portugalCenter}
-                  locations={filteredData}
-                  t={t}
-                />
-              </View>
-            )}
-          </>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
+    <KeyboardAvoidingView style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={{ flex: 1 }}>
+          {loading ? (
+            <ActivityLoader />
+          ) : (
+            <>
+              <MyFilterButtons
+                toggleFilter={toggleFilter}
+                clearFilters={clearFilters}
+                showFilter={showFilter}
+                t={t}
+              />
+              <MyFilter
+                showFilter={showFilter}
+                data={locations}
+                selectedFilters={selectedFilters}
+                setFilteredData={setFilteredData}
+                onFilterChange={setSelectedFilters}
+                user={user}
+                t={t}
+              />
+              {showMap && (
+                <View style={Styles.mapContainerScreen}>
+                  <SearchBar
+                    placeholder={t("components.searchBar.text")}
+                    onChangeText={handleSearch}
+                    value={searchQuery}
+                    round
+                    lightTheme
+                    platform="android"
+                  />
+                  <MapComponent
+                    destination={destination}
+                    directions={directions}
+                    portugalCenter={portugalCenter}
+                    locations={filteredData}
+                    t={t}
+                  />
+                </View>
+              )}
+            </>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

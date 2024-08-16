@@ -27,6 +27,18 @@ export const Styles = StyleSheet.create({
     //borderWidth: 3,
     //borderColor: "black"
   },
+  wheelchairContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 15,
+    //justifyContent: "center",
+  },
+  wheelchairInfoContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   wheelchairButtonText: {
     color: "white",
     fontSize: 18,

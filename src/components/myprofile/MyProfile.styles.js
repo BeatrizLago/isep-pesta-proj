@@ -8,10 +8,7 @@ export const Styles = StyleSheet.create({
     profilePicture: {
         width: 130,
         height: 130,
-        borderRadius: 150 / 2,
-        overflow: "hidden",
-        borderWidth: 3,
-        borderColor: "black"
+
     },
     profileName: {
       fontSize: 23, 
