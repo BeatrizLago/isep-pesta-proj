@@ -1,20 +1,17 @@
 import React, { useRef, useEffect, useState } from "react";
 import { View, TouchableWithoutFeedback, Button, Platform } from "react-native";
-import MapView, { Polyline, Marker, PROVIDER_GOOGLE, UrlTile } from "react-native-maps";
+import MapView, { Polyline, Marker, UrlTile } from "react-native-maps";
 import LocationDetail from "../locationDetail/locationDetail";
 import { Styles } from "./MapComponent.styles";
 import * as Location from "expo-location";
 import ActivityLoader from "../activityloader/ActivityLoader";
 import polyline from "@mapbox/polyline";
-// import MapboxGL from "@rnmapbox/maps";
-
-// MapboxGL.setAccessToken(
-//   "sk.eyJ1IjoiMTIwMTEzMiIsImEiOiJjbHl5bDc5ZnUxZmZ3MmpzMGkxeDk2NGh5In0.pdYLJDr9jpkELX-UuuoPOA"
-// );
 
 const MapComponent = ({ destination, directions, locations, t }) => {
   const mapRef = useRef(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [location, setLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     if (directions) {
@@ -23,16 +20,10 @@ const MapComponent = ({ destination, directions, locations, t }) => {
         .map(([latitude, longitude]) => ({ latitude, longitude }));
 
       setRouteCoordinates(decodedCoordinates);
+    } else {
+      setRouteCoordinates([]); // Reset route coordinates if no directions
     }
   }, [directions]);
-  const portoCoords = {
-    latitude: 41.1579,
-    longitude: -8.6291,
-  };
-
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -108,7 +99,8 @@ const MapComponent = ({ destination, directions, locations, t }) => {
               urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
               maximumZ={19}
             />
-            {locations &&
+            {routeCoordinates.length === 0 &&
+              locations && // Show markers only if no route is present
               locations.map((loc) => (
                 <Marker
                   key={loc.id}
@@ -146,12 +138,6 @@ const MapComponent = ({ destination, directions, locations, t }) => {
         </TouchableWithoutFeedback>
       )}
     </View>
-
-    // <View>
-    //   <View>
-    //     <Mapbox.MapView />
-    //   </View>
-    // </View>
   );
 };
 

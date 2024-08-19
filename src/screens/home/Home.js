@@ -8,18 +8,23 @@ import {
 import { SearchBar, Overlay, Button } from "@rneui/themed";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
-import { fetchDirections } from "../../state/actions/directionsAction";
-import AutoComplete from "../../components/autoCompleteInput/AutoComplete";
+import {
+  clearDirections,
+  fetchDirections,
+} from "../../state/actions/directionsAction";
 import MapComponent from "../../components/map/MapComponent";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { Styles } from "./Home.styles";
+import Directions from "../../components/directions/Directions";
 
 const useLocations = () => {
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.location.locations);
   const [filteredData, setFilteredData] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,17 +52,37 @@ const useLocations = () => {
     }
   }, [locations]);
 
-  return { locations, filteredData, setFilteredData, loading };
+  const toggleFilter = useCallback(() => {
+    setShowFilter((prev) => !prev);
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    setSelectedFilters([]);
+    setFilteredData(locations);
+  }, [locations]);
+
+  return {
+    locations,
+    filteredData,
+    setFilteredData,
+    loading,
+    toggleFilter,
+    clearFilters,
+    showFilter,
+    setShowFilter,
+    selectedFilters,
+    setSelectedFilters,
+  };
 };
 
-const useDirections = (startLocation, endLocation) => {
+const useDirections = (startLocation, endLocation, profile) => {
   const dispatch = useDispatch();
 
   const handleDirections = useCallback(() => {
     if (startLocation && endLocation) {
       const coordinates = [startLocation, endLocation];
       const fetchAndLogDirections = async () => {
-        await dispatch(fetchDirections(coordinates));
+        await dispatch(fetchDirections(coordinates, profile));
         console.log("Directions:", JSON.stringify(coordinates));
       };
       fetchAndLogDirections();
@@ -66,17 +91,39 @@ const useDirections = (startLocation, endLocation) => {
     }
   }, [startLocation, endLocation, dispatch]);
 
-  return { handleDirections };
+  const handleClearDirections = async () => {
+    await dispatch(clearDirections());
+  };
+
+  return { handleDirections, handleClearDirections };
 };
 
 const Home = ({ t }) => {
-  const { locations, filteredData, setFilteredData, loading } = useLocations();
+  const {
+    locations,
+    filteredData,
+    setFilteredData,
+    loading,
+    toggleFilter,
+    clearFilters,
+    showFilter,
+    setShowFilter,
+    selectedFilters,
+    setSelectedFilters,
+  } = useLocations();
+  const user = useSelector((state) => state.user.userInfo);
   const [visible, setVisible] = useState(false);
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const { handleDirections } = useDirections(startLocation, endLocation);
+  const [profile, setProfile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { handleDirections, handleClearDirections } = useDirections(
+    startLocation,
+    endLocation,
+    profile
+  );
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
+  const directions = useSelector((state) => state.direction.directions);
 
   const toggleOverlay = () => setVisible(!visible);
 
@@ -127,11 +174,20 @@ const Home = ({ t }) => {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={{ flex: 1 }}>
           <MyFilterButtons
-            toggleFilter={() => setShowFilter((prev) => !prev)}
-            clearFilters={() => setFilteredData(locations)}
+            toggleFilter={toggleFilter}
+            clearFilters={clearFilters}
+            showFilter={showFilter}
             t={t}
           />
-          <MyFilter data={locations} setFilteredData={setFilteredData} t={t} />
+          <MyFilter
+            showFilter={showFilter}
+            data={locations}
+            selectedFilters={selectedFilters}
+            setFilteredData={setFilteredData}
+            onFilterChange={setSelectedFilters}
+            user={user}
+            t={t}
+          />
           <View style={Styles.mapContainerScreen}>
             <SearchBar
               placeholder={t("components.searchBar.text")}
@@ -142,34 +198,29 @@ const Home = ({ t }) => {
               platform="android"
             />
             <Button
-              title="Open Overlay"
+              title="Get directions"
               onPress={toggleOverlay}
               buttonStyle={Styles.button}
             />
-            <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
-              <AutoComplete
-                data={locations}
-                placeholder="Enter start location"
-                onSelect={(name) =>
-                  handleSelectLocation(name, setStartLocation)
-                }
-              />
-              <AutoComplete
-                data={locations}
-                placeholder="Enter destination"
-                onSelect={(name) => handleSelectLocation(name, setEndLocation)}
-              />
-              <Button
-                title="Give directions"
-                onPress={() => {
-                  toggleOverlay();
-                  handleDirections();
-                }}
-              />
-            </Overlay>
+            <Button
+              title="Clear directions"
+              onPress={handleClearDirections}
+              buttonStyle={Styles.button}
+            />
+            <Directions
+              visible={visible}
+              toggleOverlay={toggleOverlay}
+              locations={locations}
+              handleSelectLocation={handleSelectLocation}
+              setStartLocation={setStartLocation}
+              setEndLocation={setEndLocation}
+              handleDirections={handleDirections}
+              profile={profile}
+              setProfile={setProfile}
+            />
             <MapComponent
               destination={filteredData[0]}
-              directions={useSelector((state) => state.direction.directions)}
+              directions={directions}
               portugalCenter={portugalCenter}
               locations={filteredData}
               t={t}

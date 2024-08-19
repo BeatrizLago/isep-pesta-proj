@@ -8,14 +8,21 @@ const directionsReducer = (state = initialState, action) => {
     case "GET_DIRECTIONS_SUCCESS":
       return {
         ...state,
-        directions: action.payload, 
+        directions: action.payload,
         error: null,
       };
-    case "GET_DIRECTIONS_FAILURE":
+    case "CLEAR_DIRECTIONS_SUCCESS":
       return {
         ...state,
         directions: null,
-        error: action.payload, 
+        error: null,
+      };
+    case "GET_DIRECTIONS_FAILURE":
+    case "CLEAR_DIRECTIONS_FAILURE":
+      return {
+        ...state,
+        directions: null,
+        error: action.payload,
       };
     default:
       return state;
