@@ -1,10 +1,11 @@
 import { openRouteService } from "../../services/openRoute/openRouteConfig";
 
-export const fetchDirections = (coordinates, profile) => async (dispatch) => {
+export const fetchDirections = (body, profile) => async (dispatch) => {
   try {
-    const response = await openRouteService.post("/v2/directions/" + profile, {
-      coordinates: coordinates,
-    });
+    const response = await openRouteService.post(
+      "/v2/directions/" + profile,
+      body
+    );
 
     dispatch({ type: "GET_DIRECTIONS_SUCCESS", payload: response.data });
   } catch (error) {

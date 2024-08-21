@@ -90,7 +90,7 @@ const Markers = ({ locations, routeCoordinates, onMarkerPress }) => (
 
 // Component for rendering a mini box with text
 const RouteInfoBox = ({ routeCoordinates, directions }) => {
-  if (routeCoordinates.length === 0) return null;
+  if (routeCoordinates.length === 0 || !directions) return null;
 
   const steps = directions.routes[0].segments[0].steps;
 

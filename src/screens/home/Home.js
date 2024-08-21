@@ -18,6 +18,7 @@ import MyFilter from "../../components/myfilter/MyFilter";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { Styles } from "./Home.styles";
 import Directions from "../../components/directions/Directions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const useLocations = () => {
   const dispatch = useDispatch();
@@ -82,8 +83,10 @@ const useDirections = (startLocation, endLocation, profile) => {
     if (startLocation && endLocation) {
       const coordinates = [startLocation, endLocation];
       const fetchAndLogDirections = async () => {
-        await dispatch(fetchDirections(coordinates, profile));
-        console.log("Directions:", JSON.stringify(coordinates));
+        const language = await AsyncStorage.getItem("LANGUAGE");
+        const body = { coordinates, language };
+        await dispatch(fetchDirections(body, profile));
+        console.log("Directions:", JSON.stringify(body));
       };
       fetchAndLogDirections();
     } else {
