@@ -1,34 +1,34 @@
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import AutocompleteInput from "react-native-autocomplete-input";
+import { View } from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const Autocomplete = ({ data, placeholder, onSelect }) => {
   const [inputQuery, setInputQuery] = useState("");
 
+  // Filter data based on the input query
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(inputQuery.toLowerCase())
   );
 
-  const handleSelectItem = (itemName) => {
-    setInputQuery(itemName); // Set the input query to the selected item
-    onSelect(itemName); // Call the onSelect function passed as a prop
+  // Handle selection of an item by id and map it to the corresponding name
+  const handleSelectItem = (selectedId) => {
+    const selectedItem = data.find((item) => item.id === selectedId);
+    if (selectedItem) {
+      console.log("Selected item name:", selectedItem.name);
+      setInputQuery(selectedItem.name);
+      onSelect(selectedItem.name);
+    }
   };
 
   return (
-    <AutocompleteInput
-      data={filteredData}
-      value={inputQuery}
-      onChangeText={(text) => setInputQuery(text)}
-      placeholder={placeholder}
-      flatListProps={{
-        keyExtractor: (item) => item.id.toString(),
-        renderItem: ({ item }) => (
-          <TouchableOpacity onPress={() => handleSelectItem(item.name)}>
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        ),
-      }}
-    />
+    <View>
+      <SelectList
+        setSelected={handleSelectItem}
+        data={filteredData.map((item) => ({ key: item.id, value: item.name }))}
+        search={true}
+        placeholder={placeholder}
+      />
+    </View>
   );
 };
 
