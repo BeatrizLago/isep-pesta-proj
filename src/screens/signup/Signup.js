@@ -27,8 +27,8 @@ const Signup = ({ t }) => {
   const [loading, setLoading] = useState(false);
 
   const deficiencies = [
-    { key: "wheelchair", label: "Cadareirante" },
-    { key: "deaf", label: "Surdo" },
+    { key: "wheelchair", label: t("screens.signup.wheelchair") },
+    { key: "deaf", label: t("screens.signup.deaf") },
   ];
 
   const signUpFunc = async () => {

@@ -105,6 +105,8 @@
         "password": "Password",
         "selectDeficiency": "Select deficiency",
         "chooseDeficiency": "Choose deficiency",
+        "wheelchair": "Wheelchair user",
+        "deaf": "Deaf",
         "signup": "Sign up",
         "alert": "Check your email",
         "alertError": "Failed to create account: "

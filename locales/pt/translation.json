@@ -109,6 +109,8 @@
         "password": "Palavra-passe",
         "selectDeficiency": "Selecionar deficiencia",
         "chooseDeficiency": "Escolha deficiencia",
+        "wheelchair": "Cadeirante",
+        "deaf": "Surdo",
         "signup": "Criar conta",
         "alert": "Verifique o seu email",
         "alertError": "Criar a conta falhou: "
