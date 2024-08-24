@@ -38,5 +38,30 @@ export const Styles = StyleSheet.create({
     flex: 1,
     marginBottom: 70,
     padding: 10,
-  },  
+  },
+  buttonContainer: {
+    flexDirection: "row", // Align buttons horizontally
+    justifyContent: "space-between", // Distribute space between buttons
+    marginTop: 10, // Add some top margin
+    marginBottom: 10, // Add some bottom margin
+  },
+  button: {
+    width: 150, // Fixed width for buttons
+    height: 60, // Set the height of the buttons
+    backgroundColor: "#0077b6", // Button background color (blue)
+    borderRadius: 10, // Rounded corners
+    paddingVertical: 5, // Smaller vertical padding
+    paddingHorizontal: 10, // Smaller horizontal padding
+    marginHorizontal: 10, // Space between the buttons
+    alignItems: "center", // Center content horizontally
+    justifyContent: "center", // Center content vertically
+  },
+  buttonText: {
+    color: "white", // Text color
+    fontSize: 14, // Adjusted text size for smaller buttons
+    fontWeight: "bold", // Text weight
+  },
+  icon: {
+    color: "grey", // Icon color
+  },
 });

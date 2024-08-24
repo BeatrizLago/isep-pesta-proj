@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, TouchableOpacity, Text, FlatList, Switch } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  FlatList,
+  Switch,
+  ScrollView,
+} from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import { Styles } from "./MyFilter.styles";
 import Collapsible from "react-native-collapsible";
@@ -166,12 +173,25 @@ const MyFilter = ({
       </Text>
     </TouchableOpacity>
   );
-
-  return (
-    <Collapsible collapsed={!showFilter}>
-      <View>
-        {/* <View style={Styles.containerLevel}>
-        {filters.map((item) => (
+  return showFilter ? (
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <Text style={Styles.label}>
+        {t("components.myFilters.accessibility")}
+      </Text>
+      <View style={Styles.containerAccess}>
+        {accessibility.map((item) => (
+          <RadioButton
+            key={item.key}
+            label={item.label}
+            selected={isFilterSelected(item.key)}
+            onPress={() => handleFilterButtonClick(item.key, "filter")}
+          />
+        ))}
+      </View>
+      <View style={Styles.divider} />
+      <Text style={Styles.label}>{t("components.myFilters.category")}</Text>
+      <View style={Styles.containerAccess}>
+        {categories.map((item) => (
           <RadioButton
             key={item}
             label={item}
@@ -179,61 +199,35 @@ const MyFilter = ({
             onPress={() => handleFilterButtonClick(item, "filter")}
           />
         ))}
-      </View> */}
-        <Text style={Styles.label}>
-          {t("components.myFilters.accessibility")}
-        </Text>
-        <View style={Styles.containerAccess}>
-          {accessibility.map((item) => (
-            <RadioButton
-              key={item.key}
-              label={item.label}
-              selected={isFilterSelected(item.key)}
-              onPress={() => handleFilterButtonClick(item.key, "filter")}
-            />
-          ))}
-        </View>
-        <View style={Styles.divider} />
-        <Text style={Styles.label}>{t("components.myFilters.category")}</Text>
-        <View style={Styles.containerAccess}>
-          {categories.map((item) => (
-            <RadioButton
-              key={item}
-              label={item}
-              selected={isFilterSelected(item)}
-              onPress={() => handleFilterButtonClick(item, "filter")}
-            />
-          ))}
-        </View>
-        <View style={Styles.divider} />
-        {["Cidade"].map((label) => (
-          <View key={label} style={Styles.pickerContainer}>
-            <SelectList
-              setSelected={(value) =>
-                handleFilterButtonClick(value, label.toLowerCase())
-              }
-              data={generateOptions(label === "Cidade" ? cities : categories)}
-              placeholder={t("components.myFilters.city")}
-              boxStyles={Styles.box}
-              dropdownStyles={Styles.dropdown}
-            />
-          </View>
-        ))}
-        <View style={Styles.divider} />
-        {userWheelChair && userWheelChair.height && userWheelChair.width && (
-          <View style={Styles.switchContainer}>
-            <Text style={Styles.label}>
-              {t("components.myFilters.wheelchair")}
-            </Text>
-            <Switch
-              value={wheelchairFilterEnabled}
-              onValueChange={setWheelchairFilterEnabled}
-            />
-          </View>
-        )}
       </View>
-    </Collapsible>
-  );
+      <View style={Styles.divider} />
+      {["Cidade"].map((label) => (
+        <View key={label} style={Styles.pickerContainer}>
+          <SelectList
+            setSelected={(value) =>
+              handleFilterButtonClick(value, label.toLowerCase())
+            }
+            data={generateOptions(label === "Cidade" ? cities : categories)}
+            placeholder={t("components.myFilters.city")}
+            boxStyles={Styles.box}
+            dropdownStyles={Styles.dropdown}
+          />
+        </View>
+      ))}
+      <View style={Styles.divider} />
+      {userWheelChair && userWheelChair.height && userWheelChair.width && (
+        <View style={Styles.switchContainer}>
+          <Text style={Styles.label}>
+            {t("components.myFilters.wheelchair")}
+          </Text>
+          <Switch
+            value={wheelchairFilterEnabled}
+            onValueChange={setWheelchairFilterEnabled}
+          />
+        </View>
+      )}
+    </ScrollView>
+  ) : null;
 };
 
 export default MyFilter;

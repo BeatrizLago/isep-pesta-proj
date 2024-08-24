@@ -19,6 +19,7 @@ import ActivityLoader from "../../components/activityloader/ActivityLoader";
 import { Styles } from "./Home.styles";
 import Directions from "../../components/directions/Directions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Icon } from "@rneui/themed";
 
 const useLocations = () => {
   const dispatch = useDispatch();
@@ -200,16 +201,36 @@ const Home = ({ t }) => {
               lightTheme
               platform="android"
             />
-            <Button
-              title="Get directions"
-              onPress={toggleOverlay}
-              buttonStyle={Styles.button}
-            />
-            <Button
-              title="Clear directions"
-              onPress={handleClearDirections}
-              buttonStyle={Styles.button}
-            />
+            <View style={Styles.buttonContainer}>
+              <Button
+                title={t("screens.map.getDirections")}
+                onPress={toggleOverlay}
+                buttonStyle={Styles.button}
+                titleStyle={Styles.buttonText} // Apply text style
+                icon={
+                  <Icon
+                    name="directions"
+                    size={20}
+                    color="white" // Ensure icon color matches text
+                    style={Styles.icon} // Apply icon style
+                  />
+                }
+              />
+              <Button
+                title={t("screens.map.clearDirections")}
+                onPress={handleClearDirections}
+                buttonStyle={Styles.button}
+                titleStyle={Styles.buttonText} // Apply text style
+                icon={
+                  <Icon
+                    name="clear"
+                    size={20}
+                    color="white" // Ensure icon color matches text
+                    style={Styles.icon} // Apply icon style
+                  />
+                }
+              />
+            </View>
             <Directions
               visible={visible}
               toggleOverlay={toggleOverlay}
@@ -220,6 +241,7 @@ const Home = ({ t }) => {
               handleDirections={handleDirections}
               profile={profile}
               setProfile={setProfile}
+              t={t}
             />
             <MapComponent
               destination={filteredData[0]}

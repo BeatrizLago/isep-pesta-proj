@@ -103,7 +103,7 @@ const RouteInfoBox = ({ routeCoordinates, directions }) => {
   );
 
   return (
-    <View style={Styles.routeInfoBox}>
+    <View style={Styles.routeInfoBox} pointerEvents="box-none">
       <Text style={Styles.routeInfoText}>Route Available</Text>
       <Text style={Styles.routeInfoText}>
         Distance: {metersToKilometers(directions.routes[0].summary.distance)} km
@@ -117,6 +117,8 @@ const RouteInfoBox = ({ routeCoordinates, directions }) => {
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderItem}
           showsVerticalScrollIndicator={true}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
         />
       </View>
     </View>

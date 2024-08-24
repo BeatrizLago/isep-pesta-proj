@@ -30,11 +30,22 @@
         "city": "Selecione uma Cidade",
         "wheelchair": "Filtrar por cadeira de rodas",
         "notFound": "Nenhum"
+      },
+      "directions":{
+        "pickMethod": "Escolha um método",
+        "wheelchair": "Cadeira de rodas",
+        "car": "Carro",
+        "foot": "Pé",
+        "startLoc": "Ponto partida",
+        "endLoc": "Chegada",
+        "start": "Ir"
       }
     },
     "screens": {
       "map": {
-        "title": "Mapa"
+        "title": "Mapa",
+        "getDirections": "Direções",
+        "clearDirections": "Limpar direções"
       },
       "list": {
         "title": "Lista",

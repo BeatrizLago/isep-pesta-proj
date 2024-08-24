@@ -28,7 +28,7 @@ export const Styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 8,
     borderRadius: 5,
-    zIndex: 1,
+    zIndex: 10,
   },
   routeInfoText: {
     fontSize: 12,

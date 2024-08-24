@@ -14,23 +14,24 @@ const Directions = ({
   handleDirections,
   profile,
   setProfile,
+  t,
 }) => {
   const profiles = [
-    { key: "wheelchair", label: "cadeira de rodas" },
-    { key: "driving-car", label: "carro" },
-    { key: "foot-walking", label: "pé" },
+    { key: "wheelchair", label: t("components.directions.wheelchair") },
+    { key: "driving-car", label: t("components.directions.car") },
+    { key: "foot-walking", label: t("components.directions.foot") },
   ];
 
   return (
     <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
       <AutoComplete
         data={locations}
-        placeholder="Enter start location"
+        placeholder={t("components.directions.startLoc")}
         onSelect={(name) => handleSelectLocation(name, setStartLocation)}
       />
       <AutoComplete
         data={locations}
-        placeholder="Enter destination"
+        placeholder={t("components.directions.endLoc")}
         onSelect={(name) => handleSelectLocation(name, setEndLocation)}
       />
       <View>
@@ -38,7 +39,7 @@ const Directions = ({
           selectedValue={profile}
           onValueChange={(itemValue) => setProfile(itemValue)}
         >
-          <Picker.Item label={"pick a method"} value="" />
+          <Picker.Item label={t("components.directions.pickMethod")} value="" />
           {profiles.map((profiles) => (
             <Picker.Item
               key={profiles.key}
@@ -49,7 +50,7 @@ const Directions = ({
         </Picker>
       </View>
       <Button
-        title="Give directions"
+        title={t("components.directions.start")}
         onPress={() => {
           toggleOverlay();
           handleDirections();

@@ -30,11 +30,22 @@
         "city": "Select a City",
         "wheelchair": "Filter by wheelchair",
         "notFound": "None"
+      },
+      "directions":{
+        "pickMethod": "Pick a method",
+        "wheelchair": "Wheelchair",
+        "car": "Car",
+        "foot": "Foot",
+        "startLoc": "Start location",
+        "endLoc": "Destination",
+        "start": "Go"
       }
     },
     "screens": {
       "map": {
-        "title": "Map"
+        "title": "Map",
+        "getDirections": "Directions",
+        "clearDirections": "Clear Directions"
       },
       "list": {
         "title": "List",
