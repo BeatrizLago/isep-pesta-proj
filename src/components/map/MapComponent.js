@@ -89,7 +89,7 @@ const Markers = ({ locations, routeCoordinates, onMarkerPress }) => (
 );
 
 // Component for rendering a mini box with text
-const RouteInfoBox = ({ routeCoordinates, directions }) => {
+const RouteInfoBox = ({ routeCoordinates, directions, t }) => {
   if (routeCoordinates.length === 0 || !directions) return null;
 
   const steps = directions.routes[0].segments[0].steps;
@@ -104,12 +104,13 @@ const RouteInfoBox = ({ routeCoordinates, directions }) => {
 
   return (
     <View style={Styles.routeInfoBox} pointerEvents="box-none">
-      <Text style={Styles.routeInfoText}>Route Available</Text>
       <Text style={Styles.routeInfoText}>
-        Distance: {metersToKilometers(directions.routes[0].summary.distance)} km
+        {t("components.mapComponent.routeInfo.distance")}:{" "}
+        {metersToKilometers(directions.routes[0].summary.distance)} km
       </Text>
       <Text style={Styles.routeInfoText}>
-        Duration: {secondsToHours(directions.routes[0].summary.duration)} h
+        {t("components.mapComponent.routeInfo.duration")}:{" "}
+        {secondsToHours(directions.routes[0].summary.duration)} h
       </Text>
       <View style={Styles.listContainer}>
         <FlatList
@@ -193,6 +194,7 @@ const MapComponent = ({ destination, directions, locations, t }) => {
           <RouteInfoBox
             routeCoordinates={routeCoordinates}
             directions={directions}
+            t={t}
           />
         </>
       ) : (

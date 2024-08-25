@@ -77,7 +77,13 @@ const useLocations = () => {
   };
 };
 
-const useDirections = (startLocation, endLocation, profile) => {
+const useDirections = (
+  startLocation,
+  endLocation,
+  preference,
+  isStraight,
+  profile
+) => {
   const dispatch = useDispatch();
 
   const handleDirections = useCallback(() => {
@@ -85,7 +91,8 @@ const useDirections = (startLocation, endLocation, profile) => {
       const coordinates = [startLocation, endLocation];
       const fetchAndLogDirections = async () => {
         const language = await AsyncStorage.getItem("LANGUAGE");
-        const body = { coordinates, language };
+        const continue_straight = isStraight;
+        const body = { coordinates, preference, continue_straight, language };
         await dispatch(fetchDirections(body, profile));
         console.log("Directions:", JSON.stringify(body));
       };
@@ -120,10 +127,14 @@ const Home = ({ t }) => {
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [preference, setPreference] = useState(null);
+  const [isStraight, setIsStraight] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { handleDirections, handleClearDirections } = useDirections(
     startLocation,
     endLocation,
+    preference,
+    isStraight,
     profile
   );
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
@@ -241,6 +252,10 @@ const Home = ({ t }) => {
               handleDirections={handleDirections}
               profile={profile}
               setProfile={setProfile}
+              preference={preference}
+              setPreference={setPreference}
+              isStraight={isStraight}
+              setIsStraight={setIsStraight}
               t={t}
             />
             <MapComponent

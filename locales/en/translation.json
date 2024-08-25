@@ -36,9 +36,24 @@
         "wheelchair": "Wheelchair",
         "car": "Car",
         "foot": "Foot",
+        "showPref": "Show preferences",
+        "hidePref": "Hide preferences",
+        "fastest": "Fastest",
+        "shortest": "Shortest",
+        "recommended": "Recommended",
+        "routeType": "Route type",
+        "isStraight": "Straight route",
+        "yes": "Yes",
+        "no": "No",
         "startLoc": "Start location",
         "endLoc": "Destination",
         "start": "Go"
+      },
+      "mapComponent":{
+        "routeInfo":{
+          "distance": "Distance",
+          "duration": "Duration"
+        }
       }
     },
     "screens": {

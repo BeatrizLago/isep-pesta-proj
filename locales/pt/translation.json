@@ -36,9 +36,24 @@
         "wheelchair": "Cadeira de rodas",
         "car": "Carro",
         "foot": "Pé",
+        "showPref": "Mostrar preferências",
+        "hidePref": "Esconder preferências",
+        "fastest": "Mais rápido",
+        "shortest": "Mais curto",
+        "recommended": "Recomendado",
+        "routeType": "Tipo de rota",
+        "isStraight": "Rota reta",
+        "yes": "Sim",
+        "no": "Não",
         "startLoc": "Ponto partida",
         "endLoc": "Chegada",
         "start": "Ir"
+      },
+      "mapComponent":{
+        "routeInfo":{
+          "distance": "Distancia",
+          "duration": "Duração"
+        }
       }
     },
     "screens": {
