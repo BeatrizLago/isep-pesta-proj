@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
+import { Styles } from "./AutoComplete.styles";
 
 const Autocomplete = ({ data, placeholder, onSelect }) => {
   const [inputQuery, setInputQuery] = useState("");
@@ -21,12 +22,15 @@ const Autocomplete = ({ data, placeholder, onSelect }) => {
   };
 
   return (
-    <View>
+    <View style={Styles.container}>
       <SelectList
         setSelected={handleSelectItem}
         data={filteredData.map((item) => ({ key: item.id, value: item.name }))}
         search={true}
         placeholder={placeholder}
+        inputStyles={Styles.input}
+        dropdownStyles={Styles.dropdown}
+        dropdownItemStyles={Styles.dropdownItem}
       />
     </View>
   );

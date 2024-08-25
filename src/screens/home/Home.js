@@ -127,8 +127,8 @@ const Home = ({ t }) => {
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [preference, setPreference] = useState(null);
-  const [isStraight, setIsStraight] = useState(null);
+  const [preference, setPreference] = useState("recommended");
+  const [isStraight, setIsStraight] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { handleDirections, handleClearDirections } = useDirections(
     startLocation,
