@@ -77,7 +77,8 @@
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
     "slider": "^1.0.4",
-    "test": "file:"
+    "test": "file:",
+    "expo-av": "~14.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
