@@ -148,4 +148,21 @@ export const Styles = StyleSheet.create({
   accessibilityIcon: {
     marginLeft: 5,
   },
+  modal2Overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalImageContainer: {
+    width: 300,
+    height: 300,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
 });

@@ -100,10 +100,14 @@ const Profile = ({ t }) => {
               />
             )}
 
-            <Text style={Styles.sectionTitle}>Common Words in Sign Language</Text>
-            {commonWords.map((item, index) => (
-              <SignLanguageWord key={index} word={item.word} videoUrl={item.videoUrl} />
-            ))}
+            {user.deficiency === "deaf" && (
+              <>
+                <Text style={Styles.sectionTitle}>Sign Language Dictionary</Text>
+                {commonWords.map((item, index) => (
+                  <SignLanguageWord key={index} word={item.word} videoUrl={item.videoUrl} />
+                ))}
+              </>
+            )}
           </ScrollView>
         </>
       )}

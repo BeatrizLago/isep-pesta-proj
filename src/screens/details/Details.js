@@ -31,6 +31,8 @@ const Details = ({ t }) => {
   const [visRating, setVisRating] = useState(false); 
   const user = useSelector((state) => state.user.userInfo);
   const reviews = useSelector((state) => state.review.reviews);
+  const [isImageModalVisible, setImageModalVisible] = useState(false);
+  const [imageSource, setImageSource] = useState(null);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -81,26 +83,63 @@ const Details = ({ t }) => {
     );
   };
 
+  const handleTextPress = (type) => {
+    let source;
+    switch (type) {
+      case 'category':
+        source = require("../../assets/signlanguage/monumentos.png");
+        break;
+      case 'address':
+        source = require("../../assets/signlanguage/endereco.png");
+        break;
+      case 'phone':
+        source = require("../../assets/signlanguage/telemovel.png");
+        break;
+      case 'email':
+        source = require("../../assets/signlanguage/email.png");
+        break;
+      // Add more cases as needed
+      default:
+        source = null;
+    }
+    if (source) {
+      setImageSource(source);
+      setImageModalVisible(true);
+    }
+  };
+
   return (
     <ScrollView style={Styles.container}>
       <Image source={{ uri: place.imageURL }} style={Styles.image} />
       <View style={Styles.content}>
         <Text style={Styles.title}>{place.name}</Text>
-        <Text style={Styles.category}>{place.category}</Text>
+          <TouchableOpacity onPress={() => handleTextPress('category')}>
+            <Text style={Styles.category}>{place.category}</Text>
+          </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleTextPress('address')}>
         <Text style={Styles.text}>
           {t("screens.details.address")}:{" "}
           {place.address
             ? `${place.address.street}, ${place.address.city}`
             : t("screens.details.notAvailable")}
         </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleTextPress('phone')}>
         <Text style={Styles.text}>
           {t("screens.details.telephone")}:{" "}
           {place.phoneNumber || t("screens.details.notAvailable")}
         </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleTextPress('email')}>
         <Text style={Styles.text}>
           {t("screens.details.email")}:{" "}
           {place.email || t("screens.details.notAvailable")}
         </Text>
+        </TouchableOpacity>
+        
         <Text style={Styles.subtitle}>
           {t("screens.details.accessibility")}:
         </Text>
@@ -233,8 +272,27 @@ const Details = ({ t }) => {
           </Text>
         )}
       </View>
+
+      {/* Modal for showing the sign language image */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setImageModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={Styles.modalOverlay}
+          onPress={() => setImageModalVisible(false)}
+        >
+          <View style={Styles.modalImageContainer}>
+            <Image source={imageSource} style={Styles.modalImage} />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
     </ScrollView>
   );
 };
 
 export default Details;
+
