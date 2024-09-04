@@ -20,7 +20,7 @@ import { Rating } from "react-native-ratings";
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
 import { capitalizeWords } from "../../utils/utils";
-import { FontAwesome } from "react-native-vector-icons";
+import { FontAwesome5, FontAwesome } from "react-native-vector-icons";
 import { useTranslation } from "react-i18next";
 
 const Details = ({ t }) => {
@@ -169,7 +169,17 @@ const Details = ({ t }) => {
         source = currentLang === 'en'
           ? require("../../assets/signlanguage/comentarios_en.png")
           : require("../../assets/signlanguage/comentarios_pt.png");
-        break;        
+        break;
+      case 'escrever':
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/escrever_en.png")
+          : require("../../assets/signlanguage/escrever_pt.png");
+        break;
+      case 'nota':
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/nota_en.png")
+          : require("../../assets/signlanguage/nota_pt.png");
+        break;                 
         // Add more cases as needed
       default:
         source = null;
@@ -330,8 +340,8 @@ const Details = ({ t }) => {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleDirections} style={Styles.directionsButton}>
-          <FontAwesome name="location-arrow" size={20} color="#fff" style={{ marginRight: 10 }} />
           <Text style={Styles.buttonText}>{t("screens.details.directions")}</Text>
+          <FontAwesome5 name="directions" size={20} color="#fff" style={{ marginLeft: 5 }} />
         </TouchableOpacity>
         
         <TouchableOpacity onPress={() => handleTextPress('comentarios')}>
@@ -340,25 +350,25 @@ const Details = ({ t }) => {
         </Text>
         </TouchableOpacity>
 
-        {reviews.map((review) => (
-          <View key={review.id} style={Styles.reviewContainer}>
-            <Text style={Styles.reviewAuthor}>{t("screens.details.By")}: {capitalizeWords(review.userName)}</Text>
-            <Text style={Styles.reviewText}>{review.text}</Text>
-            <Text style={Styles.reviewText}>{t("screens.details.rating")}: {review.rating}/5</Text>
-          </View>
-        ))}
         {user ? (
           <>
-            <Button
-              title={t("screens.details.writeReview")}
-              onPress={() => setVisRating(true)}
-            />
+            <TouchableOpacity onPress={() => setVisRating(true)} style={Styles.directionsButton}>
+              <Text style={Styles.buttonText}>{t("screens.details.writeReview")}</Text>
+              <FontAwesome name="pencil" size={20} color="#fff" style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
+
           <Modal visible={visRating} transparent={true}>
             <View style={Styles.modalOverlay}>
               <View style={Styles.modalContent}>
+
+                <TouchableOpacity onPress={() => handleTextPress('escrever')}>
                 <Text style={Styles.modalTitle}>{t("screens.details.writeReview")}</Text>
+                </TouchableOpacity>
+
                 <View style={Styles.ratingContainer}>
+                  <TouchableOpacity onPress={() => handleTextPress('nota')}>
                   <Text style={Styles.ratingText}>{t("screens.details.rating")}:</Text>
+                  </TouchableOpacity>
                   <Rating
                     type="custom"
                     ratingCount={5}
@@ -394,6 +404,15 @@ const Details = ({ t }) => {
             Please log in to write a review.
           </Text>
         )}
+        
+        {reviews.map((review) => (
+          <View key={review.id} style={Styles.reviewContainer}>
+            <Text style={Styles.reviewAuthor}>{t("screens.details.By")}: {capitalizeWords(review.userName)}</Text>
+            <Text style={Styles.reviewText}>{review.text}</Text>
+            <Text style={Styles.reviewText}>{t("screens.details.rating")}: {review.rating}/5</Text>
+          </View>
+        ))}
+
       </View>
 
       {/* Modal for showing the sign language image */}

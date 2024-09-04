@@ -22,7 +22,12 @@ const Profile = ({ t }) => {
     { word: "Hello", videoUrl: "https://media.signbsl.com/videos/asl/elementalaslconcepts/mp4/hello.mp4" },
     { word: "Thank you", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/thankyou.mp4" },
     { word: "Please", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/please.mp4" },
-    // Add more words and corresponding video URLs here
+    { word: "Sorry", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/sorry.mp4" },
+    { word: "Help", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/help.mp4" },
+    { word: "Goodbye", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/bye.mp4" },
+    { word: "Yes", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/yes.mp4" },
+    { word: "No", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/no.mp4" },
+    { word: "Excuse Me", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/excuseme.mp4" },
   ];
 
   useEffect(() => {
