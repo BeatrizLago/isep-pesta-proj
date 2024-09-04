@@ -79,7 +79,13 @@
         "imagePicker": "Pick an image from gallery"
       } ,
       "configuration": {
-        "title":"Configurations"
+        "title":"Configurations",
+        "speak":"Speak Text",
+        "placeholder":"Write your text here",
+        "selectLanguage":"Select Language",
+        "portuguese":"Portuguese (PT)",
+        "english":"English (EN)",
+        "textToSpeech":"Text to Speech"
       },
       "details": {
         "title":"Details",
