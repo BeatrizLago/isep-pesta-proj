@@ -98,7 +98,43 @@ const Details = ({ t }) => {
       case 'email':
         source = require("../../assets/signlanguage/email.png");
         break;
-      // Add more cases as needed
+      case 'acessibilidade':
+        source = require("../../assets/signlanguage/acessibilidade.png");
+        break;
+      case 'parking':
+          source = require("../../assets/signlanguage/estacionamento.png");
+        break;
+      case 'entrance':
+        source = require("../../assets/signlanguage/entrada.png");
+        break;
+      case 'handicapBathroom':
+        source = require("../../assets/signlanguage/casadebanho.png");
+        break;
+      case 'internalCirculation':
+        source = require("../../assets/signlanguage/circulacao.png");
+        break;
+      case 'signLanguage':
+        source = require("../../assets/signlanguage/linguagem.png");
+        break;
+      case 'visualAlarms':
+        source = require("../../assets/signlanguage/alarmes.png");
+        break;
+      case 'writtenDescriptions':
+        source = require("../../assets/signlanguage/informacao.png");
+        break;
+      case 'cadeiraderodas':
+        source = require("../../assets/signlanguage/cadeira.png");
+        break;
+      case 'largura':
+        source = require("../../assets/signlanguage/largura.png");
+        break; 
+      case 'altura':
+        source = require("../../assets/signlanguage/altura.png");
+        break; 
+      case 'comentarios':
+        source = require("../../assets/signlanguage/comentarios.png");
+        break;        
+        // Add more cases as needed
       default:
         source = null;
     }
@@ -140,66 +176,106 @@ const Details = ({ t }) => {
         </Text>
         </TouchableOpacity>
         
-        <Text style={Styles.subtitle}>
+        <TouchableOpacity onPress={() => handleTextPress('acessibilidade')}> 
+          <Text style={Styles.subtitle}>
           {t("screens.details.accessibility")}:
-        </Text>
+          </Text>
+        </TouchableOpacity>
+      
+      <TouchableOpacity onPress={() => handleTextPress('parking')}>
         <Text style={Styles.text}>
           {t("screens.details.parking")}:{" "}
           {place.accessibility?.parking
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.parking)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.parking)}
+        </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity onPress={() => handleTextPress('entrance')}>
+        <Text style={Styles.text}>
           {t("screens.details.entrance")}:{" "}
           {place.accessibility?.entrance
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.entrance)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.entrance)}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('handicapBathroom')}>
+        <Text style={Styles.text}>
           {t("screens.details.handicapBathroom")}:{" "}
           {place.accessibility?.handicapBathroom
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.handicapBathroom)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.handicapBathroom)}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('internalCirculation')}>
+        <Text style={Styles.text}>
           {t("screens.details.internalCirculation")}:{" "}
           {place.accessibility?.internalCirculation
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.internalCirculation)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.internalCirculation)}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('signLanguage')}>
+        <Text style={Styles.text}>
           {t("screens.details.signLanguage")}:{" "}
           {place.accessibility?.signLanguage
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.signLanguage)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.signLanguage)}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('visualAlarms')}>
+        <Text style={Styles.text}>
           {t("screens.details.visualAlarms")}:{" "}
           {place.accessibility?.visualAlarms
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.visualAlarms)}
-          {"\n"}
+          {renderAccessibilityIcon(place.accessibility?.visualAlarms)}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('writtenDescriptions')}>
+        <Text style={Styles.text}>
           {t("screens.details.writtenDescriptions")}:{" "}
           {place.accessibility?.writtenDescriptions
             ? t("screens.details.available")
             : t("screens.details.notAvailable")}
-            {renderAccessibilityIcon(place.accessibility?.writtenDescriptions)}
+          {renderAccessibilityIcon(place.accessibility?.writtenDescriptions)}
         </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('cadeiraderodas')}>
         <Text style={Styles.subtitle}>
           {t("screens.details.wheelchair")}
         </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleTextPress('largura')}>
         <Text style={Styles.text}>
           {t("screens.details.width")}:{" "}
           {place.wheelchair.width != null
             ? `${place.wheelchair.width} cm`
             : t("screens.details.notAvailable")}
-          {"\n"}
-          {t("screens.details.height")}:{" "}
-          {place.wheelchair.height != null
-            ? `${place.wheelchair.height} cm`
-            : t("screens.details.notAvailable")}
         </Text>
+      </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleTextPress('altura')}>
+          <Text style={Styles.text}>
+            {t("screens.details.height")}:{" "}
+            {place.wheelchair.height != null
+              ? `${place.wheelchair.height} cm`
+              : t("screens.details.notAvailable")}
+          </Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => Linking.openURL(place.siteURL)}>
           <Text style={Styles.link}>
             Website: {place.siteURL || t("screens.details.notAvailable")}
@@ -209,9 +285,13 @@ const Details = ({ t }) => {
           <FontAwesome name="location-arrow" size={20} color="#fff" style={{ marginRight: 10 }} />
           <Text style={Styles.buttonText}>{t("screens.details.directions")}</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => handleTextPress('comentarios')}>
         <Text style={Styles.subtitle}>
           {t("screens.details.reviews")}
         </Text>
+        </TouchableOpacity>
+
         {reviews.map((review) => (
           <View key={review.id} style={Styles.reviewContainer}>
             <Text style={Styles.reviewAuthor}>{t("screens.details.By")}: {capitalizeWords(review.userName)}</Text>

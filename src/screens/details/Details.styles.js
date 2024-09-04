@@ -155,8 +155,8 @@ export const Styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalImageContainer: {
-    width: 300,
-    height: 300,
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
