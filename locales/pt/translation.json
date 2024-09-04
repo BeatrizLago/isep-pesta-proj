@@ -103,10 +103,10 @@
         "writeReview": "Escreva um Comentário",
         "writeReviewPlaceholder": "Escreva o seu comentário aqui",
         "submitReview": "Submeter",
-        "cancel": "cancelar",
+        "cancel": "Cancelar",
         "rating":"Nota",
         "By":"Por",
-        "directions":"Obter Direções"
+        "directions":"Obter Direções" 
       },
       "login": {
         "title": "Login",

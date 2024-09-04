@@ -165,4 +165,27 @@ export const Styles = StyleSheet.create({
     height: "100%",
     resizeMode: "contain",
   },
+  websiteContainer: {
+    
+    
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
 });

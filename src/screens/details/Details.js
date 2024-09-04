@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
 import { capitalizeWords } from "../../utils/utils";
 import { FontAwesome } from "react-native-vector-icons";
+import { useTranslation } from "react-i18next";
 
 const Details = ({ t }) => {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ const Details = ({ t }) => {
   const reviews = useSelector((state) => state.review.reviews);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const [imageSource, setImageSource] = useState(null);
+  const {  i18n } = useTranslation();
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -85,54 +87,88 @@ const Details = ({ t }) => {
 
   const handleTextPress = (type) => {
     let source;
+    const currentLang = i18n.language;
     switch (type) {
       case 'category':
-        source = require("../../assets/signlanguage/monumentos.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/monumentos_en.png")
+          : require("../../assets/signlanguage/monumentos_pt.png");
         break;
       case 'address':
-        source = require("../../assets/signlanguage/endereco.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/endereco_en.png")
+          : require("../../assets/signlanguage/endereco_pt.png");
         break;
       case 'phone':
-        source = require("../../assets/signlanguage/telemovel.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/telemovel_en.png")
+          : require("../../assets/signlanguage/telemovel_pt.png");
         break;
       case 'email':
         source = require("../../assets/signlanguage/email.png");
         break;
+      case 'website':
+        source = require("../../assets/signlanguage/website.png");
+        break;        
       case 'acessibilidade':
-        source = require("../../assets/signlanguage/acessibilidade.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/acessibilidade_en.png")
+          : require("../../assets/signlanguage/acessibilidade_pt.png");
         break;
       case 'parking':
-          source = require("../../assets/signlanguage/estacionamento.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/estacionamento_en.png")
+          : require("../../assets/signlanguage/estacionamento_pt.png");
         break;
       case 'entrance':
-        source = require("../../assets/signlanguage/entrada.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/entrada_en.png")
+          : require("../../assets/signlanguage/entrada_pt.png");
         break;
       case 'handicapBathroom':
-        source = require("../../assets/signlanguage/casadebanho.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/casadebanho_en.png")
+          : require("../../assets/signlanguage/casadebanho_pt.png");
         break;
       case 'internalCirculation':
-        source = require("../../assets/signlanguage/circulacao.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/circulacao_en.png")
+          : require("../../assets/signlanguage/circulacao_pt.png");
         break;
       case 'signLanguage':
-        source = require("../../assets/signlanguage/linguagem.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/linguagem_en.png")
+          : require("../../assets/signlanguage/linguagem_pt.png");
         break;
       case 'visualAlarms':
-        source = require("../../assets/signlanguage/alarmes.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/alarmes_en.png")
+          : require("../../assets/signlanguage/alarmes_pt.png");
         break;
       case 'writtenDescriptions':
-        source = require("../../assets/signlanguage/informacao.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/informacao_en.png")
+          : require("../../assets/signlanguage/informacao_pt.png");
         break;
       case 'cadeiraderodas':
-        source = require("../../assets/signlanguage/cadeira.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/cadeira_en.png")
+          : require("../../assets/signlanguage/cadeira_pt.png");
         break;
       case 'largura':
-        source = require("../../assets/signlanguage/largura.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/largura_en.png")
+          : require("../../assets/signlanguage/largura_pt.png");
         break; 
       case 'altura':
-        source = require("../../assets/signlanguage/altura.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/altura_en.png")
+          : require("../../assets/signlanguage/altura_pt.png");
         break; 
       case 'comentarios':
-        source = require("../../assets/signlanguage/comentarios.png");
+        source = currentLang === 'en'
+          ? require("../../assets/signlanguage/comentarios_en.png")
+          : require("../../assets/signlanguage/comentarios_pt.png");
         break;        
         // Add more cases as needed
       default:
@@ -149,9 +185,7 @@ const Details = ({ t }) => {
       <Image source={{ uri: place.imageURL }} style={Styles.image} />
       <View style={Styles.content}>
         <Text style={Styles.title}>{place.name}</Text>
-          <TouchableOpacity onPress={() => handleTextPress('category')}>
-            <Text style={Styles.category}>{place.category}</Text>
-          </TouchableOpacity>
+        <Text style={Styles.category}>{place.category}</Text>
 
         <TouchableOpacity onPress={() => handleTextPress('address')}>
         <Text style={Styles.text}>
@@ -175,7 +209,26 @@ const Details = ({ t }) => {
           {place.email || t("screens.details.notAvailable")}
         </Text>
         </TouchableOpacity>
-        
+
+        <View style={Styles.websiteContainer}>
+          <TouchableOpacity onPress={() => handleTextPress('website')}>
+            <Text style={Styles.text}>
+              {"Website: "}
+            </Text>
+          </TouchableOpacity>
+          {place.siteURL ? (
+            <TouchableOpacity onPress={() => Linking.openURL(place.siteURL)}>
+              <Text style={Styles.link}>
+                {place.siteURL}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <Text style={Styles.text}>
+              {t("screens.details.notAvailable")}
+            </Text>
+          )}
+        </View>
+
         <TouchableOpacity onPress={() => handleTextPress('acessibilidade')}> 
           <Text style={Styles.subtitle}>
           {t("screens.details.accessibility")}:
@@ -276,11 +329,6 @@ const Details = ({ t }) => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => Linking.openURL(place.siteURL)}>
-          <Text style={Styles.link}>
-            Website: {place.siteURL || t("screens.details.notAvailable")}
-          </Text>
-        </TouchableOpacity>
         <TouchableOpacity onPress={handleDirections} style={Styles.directionsButton}>
           <FontAwesome name="location-arrow" size={20} color="#fff" style={{ marginRight: 10 }} />
           <Text style={Styles.buttonText}>{t("screens.details.directions")}</Text>
@@ -305,46 +353,41 @@ const Details = ({ t }) => {
               title={t("screens.details.writeReview")}
               onPress={() => setVisRating(true)}
             />
-            <Modal visible={visRating} transparent={true}>
-              <View style={Styles.modalOverlay}>
-                <View style={Styles.modalContent}>
-                  <Text style={Styles.modalTitle}>{t("screens.details.writeReview")}</Text>
-                  <View style={Styles.ratingContainer}>
-                    <Text style={Styles.ratingText}>{t("screens.details.rating")}:</Text>
-                    <Rating
-                      type="custom"
-                      ratingCount={5}
-                      imageSize={30}
-                      //showRating
-                      startingValue={rating}
-                      onFinishRating={setRating}
-                      style={Styles.rating}
-                    />
-                  </View>
-                  <TextInput
-                    placeholder={t("screens.details.writeReviewPlaceholder")}
-                    value={reviewText}
-                    onChangeText={setReviewText}
-                    style={Styles.textInput}
-                    multiline
+          <Modal visible={visRating} transparent={true}>
+            <View style={Styles.modalOverlay}>
+              <View style={Styles.modalContent}>
+                <Text style={Styles.modalTitle}>{t("screens.details.writeReview")}</Text>
+                <View style={Styles.ratingContainer}>
+                  <Text style={Styles.ratingText}>{t("screens.details.rating")}:</Text>
+                  <Rating
+                    type="custom"
+                    ratingCount={5}
+                    imageSize={30}
+                    startingValue={rating}
+                    onFinishRating={setRating}
+                    style={Styles.rating}
                   />
-                  <View style={Styles.buttonContainer}>
-                    <Button
-                      style={Styles.button}
-                      color="blue"
-                      title={t("screens.details.submitReview")}
-                      onPress={submitReview}
-                    />
-                    <Button
-                      style={Styles.button}
-                      color="red"
-                      title={t("screens.details.cancel")}
-                      onPress={() => setVisRating(false)}
-                    />
-                  </View>
+                </View>
+                <TextInput
+                  placeholder={t("screens.details.writeReviewPlaceholder")}
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                  style={Styles.textInput}
+                  multiline
+                />
+                <View style={Styles.modalButtonContainer}>
+                  <TouchableOpacity style={Styles.modalButton} onPress={submitReview}>
+                    <FontAwesome name="check" size={20} color="white" style={Styles.buttonIcon} />
+                    <Text style={Styles.buttonText}>{t("screens.details.submitReview")}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[Styles.modalButton, Styles.cancelButton]} onPress={() => setVisRating(false)}>
+                    <FontAwesome name="times" size={20} color="white" style={Styles.buttonIcon} />
+                    <Text style={Styles.buttonText}>{t("screens.details.cancel")}</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-            </Modal>
+            </View>
+          </Modal>
           </>
         ) : (
           <Text style={Styles.loginPrompt}>

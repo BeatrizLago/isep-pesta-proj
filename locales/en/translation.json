@@ -101,8 +101,12 @@
         "height": "Height",
         "reviews": "Reviews",
         "writeReview": "Write a Review",
+        "writeReviewPlaceholder": "Write your Review here",
+        "rating":"Rating",
         "By":"By",
-        "directions":"Get Directions"
+        "directions":"Get Directions",
+        "submitReview": "Submit",
+        "cancel": "Cancel"
       },
       "login": {
         "title": "Login",
