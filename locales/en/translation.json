@@ -79,7 +79,13 @@
         "imagePicker": "Pick an image from gallery"
       } ,
       "configuration": {
-        "title":"Configurations"
+        "title":"Configurations",
+        "speak":"Speak Text",
+        "placeholder":"Write your text here",
+        "selectLanguage":"Select Language",
+        "portuguese":"Portuguese (PT)",
+        "english":"English (EN)",
+        "textToSpeech":"Text to Speech"
       },
       "details": {
         "title":"Details",
@@ -101,8 +107,12 @@
         "height": "Height",
         "reviews": "Reviews",
         "writeReview": "Write a Review",
+        "writeReviewPlaceholder": "Write your Review here",
+        "rating":"Rating",
         "By":"By",
-        "directions":"Get Directions"
+        "directions":"Get Directions",
+        "submitReview": "Submit",
+        "cancel": "Cancel"
       },
       "login": {
         "title": "Login",

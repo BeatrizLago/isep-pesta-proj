@@ -79,7 +79,13 @@
         "imagePicker": "Escolha uma imagem da galeria"
       } ,
       "configuration": {
-        "title":"Configurações"
+        "title":"Configurações",
+        "speak":"Falar Texto",
+        "placeholder":"Escreva o texto aqui",
+        "selectLanguage":"Selecione a Linguagem",
+        "portuguese":"Português (PT)",
+        "english":"Inglês (EN)",
+        "textToSpeech":"Text to Speech"
       },
       "details": {
         "title":"Detalhes",
@@ -103,10 +109,10 @@
         "writeReview": "Escreva um Comentário",
         "writeReviewPlaceholder": "Escreva o seu comentário aqui",
         "submitReview": "Submeter",
-        "cancel": "cancelar",
+        "cancel": "Cancelar",
         "rating":"Nota",
         "By":"Por",
-        "directions":"Obter Direções"
+        "directions":"Obter Direções" 
       },
       "login": {
         "title": "Login",

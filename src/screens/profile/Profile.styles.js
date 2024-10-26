@@ -16,4 +16,14 @@ export const Styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 15,
+  },
 });

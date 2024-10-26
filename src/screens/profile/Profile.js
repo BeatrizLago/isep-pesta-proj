@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Button, TouchableOpacity, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Styles } from "./Profile.styles";
 import MyWheelChair from "../../components/mywheelchair/MyWheelChair";
 import MyProfile from "../../components/myprofile/MyProfile";
@@ -11,11 +11,24 @@ import {
   updateUserPhotoURL,
   uploadImageToFirebase,
 } from "../../state/actions/userAction";
+import SignLanguageWord from "../../components/signlanguageword/SignLanguageWord";
 
 const Profile = ({ t }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
+
+  const commonWords = [
+    { word: "Hello", videoUrl: "https://media.signbsl.com/videos/asl/elementalaslconcepts/mp4/hello.mp4" },
+    { word: "Thank you", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/thankyou.mp4" },
+    { word: "Please", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/please.mp4" },
+    { word: "Sorry", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/sorry.mp4" },
+    { word: "Help", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/help.mp4" },
+    { word: "Goodbye", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/bye.mp4" },
+    { word: "Yes", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/yes.mp4" },
+    { word: "No", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/no.mp4" },
+    { word: "Excuse Me", videoUrl: "https://media.signbsl.com/videos/asl/startasl/mp4/excuseme.mp4" },
+  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -70,6 +83,7 @@ const Profile = ({ t }) => {
       setLoading(false);
     }
   };
+
   return (
     <View style={Styles.container}>
       {loading || !user ? (
@@ -89,6 +103,15 @@ const Profile = ({ t }) => {
                 user={user}
                 t={t}
               />
+            )}
+
+            {user.deficiency === "deaf" && (
+              <>
+                <Text style={Styles.sectionTitle}>Sign Language Dictionary</Text>
+                {commonWords.map((item, index) => (
+                  <SignLanguageWord key={index} word={item.word} videoUrl={item.videoUrl} />
+                ))}
+              </>
             )}
           </ScrollView>
         </>
