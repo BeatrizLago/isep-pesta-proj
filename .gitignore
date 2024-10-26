@@ -109,3 +109,7 @@ yarn-error.*
 
 # backend
 backend/
+
+# services
+src/services/firebase/firebaseConfig.js
+src/services/openRoute/openRouteConfig.js
