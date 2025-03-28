@@ -1,218 +1,141 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import {
-  View,
-  TouchableWithoutFeedback,
-  Button,
-  Text,
-  Platform,
-  FlatList,
-} from "react-native";
-import MapView, { Polyline, Marker, UrlTile } from "react-native-maps";
-import LocationDetail from "../locationDetail/locationDetail";
-import { Styles } from "./MapComponent.styles";
+import React, { useRef, useEffect, useState } from "react";
+import { View, Button } from "react-native";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
-import ActivityLoader from "../activityloader/ActivityLoader";
-import polyline from "@mapbox/polyline";
-import { metersToKilometers, secondsToHours } from "../../utils/utils";
+import axios from "axios";
+import { Styles } from "./MapComponent.styles";
+import ActivityLoader from "../../components/activityloader/ActivityLoader";
 
-// Custom hook to handle location permissions and fetching current location
-const useUserLocation = () => {
+const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
+const GEOAPIFY_PLACES_URL = "https://api.geoapify.com/v2/places";
+
+const MapComponent = () => {
+  const mapRef = useRef(null);
   const [location, setLocation] = useState(null);
+  const [pointsOfInterest, setPointsOfInterest] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [route, setRoute] = useState(null);
 
   useEffect(() => {
-    const requestLocationPermission = async () => {
+    (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation(currentLocation);
+      if (status !== "granted") {
+        alert("Permissão de localização negada.");
+        return;
       }
-    };
-
-    requestLocationPermission();
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc.coords);
+      fetchPointsOfInterest(loc.coords.latitude, loc.coords.longitude);
+    })();
   }, []);
 
-  return location;
-};
-
-// Custom hook to decode and manage route coordinates
-const useRouteCoordinates = (directions) => {
-  const [routeCoordinates, setRouteCoordinates] = useState([]);
-
   useEffect(() => {
-    if (directions) {
-      const decodedCoordinates = polyline
-        .decode(directions.routes[0].geometry)
-        .map(([latitude, longitude]) => ({ latitude, longitude }));
-      setRouteCoordinates(decodedCoordinates);
-    } else {
-      setRouteCoordinates([]); // Reset route coordinates if no directions
-    }
-  }, [directions]);
-
-  return routeCoordinates;
-};
-
-// Component for rendering map markers
-const Markers = ({ locations, routeCoordinates, onMarkerPress }) => (
-  <>
-    {routeCoordinates.length > 0 ? (
-      <>
-        <Polyline
-          coordinates={routeCoordinates}
-          strokeColor="#000" // Black color for the route
-          strokeWidth={3} // Thickness of the route line
-        />
-        <Marker
-          coordinate={routeCoordinates[0]} // Start point
-          title="Start"
-        />
-        <Marker
-          coordinate={routeCoordinates[routeCoordinates.length - 1]} // End point
-          title="End"
-        />
-      </>
-    ) : (
-      locations &&
-      locations.map((loc) => (
-        <Marker
-          key={loc.id}
-          coordinate={{
-            latitude: parseFloat(loc.coordinates.latitude),
-            longitude: parseFloat(loc.coordinates.longitude),
-          }}
-          title={loc.name}
-          onPress={() => onMarkerPress(loc)}
-        />
-      ))
-    )}
-  </>
-);
-
-// Component for rendering a mini box with text
-const RouteInfoBox = ({ routeCoordinates, directions, t }) => {
-  if (routeCoordinates.length === 0 || !directions) return null;
-
-  const steps = directions.routes[0].segments[0].steps;
-
-  const renderItem = ({ item, index }) => (
-    <View style={Styles.listItem}>
-      <Text style={Styles.listItemText}>
-        {index + 1}. {item.instruction}
-      </Text>
-    </View>
-  );
-
-  return (
-    <View style={Styles.routeInfoBox} pointerEvents="box-none">
-      <Text style={Styles.routeInfoText}>
-        {t("components.mapComponent.routeInfo.distance")}:{" "}
-        {metersToKilometers(directions.routes[0].summary.distance)} km
-      </Text>
-      <Text style={Styles.routeInfoText}>
-        {t("components.mapComponent.routeInfo.duration")}:{" "}
-        {secondsToHours(directions.routes[0].summary.duration)} h
-      </Text>
-      <View style={Styles.listContainer}>
-        <FlatList
-          data={steps}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={true}
-          scrollEnabled={true}
-          nestedScrollEnabled={true}
-        />
-      </View>
-    </View>
-  );
-};
-
-// Main map component
-const MapComponent = ({ destination, directions, locations, t }) => {
-  const mapRef = useRef(null);
-  const location = useUserLocation();
-  const routeCoordinates = useRouteCoordinates(directions);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-
-  const handleZoomToUserLocation = useCallback(() => {
-    if (location && mapRef.current) {
+    if (mapRef.current && location) {
       mapRef.current.animateToRegion(
-        {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        1000
+          {
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+          1000
       );
     }
   }, [location]);
 
-  const handleMapPress = useCallback(() => {
-    setSelectedLocation(null);
-  }, []);
+  const fetchPointsOfInterest = async (lat, lon) => {
+    try {
+      const response = await axios.get(GEOAPIFY_PLACES_URL, {
+        params: {
+          categories: "tourism",
+          filter: `circle:${lon},${lat},5000`,
+          apiKey: GEOAPIFY_API_KEY,
+        },
+      });
+      const pois = response.data.features.map((poi) => ({
+        id: poi.properties.id,
+        name: poi.properties.name || "Ponto Turístico",
+        latitude: poi.geometry.coordinates[1],
+        longitude: poi.geometry.coordinates[0],
+      }));
+      setPointsOfInterest(pois);
+    } catch (error) {
+      console.error("Erro ao buscar pontos turísticos:", error);
+    }
+  };
 
-  const handleMarkerPress = useCallback((loc) => {
-    setSelectedLocation(loc);
-  }, []);
+  const fetchDirections = async (destination) => {
+    if (!location) return;
+    try {
+      const response = await axios.get("https://api.geoapify.com/v1/routing", {
+        params: {
+          waypoints: `${location.latitude},${location.longitude}|${destination.latitude},${destination.longitude}`,
+          mode: "drive",
+          apiKey: GEOAPIFY_API_KEY,
+        },
+      });
+      if (response.data.features && response.data.features.length > 0) {
+        const routeCoords = response.data.features[0].geometry.coordinates.map(
+            (coord) => ({
+              latitude: coord[1],
+              longitude: coord[0],
+            })
+        );
+        setRoute(routeCoords);
+      } else {
+        console.error("Nenhuma rota encontrada.");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar direções:", error);
+    }
+  };
 
   return (
-    <View style={Styles.mapContainer}>
-      {location ? (
-        <>
-          <MapView
-            ref={mapRef}
-            style={Styles.map}
-            showsUserLocation={true}
-            initialRegion={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.1,
-              longitudeDelta: 0.1,
-            }}
-            onPress={handleMapPress}
-          >
-            <Markers
-              locations={locations}
-              routeCoordinates={routeCoordinates}
-              onMarkerPress={handleMarkerPress}
-            />
-            <UrlTile
-              urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maximumZ={19}
-            />
-          </MapView>
+      <View style={Styles.container}>
+        {!location ? (
+            <ActivityLoader />
+        ) : (
+            <>
+              <MapView
+                  ref={mapRef}
+                  style={Styles.map}
+                  showsUserLocation={true}
+                  initialRegion={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  }}
+              >
+                {pointsOfInterest.map((poi) => (
+                    <Marker
+                        key={poi.id}
+                        coordinate={{
+                          latitude: poi.latitude,
+                          longitude: poi.longitude,
+                        }}
+                        title={poi.name}
+                        onPress={() => {
+                          setSelectedDestination(poi);
+                          fetchDirections(poi);
+                        }}
+                    />
+                ))}
+                {route && <Polyline coordinates={route} strokeWidth={3} strokeColor="blue" />}
+              </MapView>
 
-          {Platform.OS === "ios" && (
-            <View style={Styles.buttonContainer}>
-              <Button
-                title="Zoom to My Location"
-                onPress={handleZoomToUserLocation}
-              />
-            </View>
-          )}
-
-          <RouteInfoBox
-            routeCoordinates={routeCoordinates}
-            directions={directions}
-            t={t}
-          />
-        </>
-      ) : (
-        <ActivityLoader />
-      )}
-
-      {selectedLocation && (
-        <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
-          <View style={Styles.locationDetailOverlay}>
-            <LocationDetail
-              location={selectedLocation}
-              onClose={() => setSelectedLocation(null)}
-              t={t}
-            />
-          </View>
-        </TouchableWithoutFeedback>
-      )}
-    </View>
+              {selectedDestination && (
+                  <Button
+                      title="Limpar Rota"
+                      onPress={() => {
+                        setRoute(null);
+                        setSelectedDestination(null);
+                      }}
+                  />
+              )}
+            </>
+        )}
+      </View>
   );
 };
 

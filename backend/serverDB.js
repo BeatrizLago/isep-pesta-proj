@@ -69,27 +69,27 @@ async function fetchDocuments(name) {
 }
 
 const createPlace = ({
-  accessLevel,
-  city,
-  street,
-  category,
-  phoneNumber,
-  email,
-  parking = false,
-  entrance = false,
-  handicapBathroom = false,
-  internalCirculation = false,
-  visualAlarms = false,
-  signLanguage = false,
-  writtenDescriptions = false,
-  wheelchairWidth = "",
-  wheelchairHeight = "",
-  latitude,
-  longitude,
-  siteURL,
-  imageURL,
-  name,
-}) => ({
+                       accessLevel,
+                       city,
+                       street,
+                       category,
+                       phoneNumber,
+                       email,
+                       parking = false,
+                       entrance = false,
+                       handicapBathroom = false,
+                       internalCirculation = false,
+                       visualAlarms = false,
+                       signLanguage = false,
+                       writtenDescriptions = false,
+                       wheelchairWidth = "",
+                       wheelchairHeight = "",
+                       latitude,
+                       longitude,
+                       siteURL,
+                       imageURL,
+                       name,
+                     }) => ({
   accessLevel,
   address: {
     city,
@@ -141,7 +141,7 @@ const initialData = [
     longitude: "-8.613813434187623",
     siteURL: "https://www.torredosclerigos.pt/pt/",
     imageURL:
-      "https://newinporto.nit.pt/wp-content/uploads/2024/04/eb6f6ff83ce2fdc50474b963780a01c1.jpeg",
+        "https://newinporto.nit.pt/wp-content/uploads/2024/04/eb6f6ff83ce2fdc50474b963780a01c1.jpeg",
     name: "Torre dos Clérigos",
   }),
   createPlace({
@@ -164,7 +164,7 @@ const initialData = [
     longitude: "-8.614892646831137",
     siteURL: "https://www.livrarialello.pt/",
     imageURL:
-      "https://www.comerciocomhistoria.gov.pt/wp-content/uploads/import/listings/3351_imagem2.jpg",
+        "https://www.comerciocomhistoria.gov.pt/wp-content/uploads/import/listings/3351_imagem2.jpg",
     name: "Livraria Lello",
   }),
   createPlace({
@@ -187,7 +187,7 @@ const initialData = [
     longitude: "-8.61566840718015",
     siteURL: "https://palaciodabolsa.com/",
     imageURL:
-      "https://upload.wikimedia.org/wikipedia/commons/3/3b/BolsaValoresPorto.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/3/3b/BolsaValoresPorto.jpg",
     name: "Palácio da Bolsa",
   }),
   createPlace({
@@ -210,7 +210,7 @@ const initialData = [
     longitude: "-8.609288111375953",
     siteURL: "https://www.cm-gaia.pt/pt/",
     imageURL:
-      "https://lh3.googleusercontent.com/p/AF1QipOtAkPl81DHXMNsSOv7AzgOZDU6oLkU3wk2gzlY=s1360-w1360-h1020",
+        "https://lh3.googleusercontent.com/p/AF1QipOtAkPl81DHXMNsSOv7AzgOZDU6oLkU3wk2gzlY=s1360-w1360-h1020",
     name: "Jardim do Morro",
   }),
   createPlace({
@@ -233,7 +233,7 @@ const initialData = [
     longitude: "-8.611105774187497",
     siteURL: "https://www.diocese-porto.pt/pt/catedral-do-porto/",
     imageURL:
-      "https://offloadmedia.feverup.com/portosecreto.co/wp-content/uploads/2022/10/13113440/se-catedral-porto-unsplash-1024x683.jpg",
+        "https://offloadmedia.feverup.com/portosecreto.co/wp-content/uploads/2022/10/13113440/se-catedral-porto-unsplash-1024x683.jpg",
     name: "Catedral do Porto",
   }),
   createPlace({
@@ -255,9 +255,9 @@ const initialData = [
     latitude: "41.13842367518304",
     longitude: "-8.607536667166048",
     siteURL:
-      "https://culturanorte.gov.pt/patrimonio/mosteiro-da-serra-do-pilar/",
+        "https://culturanorte.gov.pt/patrimonio/mosteiro-da-serra-do-pilar/",
     imageURL:
-      "https://euroveloportugal.com/files/2016/01/Mosteiro-da-Serra-do-Pilar.jpg",
+        "https://euroveloportugal.com/files/2016/01/Mosteiro-da-Serra-do-Pilar.jpg",
     name: "Mosteiro da Serra do Pilar",
   }),
   createPlace({
@@ -280,7 +280,7 @@ const initialData = [
     longitude: "-8.658605232238742",
     siteURL: "https://www.cm-gaia.pt/pt/",
     imageURL:
-      "https://cdn.visitportugal.com/sites/default/files/styles/encontre_detalhe_poi_destaque/public/mediateca/CapelaSenhorPedra-d.jpg?itok=F5fkDDy7",
+        "https://cdn.visitportugal.com/sites/default/files/styles/encontre_detalhe_poi_destaque/public/mediateca/CapelaSenhorPedra-d.jpg?itok=F5fkDDy7",
     name: "Capela do Senhor da Pedra",
   }),
   createPlace({
@@ -333,16 +333,16 @@ async function initializeData(initialData) {
   for (const data of initialData) {
     // Check if a document with the same name already exists
     const existingDocument = await db
-      .collection("locations")
-      .where("name", "==", data.name)
-      .get();
+        .collection("locations")
+        .where("name", "==", data.name)
+        .get();
     if (existingDocument.empty) {
       // If no document with the same name exists, add the current data
       await addDocument("locations", data);
     } else {
       // If a document with the same name exists, do nothing
       console.log(
-        `Document with name '${data.name}' already exists. Skipping...`
+          `Document with name '${data.name}' already exists. Skipping...`
       );
     }
   }

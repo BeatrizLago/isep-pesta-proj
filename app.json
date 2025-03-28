@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to show your current position on the map.",
-        "NSLocationAlwaysUsageDescription": "We need your location to show your current position on the map even when the app is in the background.",
+        "NSLocationAlwaysUsageDescription": "We need your location to show your current position even when the app is in the background.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow to use your location",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
