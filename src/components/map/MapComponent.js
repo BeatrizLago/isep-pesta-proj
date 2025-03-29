@@ -1,139 +1,129 @@
 import React, { useRef, useEffect, useState } from "react";
-import { View, Button } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
-import * as Location from "expo-location";
-import axios from "axios";
+import { View, TouchableWithoutFeedback } from "react-native";
+import MapView, { Marker, UrlTile } from "react-native-maps";
+import LocationDetail from "../locationDetail/locationDetail";
 import { Styles } from "./MapComponent.styles";
-import ActivityLoader from "../../components/activityloader/ActivityLoader";
+import * as Location from "expo-location";
+import ActivityLoader from "../activityloader/ActivityLoader";
+import axios from "axios";
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
-const GEOAPIFY_PLACES_URL = "https://api.geoapify.com/v2/places";
 
-const MapComponent = () => {
-  const mapRef = useRef(null);
+const useUserLocation = () => {
   const [location, setLocation] = useState(null);
-  const [pointsOfInterest, setPointsOfInterest] = useState([]);
-  const [selectedDestination, setSelectedDestination] = useState(null);
-  const [route, setRoute] = useState(null);
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permissão de localização negada.");
-        return;
+      if (status === "granted") {
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation(currentLocation);
       }
-      const loc = await Location.getCurrentPositionAsync({});
-      setLocation(loc.coords);
-      fetchPointsOfInterest(loc.coords.latitude, loc.coords.longitude);
     })();
   }, []);
 
+  return location;
+};
+
+const usePointsOfInterest = (latitude, longitude) => {
+  const [poi, setPoi] = useState([]);
+
   useEffect(() => {
-    if (mapRef.current && location) {
-      mapRef.current.animateToRegion(
-          {
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          },
-          1000
-      );
+    if (latitude && longitude) {
+      const fetchPOI = async () => {
+        try {
+          const response = await axios.get(
+              `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${longitude},${latitude},1000&limit=50&apiKey=${GEOAPIFY_API_KEY}`
+          );
+          setPoi(
+              response.data.features.map((poi) => ({
+                id: poi.properties.place_id,
+                name: poi.properties.name || "Ponto de Interesse",
+                latitude: poi.geometry.coordinates[1],
+                longitude: poi.geometry.coordinates[0],
+              }))
+          );
+        } catch (error) {}
+      };
+      fetchPOI();
     }
-  }, [location]);
+  }, [latitude, longitude]);
 
-  const fetchPointsOfInterest = async (lat, lon) => {
-    try {
-      const response = await axios.get(GEOAPIFY_PLACES_URL, {
-        params: {
-          categories: "tourism",
-          filter: `circle:${lon},${lat},5000`,
-          apiKey: GEOAPIFY_API_KEY,
-        },
-      });
-      const pois = response.data.features.map((poi) => ({
-        id: poi.properties.id,
-        name: poi.properties.name || "Ponto Turístico",
-        latitude: poi.geometry.coordinates[1],
-        longitude: poi.geometry.coordinates[0],
-      }));
-      setPointsOfInterest(pois);
-    } catch (error) {
-      console.error("Erro ao buscar pontos turísticos:", error);
-    }
-  };
+  return poi;
+};
 
-  const fetchDirections = async (destination) => {
-    if (!location) return;
-    try {
-      const response = await axios.get("https://api.geoapify.com/v1/routing", {
-        params: {
-          waypoints: `${location.latitude},${location.longitude}|${destination.latitude},${destination.longitude}`,
-          mode: "drive",
-          apiKey: GEOAPIFY_API_KEY,
-        },
-      });
-      if (response.data.features && response.data.features.length > 0) {
-        const routeCoords = response.data.features[0].geometry.coordinates.map(
-            (coord) => ({
-              latitude: coord[1],
-              longitude: coord[0],
-            })
-        );
-        setRoute(routeCoords);
-      } else {
-        console.error("Nenhuma rota encontrada.");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar direções:", error);
-    }
-  };
+const Markers = ({ locations, pois, onMarkerPress }) => (
+    <>
+      {pois.map((poi) => (
+          <Marker
+              key={poi.id}
+              coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
+              title={poi.name}
+              onPress={() => onMarkerPress(poi)}
+          />
+      ))}
+      {locations.map((loc) => (
+          <Marker
+              key={loc.id}
+              coordinate={{
+                latitude: parseFloat(loc.coordinates.latitude),
+                longitude: parseFloat(loc.coordinates.longitude),
+              }}
+              title={loc.name}
+              onPress={() => onMarkerPress(loc)}
+          />
+      ))}
+    </>
+);
+
+const MapComponent = ({ locations }) => {
+  const mapRef = useRef(null);
+  const location = useUserLocation();
+  const pointsOfInterest = usePointsOfInterest(
+      location?.coords.latitude,
+      location?.coords.longitude
+  );
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   return (
-      <View style={Styles.container}>
-        {!location ? (
-            <ActivityLoader />
-        ) : (
+      <View style={Styles.mapContainer}>
+        {location ? (
             <>
               <MapView
                   ref={mapRef}
                   style={Styles.map}
                   showsUserLocation={true}
                   initialRegion={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.1,
+                    longitudeDelta: 0.1,
                   }}
               >
-                {pointsOfInterest.map((poi) => (
-                    <Marker
-                        key={poi.id}
-                        coordinate={{
-                          latitude: poi.latitude,
-                          longitude: poi.longitude,
-                        }}
-                        title={poi.name}
-                        onPress={() => {
-                          setSelectedDestination(poi);
-                          fetchDirections(poi);
-                        }}
-                    />
-                ))}
-                {route && <Polyline coordinates={route} strokeWidth={3} strokeColor="blue" />}
+                <Markers
+                    locations={locations}
+                    pois={pointsOfInterest}
+                    onMarkerPress={setSelectedLocation}
+                />
+                <UrlTile
+                    urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    maximumZ={19}
+                />
               </MapView>
-
-              {selectedDestination && (
-                  <Button
-                      title="Limpar Rota"
-                      onPress={() => {
-                        setRoute(null);
-                        setSelectedDestination(null);
-                      }}
-                  />
-              )}
             </>
+        ) : (
+            <ActivityLoader />
+        )}
+
+        {selectedLocation && (
+            <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
+              <View style={Styles.locationDetailOverlay}>
+                <LocationDetail
+                    location={selectedLocation}
+                    onClose={() => setSelectedLocation(null)}
+                />
+              </View>
+            </TouchableWithoutFeedback>
         )}
       </View>
   );
