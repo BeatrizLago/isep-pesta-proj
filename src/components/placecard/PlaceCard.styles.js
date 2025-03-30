@@ -12,14 +12,7 @@ export const Styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
   },
-  image: {
-    width: "100%",
-    height: 250,
-    justifyContent: "flex-end",
-  },
-  imageStyle: {
-    borderRadius: 10,
-  },
+
   gradient: {
     flex: 1,
     justifyContent: "flex-end",

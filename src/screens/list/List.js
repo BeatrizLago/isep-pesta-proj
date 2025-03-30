@@ -7,102 +7,124 @@ import { fetchLocations } from "../../state/actions/locationAction";
 import MyFilter from "../../components/myfilter/MyFilter";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import { Styles } from "./List.styles";
+import axios from "axios";
+import * as Location from "expo-location";
 
-const List = ({t}) => {
+const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
+
+const List = ({ t }) => {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.location.locations);
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedFilters, setSelectedFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [pointsOfInterest, setPointsOfInterest] = useState([]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  useEffect(() => {
+    // Request location permissions and get user's location
+    const getUserLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation(location.coords);
+      }
+    };
+    getUserLocation();
+  }, []);
+
+  useEffect(() => {
+    if (userLocation) {
+      fetchPointsOfInterest(userLocation);
+    }
+  }, [userLocation]);
+
+  const fetchPointsOfInterest = async (location) => {
+    const url = `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${location.longitude},${location.latitude},100000&limit=100&apiKey=${GEOAPIFY_API_KEY}`;
     try {
-      await dispatch(fetchLocations());
+      const response = await axios.get(url);
+      const pois = response.data.features.map((poi) => ({
+        id: poi.properties.place_id.toString(),
+        name: poi.properties.name || "Tourist Point",
+        coordinates: {
+          latitude: poi.geometry.coordinates[1],
+          longitude: poi.geometry.coordinates[0]
+        },
+        address: {
+          street: poi.properties.street || "Unknown",
+          city: poi.properties.city || "Unknown"
+        },
+        category: poi.properties.categories || "Tourism"
+      }));
+      setPointsOfInterest(pois);
+      setFilteredData(pois);  // Set the fetched POIs as filtered data
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching POIs:", error);
     } finally {
       setLoading(false);
     }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!data.length) {
-      fetchData();
-    } else {
-      setLoading(false);
-    }
-  }, [data.length, fetchData]);
-
-  useEffect(() => {
-    if (data.length) {
-      setFilteredData(data);
-    }
-  }, [data]);
+  };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    try {
-      await fetchData();
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    } finally {
-      setRefreshing(false);
+    if (userLocation) {
+      await fetchPointsOfInterest(userLocation);
     }
-  }, [fetchData]);
-
-  const clearFilters = useCallback(() => {
-    setSelectedFilters([]);
-    setFilteredData(data);
-  }, [data]);
+    setRefreshing(false);
+  }, [userLocation]);
 
   const toggleFilter = useCallback(() => {
     setShowFilter((prev) => !prev);
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      {loading ? (
-        <ActivityLoader />
-      ) : (
-        <>
-          <MyFilterButtons
-            toggleFilter={toggleFilter}
-            clearFilters={clearFilters}
-            showFilter={showFilter}
-            t={t}
-          />
+      <View style={{ flex: 1 }}>
+        {loading ? (
+            <ActivityLoader />
+        ) : (
+            <>
+              <MyFilterButtons
+                  toggleFilter={toggleFilter}
+                  showFilter={showFilter}
+                  t={t}
+              />
+              <MyFilter
+                  showFilter={showFilter}
+                  data={pointsOfInterest}
+                  selectedFilters={[]}  // Optional: handle filter for POIs
+                  setFilteredData={setFilteredData}
+                  onFilterChange={() => {}}
+                  user={user}
+                  t={t}
+              />
+              {filteredData.length > 0 ? (
+                  <FlatList
+                      data={filteredData}
+                      renderItem={({ item }) => (
+                          <PlaceCard
+                              place={{
+                                name: item.name,
+                                address: item.address,
+                                category: item.category
+                              }}
+                          />
+                      )}
+                      keyExtractor={(item, index) => index.toString()}
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                      contentContainerStyle={Styles.locationList}
+                  />
 
-          <MyFilter
-            showFilter={showFilter}
-            data={data}
-            selectedFilters={selectedFilters}
-            setFilteredData={setFilteredData}
-            onFilterChange={setSelectedFilters}
-            user={user}
-            t={t}
-          />
 
-          {filteredData.length > 0 ? (
-            <FlatList
-              data={filteredData}
-              renderItem={({ item }) => <PlaceCard place={item} />}
-              keyExtractor={(item, index) => index.toString()}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              contentContainerStyle={Styles.locationList}
-            />
-          ) : (
-            <Text style={{ textAlign: "center", marginTop: 20 }}>
-              {t("screens.list.notFound")}
-            </Text>
-          )}
-        </>
-      )}
-    </View>
+              ) : (
+                  <Text style={{ textAlign: "center", marginTop: 20 }}>
+                    {t("screens.list.notFound")}
+                  </Text>
+              )}
+            </>
+        )}
+      </View>
   );
 };
 
