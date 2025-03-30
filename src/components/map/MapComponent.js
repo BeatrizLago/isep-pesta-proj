@@ -33,7 +33,7 @@ const usePointsOfInterest = (latitude, longitude) => {
       const fetchPOI = async () => {
         try {
           const response = await axios.get(
-              `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${longitude},${latitude},1000&limit=50&apiKey=${GEOAPIFY_API_KEY}`
+              `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}` // Aumentado para 200
           );
           setPoi(
               response.data.features.map((poi) => ({
@@ -43,7 +43,9 @@ const usePointsOfInterest = (latitude, longitude) => {
                 longitude: poi.geometry.coordinates[0],
               }))
           );
-        } catch (error) {}
+        } catch (error) {
+          console.error(error); // Logar erro caso ocorra
+        }
       };
       fetchPOI();
     }
