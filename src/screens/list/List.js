@@ -23,7 +23,6 @@ const List = ({ t }) => {
   const [pointsOfInterest, setPointsOfInterest] = useState([]);
 
   useEffect(() => {
-    // Request location permissions and get user's location
     const getUserLocation = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
@@ -58,7 +57,7 @@ const List = ({ t }) => {
         category: poi.properties.categories || "Tourism"
       }));
       setPointsOfInterest(pois);
-      setFilteredData(pois);  // Set the fetched POIs as filtered data
+      setFilteredData(pois);
     } catch (error) {
       console.error("Error fetching POIs:", error);
     } finally {
@@ -92,7 +91,7 @@ const List = ({ t }) => {
               <MyFilter
                   showFilter={showFilter}
                   data={pointsOfInterest}
-                  selectedFilters={[]}  // Optional: handle filter for POIs
+                  selectedFilters={[]}
                   setFilteredData={setFilteredData}
                   onFilterChange={() => {}}
                   user={user}
@@ -104,9 +103,16 @@ const List = ({ t }) => {
                       renderItem={({ item }) => (
                           <PlaceCard
                               place={{
+                                id: item.id,
                                 name: item.name,
                                 address: item.address,
-                                category: item.category
+                                category: item.category,
+                                coordinates: item.coordinates,
+                                accessibility: {},
+                                wheelchair: { width: null, height: null },
+                                phoneNumber: null,
+                                email: null,
+                                siteURL: null
                               }}
                           />
                       )}
@@ -115,8 +121,6 @@ const List = ({ t }) => {
                       onRefresh={onRefresh}
                       contentContainerStyle={Styles.locationList}
                   />
-
-
               ) : (
                   <Text style={{ textAlign: "center", marginTop: 20 }}>
                     {t("screens.list.notFound")}

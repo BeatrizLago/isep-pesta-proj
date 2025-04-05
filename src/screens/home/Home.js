@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, KeyboardAvoidingView, Text, ScrollView, Platform } from "react-native";
+import { View, KeyboardAvoidingView, Text, ScrollView, Platform, Linking } from "react-native";
 import { SearchBar, Overlay, Button, Icon } from "@rneui/themed";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
@@ -49,7 +49,10 @@ const useLocations = () => {
   }, [locations]);
 
   const toggleFilter = useCallback(() => setShowFilter((prev) => !prev), []);
-  const clearFilters = useCallback(() => { setSelectedFilters([]); setFilteredData(locations); }, [locations]);
+  const clearFilters = useCallback(() => {
+    setSelectedFilters([]);
+    setFilteredData(locations);
+  }, [locations]);
 
   return { locations, filteredData, setFilteredData, loading, toggleFilter, clearFilters, showFilter, setShowFilter, selectedFilters, setSelectedFilters };
 };
@@ -107,48 +110,54 @@ const Home = ({ t }) => {
       const response = await axios.get(url);
       const pois = response.data.features.map((poi) => ({
         id: poi.properties.place_id.toString(),
-        name: poi.properties.name || "Ponto Turístico",
+        name: poi.properties.name || "Tourist Point",
         coordinates: {
           latitude: poi.geometry.coordinates[1],
           longitude: poi.geometry.coordinates[0]
         },
         address: {
-          street: poi.properties.street || "Desconhecido",
-          city: poi.properties.city || "Desconhecido"
+          street: poi.properties.street || "Unknown",
+          city: poi.properties.city || "Unknown"
         },
-        category: poi.properties.categories ? poi.properties.categories[0] : "Turismo" // Ajustando aqui
+        category: poi.properties.categories || "Tourism"
       }));
       setPointsOfInterest(pois);
     } catch (error) {
-      console.error("Erro ao buscar POIs:", error);
+      console.error("Error fetching POIs:", error);
       setPointsOfInterest([]);
     }
   };
-
 
   const handleGetPOIs = () => {
     fetchPointsOfInterest();
     setShowPOIList(true);
   };
 
+  // Ao selecionar um ponto de interesse na lista, abre o Google Maps com as direções para o local.
   const handleSelectPOI = (poi) => {
     if (userLocation) {
-      setStartLocation([userLocation.longitude, userLocation.latitude]);
-      setEndLocation([poi.coordinates.longitude, poi.coordinates.latitude]);
       setShowPOIList(false);
-      setTimeout(() => handleDirections(), 300);
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${poi.coordinates.latitude},${poi.coordinates.longitude}`;
+      Linking.openURL(url);
     }
   };
 
   if (loading) return <ActivityLoader />;
 
   return (
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height" }>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <View style={{ flex: 1 }}>
           <MyFilterButtons toggleFilter={toggleFilter} clearFilters={clearFilters} showFilter={showFilter} t={t} />
           <MyFilter showFilter={showFilter} data={locations} selectedFilters={selectedFilters} setFilteredData={setFilteredData} onFilterChange={setSelectedFilters} user={user} t={t} />
           <View style={Styles.mapContainerScreen}>
-            <SearchBar placeholder={t("components.searchBar.text")} onChangeText={(text) => setSearchQuery(text)} value={searchQuery} round lightTheme platform="android" />
+            <SearchBar
+                placeholder={t("components.searchBar.text")}
+                onChangeText={(text) => setSearchQuery(text)}
+                value={searchQuery}
+                round
+                lightTheme
+                platform="android"
+            />
             <View style={Styles.buttonContainer}>
               <Button
                   title={t("screens.map.getDirections")}
@@ -172,7 +181,7 @@ const Home = ({ t }) => {
             >
               <ScrollView style={{ maxHeight: 400 }}>
                 <View style={{ padding: 20 }}>
-                  {pointsOfInterest.length > 0 ?
+                  {pointsOfInterest.length > 0 ? (
                       pointsOfInterest.map((poi) => (
                           <Button
                               key={poi.id}
@@ -180,11 +189,12 @@ const Home = ({ t }) => {
                               onPress={() => handleSelectPOI(poi)}
                               buttonStyle={{ marginVertical: 5 }}
                           />
-                      )) :
+                      ))
+                  ) : (
                       <Text style={{ textAlign: "center", padding: 20 }}>
                         {t("screens.map.noPoints") || "Nenhum ponto turístico encontrado"}
                       </Text>
-                  }
+                  )}
                 </View>
               </ScrollView>
             </Overlay>
