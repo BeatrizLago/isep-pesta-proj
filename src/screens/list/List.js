@@ -16,11 +16,12 @@ const List = ({ t }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(true);
+  const [pointsOfInterest, setPointsOfInterest] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [pointsOfInterest, setPointsOfInterest] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]); // estado para os filtros selecionados
 
   useEffect(() => {
     const getUserLocation = async () => {
@@ -91,7 +92,8 @@ const List = ({ t }) => {
               <MyFilter
                   showFilter={showFilter}
                   data={pointsOfInterest}
-                  selectedFilters={[]}
+                  selectedFilters={selectedFilters}
+                  setSelectedFilters={setSelectedFilters}
                   setFilteredData={setFilteredData}
                   onFilterChange={() => {}}
                   user={user}
