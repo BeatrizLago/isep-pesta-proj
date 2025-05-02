@@ -9,9 +9,11 @@ import {
   Modal,
   Text,
   Pressable,
+  Alert,
 } from "react-native";
 import MapView, { Marker, UrlTile } from "react-native-maps";
 import * as Location from "expo-location";
+import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import LocationDetail from "../locationDetail/locationDetail";
 import ActivityLoader from "../activityloader/ActivityLoader";
@@ -48,7 +50,10 @@ const usePointsOfInterest = (latitude, longitude) => {
                 latitude: poi.geometry.coordinates[1],
                 longitude: poi.geometry.coordinates[0],
                 address: {
-                  street: poi.properties.street || poi.properties.address_line1 || "",
+                  street:
+                      poi.properties.street ||
+                      poi.properties.address_line1 ||
+                      "",
                   city: poi.properties.city || "",
                   formatted: poi.properties.formatted || "",
                   address_line2: poi.properties.address_line2 || "",
@@ -72,6 +77,7 @@ const Markers = ({ locations, pois, onMarkerPress }) => (
               key={poi.id}
               coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
               title={poi.name}
+              calloutAnchor={{ x: 0.5, y: 0 }}
               onPress={() => onMarkerPress(poi)}
           />
       ))}
@@ -83,12 +89,13 @@ const Markers = ({ locations, pois, onMarkerPress }) => (
                 longitude: parseFloat(loc.coordinates.longitude),
               }}
               title={loc.name}
-              onPress={() => {
-                onMarkerPress({
-                  ...loc,
-                  address: loc.address || { street: "", city: "", formatted: "" },
-                });
-              }}
+              calloutAnchor={{ x: 0.5, y: 0 }}
+              onPress={() =>
+                  onMarkerPress({
+                    ...loc,
+                    address: loc.address || { street: "", city: "", formatted: "" },
+                  })
+              }
           />
       ))}
     </>
@@ -104,6 +111,22 @@ const MapComponent = ({ locations, t }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showSOSModal, setShowSOSModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
+
+  const handleAddPhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permissão necessária", "Permita acesso à câmara para tirar fotos.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: false,
+      quality: 0.7,
+    });
+    if (!result.cancelled) {
+      console.log("Foto capturada:", result.uri);
+    }
+  };
 
   return (
       <View style={styles.mapContainer}>
@@ -132,7 +155,6 @@ const MapComponent = ({ locations, t }) => {
         ) : (
             <ActivityLoader />
         )}
-
         <TouchableOpacity
             style={styles.alertButton}
             onPress={() => setShowAlertModal(true)}
@@ -143,10 +165,9 @@ const MapComponent = ({ locations, t }) => {
               resizeMode="contain"
           />
         </TouchableOpacity>
-
         <Modal
             visible={showAlertModal}
-            animationType="slide"
+            animationType="fade"
             transparent
             onRequestClose={() => setShowAlertModal(false)}
         >
@@ -155,57 +176,37 @@ const MapComponent = ({ locations, t }) => {
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Alertas</Text>
-
             <View style={styles.iconGrid}>
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity onPress={() => setShowSOSModal(true)}>
-                  <Image
-                      source={require("../../assets/sos.png")}
-                      style={styles.icon}
-                  />
+                  <Image source={require("../../assets/sos.png")} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>SOS</Text>
               </View>
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity onPress={() => console.log("Corte clicado")}>
-                  <Image
-                      source={require("../../assets/corte.jpg")}
-                      style={styles.icon}
-                  />
+                  <Image source={require("../../assets/corte.jpg")} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Cortes</Text>
               </View>
-
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity onPress={() => console.log("Construção clicado")}>
-                  <Image
-                      source={require("../../assets/construcao.png")}
-                      style={styles.icon}
-                  />
+                  <Image source={require("../../assets/construcao.png")} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Obras</Text>
               </View>
-
               <View style={styles.iconWithLabel}>
-                <TouchableOpacity onPress={() => console.log("Chat clicado")}>
-                  <Image
-                      source={require("../../assets/chat.jpg")}
-                      style={styles.icon}
-                  />
+                <TouchableOpacity onPress={() => setShowChatModal(true)}>
+                  <Image source={require("../../assets/chat.jpg")} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Comunidade</Text>
               </View>
             </View>
-
-            <Pressable
-                style={styles.modalButton}
-                onPress={() => setShowAlertModal(false)}
-            >
+            <Pressable style={styles.modalButton} onPress={() => setShowAlertModal(false)}>
               <Text style={styles.modalButtonText}>Fechar</Text>
             </Pressable>
           </View>
         </Modal>
-
         <Modal
             visible={showSOSModal}
             animationType="fade"
@@ -219,27 +220,45 @@ const MapComponent = ({ locations, t }) => {
             <Text style={styles.modalTitle}>Emergência</Text>
             <Text style={styles.modalText}>
               <Text style={styles.boldText}>Urgências: </Text>
-              <TouchableOpacity onPress={() => Linking.openURL('tel:112')}>
+              <TouchableOpacity onPress={() => Linking.openURL("tel:112")}>
                 <Text style={styles.phoneNumber}>112</Text>
               </TouchableOpacity>
             </Text>
-
             <Text style={styles.modalText}>
               <Text style={styles.boldText}>SNS: </Text>
-              <TouchableOpacity onPress={() => Linking.openURL('tel:808242424')}>
+              <TouchableOpacity onPress={() => Linking.openURL("tel:808242424")}>
                 <Text style={styles.phoneNumber}>808 242 424</Text>
               </TouchableOpacity>
             </Text>
-
-            <Pressable
-                style={styles.modalButton}
-                onPress={() => setShowSOSModal(false)}
-            >
+            <Pressable style={styles.modalButton} onPress={() => setShowSOSModal(false)}>
               <Text style={styles.modalButtonText}>Fechar</Text>
             </Pressable>
           </View>
         </Modal>
-
+        <Modal
+            visible={showChatModal}
+            animationType="fade"
+            transparent
+            onRequestClose={() => setShowChatModal(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowChatModal(false)}>
+            <View style={styles.modalOverlay} />
+          </TouchableWithoutFeedback>
+          <View style={[styles.modalContent, styles.chatModal]}>
+            <Text style={styles.modalTitle}>Comunidade</Text>
+            <Pressable style={styles.chatButton} onPress={() => setShowCommentModal(true)}>
+              <Image source={require("../../assets/comentário.png")} style={styles.chatIcon} />
+              <Text style={styles.chatButtonText}>Comentar</Text>
+            </Pressable>
+            <Pressable style={styles.chatButton} onPress={handleAddPhoto}>
+              <Image source={require("../../assets/foto.png")} style={styles.chatIcon} />
+              <Text style={styles.chatButtonText}>Adicionar Foto</Text>
+            </Pressable>
+            <Pressable style={styles.modalButton} onPress={() => setShowChatModal(false)}>
+              <Text style={styles.modalButtonText}>Fechar</Text>
+            </Pressable>
+          </View>
+        </Modal>
         {selectedLocation && (
             <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
               <View style={styles.locationDetailTopOverlay}>
@@ -274,6 +293,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
+  chatModal: {
+    marginHorizontal: 20,
+    borderRadius: 8,
+  },
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
   iconGrid: {
     flexDirection: "row",
@@ -296,25 +319,50 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
   },
-  modalButton: { alignSelf: "flex-end", padding: 10 },
-  modalButtonText: { fontSize: 16, fontWeight: "bold" },
+  chatButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#eee",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  chatIcon: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
+  },
+  chatButtonText: {
+    fontSize: 16,
+  },
+  modalButton: {
+    marginTop: 20,
+    backgroundColor: "#2196F3",
+    padding: 12,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  modalText: {
+    marginTop: 10,
+    fontSize: 14,
+  },
+  boldText: {
+    fontWeight: "bold",
+  },
+  phoneNumber: {
+    color: "#1E90FF",
+    textDecorationLine: "underline",
+  },
   locationDetailTopOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 999,
-  },
-  modalText: { fontSize: 16, marginBottom: 20 },
-  phoneNumber: {
-    color: 'black',
-    fontSize: 15,
-    fontWeight: 'normal',
-    textDecorationLine: 'underline',
-    marginLeft: 5,
-  },
-  boldText: {
-    fontWeight: 'bold',
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
 });
 
