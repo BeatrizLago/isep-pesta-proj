@@ -51,9 +51,7 @@ const usePointsOfInterest = (latitude, longitude) => {
                 longitude: poi.geometry.coordinates[0],
                 address: {
                   street:
-                      poi.properties.street ||
-                      poi.properties.address_line1 ||
-                      "",
+                      poi.properties.street || poi.properties.address_line1 || "",
                   city: poi.properties.city || "",
                   formatted: poi.properties.formatted || "",
                   address_line2: poi.properties.address_line2 || "",
@@ -108,15 +106,20 @@ const MapComponent = ({ locations, t }) => {
       location?.coords.latitude,
       location?.coords.longitude
   );
+
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showSOSModal, setShowSOSModal] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
+  const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
+  const [clickedCoordinate, setClickedCoordinate] = useState(null);
 
   const handleAddPhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Permita acesso à câmara para tirar fotos.");
+      Alert.alert(
+          "Permissão necessária",
+          "Permita acesso à câmara para tirar fotos."
+      );
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -125,6 +128,7 @@ const MapComponent = ({ locations, t }) => {
     });
     if (!result.cancelled) {
       console.log("Foto capturada:", result.uri);
+      // Aqui podes guardar a URI + coords, enviar para servidor etc.
     }
   };
 
@@ -135,6 +139,10 @@ const MapComponent = ({ locations, t }) => {
                 ref={mapRef}
                 style={styles.map}
                 showsUserLocation
+                onPress={(e) => {
+                  setClickedCoordinate(e.nativeEvent.coordinate);
+                  setShowAddPhotoModal(true);
+                }}
                 initialRegion={{
                   latitude: location.coords.latitude,
                   longitude: location.coords.longitude,
@@ -155,6 +163,8 @@ const MapComponent = ({ locations, t }) => {
         ) : (
             <ActivityLoader />
         )}
+
+        {/* Botão flutuante de alertas */}
         <TouchableOpacity
             style={styles.alertButton}
             onPress={() => setShowAlertModal(true)}
@@ -165,6 +175,8 @@ const MapComponent = ({ locations, t }) => {
               resizeMode="contain"
           />
         </TouchableOpacity>
+
+        {/* Modal principal de Alertas */}
         <Modal
             visible={showAlertModal}
             animationType="fade"
@@ -177,36 +189,51 @@ const MapComponent = ({ locations, t }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Alertas</Text>
             <View style={styles.iconGrid}>
+              {/* SOS */}
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity onPress={() => setShowSOSModal(true)}>
-                  <Image source={require("../../assets/sos.png")} style={styles.icon} />
+                  <Image
+                      source={require("../../assets/sos.png")}
+                      style={styles.icon}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>SOS</Text>
               </View>
+              {/* Cortes */}
               <View style={styles.iconWithLabel}>
-                <TouchableOpacity onPress={() => console.log("Corte clicado")}>
-                  <Image source={require("../../assets/corte.jpg")} style={styles.icon} />
+                <TouchableOpacity
+                    onPress={() => Alert.alert("Corte", "Alerta de corte registado")}
+                >
+                  <Image
+                      source={require("../../assets/corte.jpg")}
+                      style={styles.icon}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Cortes</Text>
               </View>
+              {/* Obras */}
               <View style={styles.iconWithLabel}>
-                <TouchableOpacity onPress={() => console.log("Construção clicado")}>
-                  <Image source={require("../../assets/construcao.png")} style={styles.icon} />
+                <TouchableOpacity
+                    onPress={() => Alert.alert("Obras", "Alerta de obras registado")}
+                >
+                  <Image
+                      source={require("../../assets/construcao.png")}
+                      style={styles.icon}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Obras</Text>
               </View>
-              <View style={styles.iconWithLabel}>
-                <TouchableOpacity onPress={() => setShowChatModal(true)}>
-                  <Image source={require("../../assets/chat.jpg")} style={styles.icon} />
-                </TouchableOpacity>
-                <Text style={styles.iconLabel}>Comunidade</Text>
-              </View>
             </View>
-            <Pressable style={styles.modalButton} onPress={() => setShowAlertModal(false)}>
+            <Pressable
+                style={styles.modalButton}
+                onPress={() => setShowAlertModal(false)}
+            >
               <Text style={styles.modalButtonText}>Fechar</Text>
             </Pressable>
           </View>
         </Modal>
+
+        {/* Modal SOS */}
         <Modal
             visible={showSOSModal}
             animationType="fade"
@@ -230,35 +257,53 @@ const MapComponent = ({ locations, t }) => {
                 <Text style={styles.phoneNumber}>808 242 424</Text>
               </TouchableOpacity>
             </Text>
-            <Pressable style={styles.modalButton} onPress={() => setShowSOSModal(false)}>
+            <Pressable
+                style={styles.modalButton}
+                onPress={() => setShowSOSModal(false)}
+            >
               <Text style={styles.modalButtonText}>Fechar</Text>
             </Pressable>
           </View>
         </Modal>
+
+        {/* Modal ao clicar no mapa (Adicionar Foto) */}
         <Modal
-            visible={showChatModal}
+            visible={showAddPhotoModal}
             animationType="fade"
             transparent
-            onRequestClose={() => setShowChatModal(false)}
+            onRequestClose={() => setShowAddPhotoModal(false)}
         >
-          <TouchableWithoutFeedback onPress={() => setShowChatModal(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowAddPhotoModal(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
-          <View style={[styles.modalContent, styles.chatModal]}>
-            <Text style={styles.modalTitle}>Comunidade</Text>
-            <Pressable style={styles.chatButton} onPress={() => setShowCommentModal(true)}>
-              <Image source={require("../../assets/comentário.png")} style={styles.chatIcon} />
-              <Text style={styles.chatButtonText}>Comentar</Text>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Adicionar Foto</Text>
+            <Text style={styles.modalText}>
+              {clickedCoordinate
+                  ? `Latitude: ${clickedCoordinate.latitude.toFixed(
+                      5
+                  )}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
+                  : "Coordenadas indisponíveis"}
+            </Text>
+            <Pressable
+                style={styles.modalButton}
+                onPress={() => {
+                  setShowAddPhotoModal(false);
+                  handleAddPhoto();
+                }}
+            >
+              <Text style={styles.modalButtonText}>Tirar Foto</Text>
             </Pressable>
-            <Pressable style={styles.chatButton} onPress={handleAddPhoto}>
-              <Image source={require("../../assets/foto.png")} style={styles.chatIcon} />
-              <Text style={styles.chatButtonText}>Adicionar Foto</Text>
-            </Pressable>
-            <Pressable style={styles.modalButton} onPress={() => setShowChatModal(false)}>
-              <Text style={styles.modalButtonText}>Fechar</Text>
+            <Pressable
+                style={[styles.modalButton, { backgroundColor: "gray", marginTop: 10 }]}
+                onPress={() => setShowAddPhotoModal(false)}
+            >
+              <Text style={styles.modalButtonText}>Cancelar</Text>
             </Pressable>
           </View>
         </Modal>
+
+        {/* Detalhes do local clicado */}
         {selectedLocation && (
             <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
               <View style={styles.locationDetailTopOverlay}>
@@ -277,6 +322,7 @@ const MapComponent = ({ locations, t }) => {
 const styles = StyleSheet.create({
   mapContainer: { flex: 1 },
   map: { flex: 1 },
+
   alertButton: {
     position: "absolute",
     bottom: 20,
@@ -286,6 +332,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   alertIcon: { width: "100%", height: "100%" },
+
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: {
     backgroundColor: "white",
@@ -293,77 +340,38 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
-  chatModal: {
-    marginHorizontal: 20,
-    borderRadius: 8,
-  },
+
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  modalText: { fontSize: 14, marginBottom: 10 },
+  boldText: { fontWeight: "bold" },
+  phoneNumber: { color: "#1E90FF" },
+
   iconGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-around",
-    alignItems: "center",
     marginBottom: 20,
   },
-  iconWithLabel: {
-    alignItems: "center",
-    margin: 10,
-  },
-  icon: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-  },
-  iconLabel: {
-    marginTop: 5,
-    fontSize: 12,
-    textAlign: "center",
-  },
-  chatButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#eee",
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-  },
-  chatIcon: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
-  },
-  chatButtonText: {
-    fontSize: 16,
-  },
+  iconWithLabel: { alignItems: "center", margin: 10 },
+  icon: { width: 60, height: 60, borderRadius: 8 },
+  iconLabel: { marginTop: 5, fontSize: 12, textAlign: "center" },
+
   modalButton: {
-    marginTop: 20,
+    marginTop: 15,
     backgroundColor: "#2196F3",
     padding: 12,
     borderRadius: 8,
+    alignItems: "center"
   },
-  modalButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  modalText: {
-    marginTop: 10,
-    fontSize: 14,
-  },
-  boldText: {
-    fontWeight: "bold",
-  },
-  phoneNumber: {
-    color: "#1E90FF",
-    textDecorationLine: "underline",
-  },
+  modalButtonText: { color: "#fff", fontWeight: "bold" },
+
   locationDetailTopOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
-  },
+  }
 });
 
 export default MapComponent;

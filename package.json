@@ -38,7 +38,7 @@
     "dsp.js": "^1.0.1",
     "expo": "~51.0.31",
     "expo-av": "~14.0.7",
-    "expo-dev-client": "~4.0.25",
+    "expo-dev-client": "~4.0.29",
     "expo-image-picker": "^15.0.7",
     "expo-linear-gradient": "^13.0.2",
     "expo-linking": "~6.3.1",
