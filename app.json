@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Coach App",
-    "slug": "coach-app-slug",
+    "slug": "travel-coach",
     "version": "1.0.0",
     "splash": {
       "resizeMode": "contain",
@@ -47,8 +47,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "4ee36c11-7853-40c5-a086-ddcb42a516a6"
+        "projectId": "4d923068-d5b4-42b2-97b1-776c09e8dfda"
       }
-    }
+    },
+    "owner": "beatrizzz"
   }
 }
