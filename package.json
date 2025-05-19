@@ -39,7 +39,7 @@
     "expo": "~51.0.31",
     "expo-av": "~14.0.7",
     "expo-dev-client": "~4.0.29",
-    "expo-image-picker": "^15.0.7",
+    "expo-image-picker": "~15.1.0",
     "expo-linear-gradient": "^13.0.2",
     "expo-linking": "~6.3.1",
     "expo-location": "~17.0.1",
@@ -80,7 +80,8 @@
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
     "slider": "^1.0.4",
-    "test": "file:"
+    "test": "file:",
+    "expo-camera": "~15.0.16"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

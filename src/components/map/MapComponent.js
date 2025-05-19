@@ -15,7 +15,6 @@ import MapView, { Marker, UrlTile } from "react-native-maps";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
-import LocationDetail from "../locationDetail/locationDetail";
 import ActivityLoader from "../activityloader/ActivityLoader";
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
@@ -50,8 +49,7 @@ const usePointsOfInterest = (latitude, longitude) => {
                 latitude: poi.geometry.coordinates[1],
                 longitude: poi.geometry.coordinates[0],
                 address: {
-                  street:
-                      poi.properties.street || poi.properties.address_line1 || "",
+                  street: poi.properties.street || poi.properties.address_line1 || "",
                   city: poi.properties.city || "",
                   formatted: poi.properties.formatted || "",
                   address_line2: poi.properties.address_line2 || "",
@@ -68,37 +66,6 @@ const usePointsOfInterest = (latitude, longitude) => {
   return poi;
 };
 
-const Markers = ({ locations, pois, onMarkerPress }) => (
-    <>
-      {pois.map((poi) => (
-          <Marker
-              key={poi.id}
-              coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
-              title={poi.name}
-              calloutAnchor={{ x: 0.5, y: 0 }}
-              onPress={() => onMarkerPress(poi)}
-          />
-      ))}
-      {locations.map((loc) => (
-          <Marker
-              key={loc.id}
-              coordinate={{
-                latitude: parseFloat(loc.coordinates.latitude),
-                longitude: parseFloat(loc.coordinates.longitude),
-              }}
-              title={loc.name}
-              calloutAnchor={{ x: 0.5, y: 0 }}
-              onPress={() =>
-                  onMarkerPress({
-                    ...loc,
-                    address: loc.address || { street: "", city: "", formatted: "" },
-                  })
-              }
-          />
-      ))}
-    </>
-);
-
 const MapComponent = ({ locations, t }) => {
   const mapRef = useRef(null);
   const location = useUserLocation();
@@ -110,25 +77,46 @@ const MapComponent = ({ locations, t }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showSOSModal, setShowSOSModal] = useState(false);
-  const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
+  const [showAddChoiceModal, setShowAddChoiceModal] = useState(false);
   const [clickedCoordinate, setClickedCoordinate] = useState(null);
+  const [customMarkers, setCustomMarkers] = useState([]); // <- armazenar markers personalizados
 
-  const handleAddPhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-          "Permissão necessária",
-          "Permita acesso à câmara para tirar fotos."
-      );
+  const openCamera = async (type) => {
+    setShowAddChoiceModal(false);
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permissão negada", "Permita o uso da câmara para continuar.");
       return;
     }
+
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: false,
-      quality: 0.7,
+      allowsEditing: true,
+      quality: 0.5,
     });
-    if (!result.cancelled) {
-      console.log("Foto capturada:", result.uri);
-      // Aqui podes guardar a URI + coords, enviar para servidor etc.
+
+    if (!result.canceled) {
+      Alert.alert(
+          `${type} registado com foto!`,
+          `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
+      );
+
+      // Adicionar um novo marcador com ícone correspondente
+      const icon =
+          type === "Obras"
+              ? require("../../assets/construcao.png")
+              : require("../../assets/corte.jpg");
+
+      const newMarker = {
+        id: Date.now().toString(),
+        latitude: clickedCoordinate.latitude,
+        longitude: clickedCoordinate.longitude,
+        type,
+        icon,
+      };
+
+      setCustomMarkers((prev) => [...prev, newMarker]);
+
+      console.log("Foto URI:", result.assets[0].uri);
     }
   };
 
@@ -141,7 +129,7 @@ const MapComponent = ({ locations, t }) => {
                 showsUserLocation
                 onPress={(e) => {
                   setClickedCoordinate(e.nativeEvent.coordinate);
-                  setShowAddPhotoModal(true);
+                  setShowAddChoiceModal(true);
                 }}
                 initialRegion={{
                   latitude: location.coords.latitude,
@@ -150,11 +138,51 @@ const MapComponent = ({ locations, t }) => {
                   longitudeDelta: 0.1,
                 }}
             >
-              <Markers
-                  locations={locations}
-                  pois={pointsOfInterest}
-                  onMarkerPress={setSelectedLocation}
-              />
+              {/* Pontos de Interesse e outros locais */}
+              {pointsOfInterest.map((poi) => (
+                  <Marker
+                      key={poi.id}
+                      coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
+                      title={poi.name}
+                      onPress={() => setSelectedLocation(poi)}
+                  />
+              ))}
+
+              {locations.map((loc) => (
+                  <Marker
+                      key={loc.id}
+                      coordinate={{
+                        latitude: parseFloat(loc.coordinates.latitude),
+                        longitude: parseFloat(loc.coordinates.longitude),
+                      }}
+                      title={loc.name}
+                      onPress={() =>
+                          setSelectedLocation({
+                            ...loc,
+                            address: loc.address || { street: "", city: "", formatted: "" },
+                          })
+                      }
+                  />
+              ))}
+
+              {/* Marcadores personalizados com ícones */}
+              {customMarkers.map((marker) => (
+                  <Marker
+                      key={marker.id}
+                      coordinate={{
+                        latitude: marker.latitude,
+                        longitude: marker.longitude,
+                      }}
+                      title={marker.type}
+                  >
+                    <Image
+                        source={marker.icon}
+                        style={{ width: 32, height: 32 }}
+                        resizeMode="contain"
+                    />
+                  </Marker>
+              ))}
+
               <UrlTile
                   urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   maximumZ={19}
@@ -164,7 +192,7 @@ const MapComponent = ({ locations, t }) => {
             <ActivityLoader />
         )}
 
-        {/* Botão flutuante de alertas */}
+        {/* Botão de alerta */}
         <TouchableOpacity
             style={styles.alertButton}
             onPress={() => setShowAlertModal(true)}
@@ -176,20 +204,14 @@ const MapComponent = ({ locations, t }) => {
           />
         </TouchableOpacity>
 
-        {/* Modal principal de Alertas */}
-        <Modal
-            visible={showAlertModal}
-            animationType="fade"
-            transparent
-            onRequestClose={() => setShowAlertModal(false)}
-        >
+        {/* Modal de alertas */}
+        <Modal visible={showAlertModal} animationType="fade" transparent>
           <TouchableWithoutFeedback onPress={() => setShowAlertModal(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Alertas</Text>
             <View style={styles.iconGrid}>
-              {/* SOS */}
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity onPress={() => setShowSOSModal(true)}>
                   <Image
@@ -199,7 +221,6 @@ const MapComponent = ({ locations, t }) => {
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>SOS</Text>
               </View>
-              {/* Cortes */}
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity
                     onPress={() => Alert.alert("Corte", "Alerta de corte registado")}
@@ -211,7 +232,6 @@ const MapComponent = ({ locations, t }) => {
                 </TouchableOpacity>
                 <Text style={styles.iconLabel}>Cortes</Text>
               </View>
-              {/* Obras */}
               <View style={styles.iconWithLabel}>
                 <TouchableOpacity
                     onPress={() => Alert.alert("Obras", "Alerta de obras registado")}
@@ -233,13 +253,8 @@ const MapComponent = ({ locations, t }) => {
           </View>
         </Modal>
 
-        {/* Modal SOS */}
-        <Modal
-            visible={showSOSModal}
-            animationType="fade"
-            transparent
-            onRequestClose={() => setShowSOSModal(false)}
-        >
+        {/* Modal de emergência */}
+        <Modal visible={showSOSModal} animationType="fade" transparent>
           <TouchableWithoutFeedback onPress={() => setShowSOSModal(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
@@ -266,55 +281,53 @@ const MapComponent = ({ locations, t }) => {
           </View>
         </Modal>
 
-        {/* Modal ao clicar no mapa (Adicionar Foto) */}
+        {/* Modal ao clicar no mapa (Obras ou Cortes com CÂMARA) */}
         <Modal
-            visible={showAddPhotoModal}
+            visible={showAddChoiceModal}
             animationType="fade"
             transparent
-            onRequestClose={() => setShowAddPhotoModal(false)}
+            onRequestClose={() => setShowAddChoiceModal(false)}
         >
-          <TouchableWithoutFeedback onPress={() => setShowAddPhotoModal(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowAddChoiceModal(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Adicionar Foto</Text>
+            <Text style={styles.modalTitle}>Registar</Text>
             <Text style={styles.modalText}>
               {clickedCoordinate
-                  ? `Latitude: ${clickedCoordinate.latitude.toFixed(
+                  ? `Selecione o tipo de alerta para:\nLat: ${clickedCoordinate.latitude.toFixed(
                       5
-                  )}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
+                  )}, Lon: ${clickedCoordinate.longitude.toFixed(5)}`
                   : "Coordenadas indisponíveis"}
             </Text>
+            <View style={styles.iconGrid}>
+              <View style={styles.iconWithLabel}>
+                <TouchableOpacity onPress={() => openCamera("Obras")}>
+                  <Image
+                      source={require("../../assets/construcao.png")}
+                      style={styles.icon}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.iconLabel}>Obras</Text>
+              </View>
+              <View style={styles.iconWithLabel}>
+                <TouchableOpacity onPress={() => openCamera("Cortes")}>
+                  <Image
+                      source={require("../../assets/corte.jpg")}
+                      style={styles.icon}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.iconLabel}>Cortes</Text>
+              </View>
+            </View>
             <Pressable
                 style={styles.modalButton}
-                onPress={() => {
-                  setShowAddPhotoModal(false);
-                  handleAddPhoto();
-                }}
-            >
-              <Text style={styles.modalButtonText}>Tirar Foto</Text>
-            </Pressable>
-            <Pressable
-                style={[styles.modalButton, { backgroundColor: "gray", marginTop: 10 }]}
-                onPress={() => setShowAddPhotoModal(false)}
+                onPress={() => setShowAddChoiceModal(false)}
             >
               <Text style={styles.modalButtonText}>Cancelar</Text>
             </Pressable>
           </View>
         </Modal>
-
-        {/* Detalhes do local clicado */}
-        {selectedLocation && (
-            <TouchableWithoutFeedback onPress={() => setSelectedLocation(null)}>
-              <View style={styles.locationDetailTopOverlay}>
-                <LocationDetail
-                    t={t}
-                    location={selectedLocation}
-                    onClose={() => setSelectedLocation(null)}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-        )}
       </View>
   );
 };
@@ -322,56 +335,71 @@ const MapComponent = ({ locations, t }) => {
 const styles = StyleSheet.create({
   mapContainer: { flex: 1 },
   map: { flex: 1 },
-
   alertButton: {
     position: "absolute",
-    bottom: 20,
-    right: 10,
-    width: 40,
-    height: 40,
-    zIndex: 1000,
-  },
-  alertIcon: { width: "100%", height: "100%" },
-
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: {
+    top: 20,
+    right: 20,
     backgroundColor: "white",
-    padding: 20,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    padding: 10,
+    borderRadius: 50,
+    elevation: 5,
   },
-
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  modalText: { fontSize: 14, marginBottom: 10 },
-  boldText: { fontWeight: "bold" },
-  phoneNumber: { color: "#1E90FF" },
-
+  alertIcon: { width: 30, height: 30 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  modalContent: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalText: {
+    marginBottom: 10,
+  },
+  boldText: {
+    fontWeight: "bold",
+  },
+  phoneNumber: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
+  modalButton: {
+    backgroundColor: "#ccc",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   iconGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-around",
-    marginBottom: 20,
+    marginVertical: 10,
   },
-  iconWithLabel: { alignItems: "center", margin: 10 },
-  icon: { width: 60, height: 60, borderRadius: 8 },
-  iconLabel: { marginTop: 5, fontSize: 12, textAlign: "center" },
-
-  modalButton: {
-    marginTop: 15,
-    backgroundColor: "#2196F3",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center"
+  iconWithLabel: {
+    alignItems: "center",
   },
-  modalButtonText: { color: "#fff", fontWeight: "bold" },
-
-  locationDetailTopOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  }
+  icon: {
+    width: 50,
+    height: 50,
+  },
+  iconLabel: {
+    marginTop: 5,
+    fontSize: 12,
+  },
 });
 
 export default MapComponent;
