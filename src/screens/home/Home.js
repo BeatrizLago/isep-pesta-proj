@@ -269,69 +269,75 @@ const Home = ({ t }) => {
           <View style={{ flex: 1 }}>
             <MyFilterButtons toggleFilter={toggleFilter} clearFilters={clearFilters} showFilter={showFilter} t={t} />
             <MyFilter showFilter={showFilter} data={locations} selectedFilters={selectedFilters} setFilteredData={setFilteredData} onFilterChange={setSelectedFilters} user={user} t={t} />
+
+            {/* Conditionally render SearchBar and Buttons */}
+            {!showFilter && (
+                <>
+                  <View style={Styles.searchBarWrapper}>
+                    <SearchBar
+                        placeholder={t("components.searchBar.text")}
+                        onChangeText={handleSearch}
+                        value={searchQuery}
+                        round
+                        lightTheme
+                        platform="android"
+                        containerStyle={Styles.searchBarContainer}
+                        inputContainerStyle={Styles.searchBarInputContainer}
+                        onFocus={() => {
+                          if (searchQuery.length > 2 && searchResults.length > 0) {
+                            setShowSearchSuggestions(true);
+                          }
+                        }}
+                    />
+                    {showSearchSuggestions && searchResults.length > 0 && (
+                        <ScrollView
+                            style={Styles.suggestionsList}
+                            keyboardShouldPersistTaps="always"
+                        >
+                          {searchResults.map((item, index) => (
+                              <TouchableOpacity
+                                  key={`${item.id}-${index}`}
+                                  style={Styles.suggestionItem}
+                                  onPress={() => handleSelectSearchSuggestion(item)}
+                              >
+                                <Text style={Styles.suggestionText}>{item.name}</Text>
+                              </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                    )}
+                  </View>
+
+                  <View style={Styles.buttonContainer}>
+                    <Button
+                        title={t("screens.map.getDirections")}
+                        onPress={handleDirections} // This will now use startLocation and endLocation
+                        buttonStyle={Styles.button}
+                        titleStyle={Styles.buttonText}
+                        icon={<Icon name="directions" size={20} color="white" style={Styles.icon} />}
+                    />
+                    <Button
+                        title={t("screens.map.clearDirections")}
+                        onPress={() => {
+                          handleClearDirections();
+                          setEndLocation(null); // Clear end location to reset map view
+                          setSelectedPoiForMapClick(null); // Clear the selected POI for map click
+                        }}
+                        buttonStyle={Styles.button}
+                        titleStyle={Styles.buttonText}
+                        icon={<Icon name="clear" size={20} color="white" style={Styles.icon} />}
+                    />
+                    <Button
+                        title="Ver Pontos de Interesse"
+                        onPress={handleGetPOIs}
+                        buttonStyle={Styles.button}
+                        titleStyle={Styles.buttonText}
+                        icon={<Icon name="place" size={20} color="white" style={Styles.icon} />}
+                    />
+                  </View>
+                </>
+            )}
+
             <View style={Styles.mapContainerScreen}>
-              <View style={Styles.searchBarWrapper}>
-                <SearchBar
-                    placeholder={t("components.searchBar.text")}
-                    onChangeText={handleSearch}
-                    value={searchQuery}
-                    round
-                    lightTheme
-                    platform="android"
-                    containerStyle={Styles.searchBarContainer}
-                    inputContainerStyle={Styles.searchBarInputContainer}
-                    onFocus={() => {
-                      if (searchQuery.length > 2 && searchResults.length > 0) {
-                        setShowSearchSuggestions(true);
-                      }
-                    }}
-                />
-                {showSearchSuggestions && searchResults.length > 0 && (
-                    <ScrollView
-                        style={Styles.suggestionsList}
-                        keyboardShouldPersistTaps="always"
-                    >
-                      {searchResults.map((item, index) => (
-                          <TouchableOpacity
-                              key={`${item.id}-${index}`}
-                              style={Styles.suggestionItem}
-                              onPress={() => handleSelectSearchSuggestion(item)}
-                          >
-                            <Text style={Styles.suggestionText}>{item.name}</Text>
-                          </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                )}
-              </View>
-
-              <View style={Styles.buttonContainer}>
-                <Button
-                    title={t("screens.map.getDirections")}
-                    onPress={handleDirections} // This will now use startLocation and endLocation
-                    buttonStyle={Styles.button}
-                    titleStyle={Styles.buttonText}
-                    icon={<Icon name="directions" size={20} color="white" style={Styles.icon} />}
-                />
-                <Button
-                    title={t("screens.map.clearDirections")}
-                    onPress={() => {
-                      handleClearDirections();
-                      setEndLocation(null); // Clear end location to reset map view
-                      setSelectedPoiForMapClick(null); // Clear the selected POI for map click
-                    }}
-                    buttonStyle={Styles.button}
-                    titleStyle={Styles.buttonText}
-                    icon={<Icon name="clear" size={20} color="white" style={Styles.icon} />}
-                />
-                <Button
-                    title="Ver Pontos de Interesse"
-                    onPress={handleGetPOIs}
-                    buttonStyle={Styles.button}
-                    titleStyle={Styles.buttonText}
-                    icon={<Icon name="place" size={20} color="white" style={Styles.icon} />}
-                />
-              </View>
-
               <Overlay
                   isVisible={showPOIList}
                   onBackdropPress={() => setShowPOIList(false)}
