@@ -106,8 +106,9 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
     }
 };
 
-const MapComponent = ({ locations, t }) => {
-    const mapRef = useRef(null);
+// Use forwardRef para permitir que o componente pai acesse os métodos internos do MapView
+const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick }, ref) => { // Adicionado 'ref'
+    const mapRef = ref || useRef(null); // Usar o ref passado ou criar um interno
     const location = useUserLocation();
     const pointsOfInterest = usePointsOfInterest(
         location?.coords.latitude,
@@ -201,10 +202,8 @@ const MapComponent = ({ locations, t }) => {
         }
 
         // Usar as coordenadas roteáveis obtidas
-        // !!! CORREÇÃO APLICADA AQUI: INVERTER PARA LATITUDE,LONGITUDE PARA A API DE ROTAS DA GEOAPIFY !!!
         const origin = `${routableOrigin.latitude.toFixed(6)},${routableOrigin.longitude.toFixed(6)}`;
         const destination = `${routableDestination.latitude.toFixed(6)},${routableDestination.longitude.toFixed(6)}`;
-        // --- FIM DA NOVA LÓGICA ---
 
         console.log("Valor de 'origin' (roteável e arredondado para API):", origin);
         console.log("Valor de 'destination' (roteável e arredondado para API):", destination);
@@ -224,12 +223,14 @@ const MapComponent = ({ locations, t }) => {
                 }));
                 setRouteCoordinates(formattedRoute);
                 console.log("Rota encontrada com", formattedRoute.length, "pontos.");
-                if (mapRef.current) {
-                    mapRef.current.fitToCoordinates(formattedRoute, {
-                        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-                        animated: true,
-                    });
-                }
+                // O fitToCoordinates pode ser útil se você quiser mostrar a rota inteira,
+                // mas para "zoom no POI", vamos depender do useEffect abaixo.
+                // if (mapRef.current) {
+                //     mapRef.current.fitToCoordinates(formattedRoute, {
+                //         edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                //         animated: true,
+                //     });
+                // }
             } else {
                 Alert.alert("Rota não encontrada", "Não foi possível encontrar uma rota para o destino.");
                 setRouteCoordinates([]);
@@ -247,6 +248,25 @@ const MapComponent = ({ locations, t }) => {
         }
     };
 
+    // useEffect para lidar com o POI selecionado da Home e dar zoom
+    useEffect(() => {
+        if (selectedPoiForMapClick) {
+            console.log("MapComponent recebeu POI para clique automático:", selectedPoiForMapClick.name);
+            // Simular o comportamento de um clique no marcador
+            setSelectedLocation(selectedPoiForMapClick);
+            fetchRoute(selectedPoiForMapClick.coordinates.longitude, selectedPoiForMapClick.coordinates.latitude);
+
+            // Animar o mapa para o POI selecionado com zoom
+            if (mapRef.current) {
+                mapRef.current.animateToRegion({
+                    latitude: selectedPoiForMapClick.coordinates.latitude,
+                    longitude: selectedPoiForMapClick.coordinates.longitude,
+                    latitudeDelta: 0.005, // Ajuste este valor para controlar o nível de zoom (menor = mais zoom)
+                    longitudeDelta: 0.005, // Ajuste este valor para controlar o nível de zoom
+                }, 1000); // Duração da animação em milissegundos
+            }
+        }
+    }, [selectedPoiForMapClick]); // Dependência: executa quando selectedPoiForMapClick muda
 
     return (
         <View style={styles.mapContainer}>
@@ -259,6 +279,7 @@ const MapComponent = ({ locations, t }) => {
                         setClickedCoordinate(e.nativeEvent.coordinate);
                         setShowAddChoiceModal(true);
                         setRouteCoordinates([]); // Limpa a rota ao clicar no mapa
+                        setSelectedLocation(null); // Limpa o POI selecionado
                         console.log("Mapa clicado em:", e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude);
                     }}
                     initialRegion={{
@@ -477,7 +498,7 @@ const MapComponent = ({ locations, t }) => {
             </Modal>
         </View>
     );
-};
+}); // Fechamento do forwardRef
 
 const styles = StyleSheet.create({
     mapContainer: { flex: 1 },

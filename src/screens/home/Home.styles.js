@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import {Dimensions, StyleSheet} from "react-native";
 
 export const Styles = StyleSheet.create({
   map: {
@@ -63,5 +63,29 @@ export const Styles = StyleSheet.create({
   },
   icon: {
     color: "grey", // Icon color
+  },
+  suggestionText: {
+    fontSize: 18, // Example: Increased font size for POI names
+    color: 'black', // Example: default text color
+  },
+  suggestionsList: {
+    position: 'absolute',
+    top: 100,
+    left: 10,
+    right: 10,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    maxHeight: Dimensions.get('window').height * 0.4,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    zIndex: 10,
+  },
+  suggestionItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
 });
