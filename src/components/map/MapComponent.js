@@ -16,6 +16,8 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import ActivityLoader from "../activityloader/ActivityLoader";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from "react-redux"; // Importação adicionada
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62"; // Sua chave API
 
@@ -48,11 +50,11 @@ const usePointsOfInterest = (latitude, longitude) => {
                         `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}`
                     );
                     setPoi(
-                        response.data.features.map((poiItem) => ({ // Renomeado 'poi' para 'poiItem' para evitar conflito
+                        response.data.features.map((poiItem) => ({
                             id: poiItem.properties.place_id,
                             name: poiItem.properties.name || "Ponto de Interesse",
-                            latitude: poiItem.geometry.coordinates[1], // Geoapify Places API: [lon, lat]
-                            longitude: poiItem.geometry.coordinates[0], // Geoapify Places API: [lon, lat]
+                            latitude: poiItem.geometry.coordinates[1],
+                            longitude: poiItem.geometry.coordinates[0],
                             address: {
                                 street: poiItem.properties.street || poiItem.properties.address_line1 || "",
                                 city: poiItem.properties.city || "",
@@ -78,7 +80,6 @@ const usePointsOfInterest = (latitude, longitude) => {
     return poi;
 };
 
-// Nova função para geocodificação reversa e obtenção de uma coordenada roteável
 const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
     console.log("Geocodificando reversamente para ponto roteável: Lon:", lon, "Lat:", lat);
     try {
@@ -96,7 +97,7 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
             return routableCoord;
         }
         console.log("Não encontrou uma coordenada roteável para Lon:", lon, "Lat:", lat, "Resposta:", response.data);
-        return null; // Não encontrou uma coordenada roteável
+        return null;
     } catch (error) {
         console.error("Erro ao geocodificar reversamente para ponto roteável:", error.message);
         if (error.response) {
@@ -106,9 +107,8 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
     }
 };
 
-// Use forwardRef para permitir que o componente pai acesse os métodos internos do MapView
-const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick }, ref) => { // Adicionado 'ref'
-    const mapRef = ref || useRef(null); // Usar o ref passado ou criar um interno
+const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick }, ref) => {
+    const mapRef = ref || useRef(null);
     const location = useUserLocation();
     const pointsOfInterest = usePointsOfInterest(
         location?.coords.latitude,
@@ -122,6 +122,37 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     const [clickedCoordinate, setClickedCoordinate] = useState(null);
     const [customMarkers, setCustomMarkers] = useState([]);
     const [routeCoordinates, setRouteCoordinates] = useState([]);
+
+    const [showAlertDetailsModal, setShowAlertDetailsModal] = useState(false);
+    const [selectedAlert, setSelectedAlert] = useState(null);
+
+    // Obter o utilizador do estado Redux
+    const authUser = useSelector((state) => state.auth.user);
+    const currentUserName = authUser?.email || "Utilizador Anónimo";
+
+    useEffect(() => {
+        const loadMarkers = async () => {
+            try {
+                const storedMarkers = await AsyncStorage.getItem('mapAlertMarkers');
+                if (storedMarkers) {
+                    setCustomMarkers(JSON.parse(storedMarkers));
+                    console.log("Marcadores carregados do AsyncStorage:", JSON.parse(storedMarkers).length);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar marcadores do AsyncStorage:", error);
+            }
+        };
+        loadMarkers();
+    }, []);
+
+    const saveMarkers = async (markers) => {
+        try {
+            await AsyncStorage.setItem('mapAlertMarkers', JSON.stringify(markers));
+            console.log("Marcadores guardados no AsyncStorage:", markers.length);
+        } catch (error) {
+            console.error("Erro ao guardar marcadores no AsyncStorage:", error);
+        }
+    };
 
     const openCamera = async (type) => {
         setShowAddChoiceModal(false);
@@ -137,27 +168,61 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
         });
 
         if (!result.canceled) {
-            Alert.alert(
-                `${type} registado com foto!`,
-                `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
-            );
-
-            const icon =
-                type === "Obras"
-                    ? require("../../assets/construcao.png")
-                    : require("../../assets/corte.jpg");
-
             const newMarker = {
                 id: Date.now().toString(),
                 latitude: clickedCoordinate.latitude,
                 longitude: clickedCoordinate.longitude,
                 type,
-                icon,
+                imageUri: result.assets[0].uri,
+                icon: type === "Obras" ? "construcao" : "corte",
+                publishedBy: currentUserName, // Usa o nome do utilizador do Redux
+                publishedAt: new Date().toISOString(), // Data e hora da publicação
             };
 
-            setCustomMarkers((prev) => [...prev, newMarker]);
+            setCustomMarkers((prev) => {
+                const updatedMarkers = [...prev, newMarker];
+                saveMarkers(updatedMarkers);
+                return updatedMarkers;
+            });
+
+            Alert.alert(
+                `${type} registado com foto!`,
+                `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
+            );
 
             console.log("Foto URI:", result.assets[0].uri);
+        }
+    };
+
+    // --- NOVA FUNÇÃO: Remover um alerta ---
+    const removeAlert = () => {
+        if (selectedAlert) {
+            Alert.alert(
+                "Remover Alerta",
+                `Tem a certeza que quer remover o alerta de ${selectedAlert.type} publicado por ${selectedAlert.publishedBy}?`,
+                [
+                    {
+                        text: "Cancelar",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Remover",
+                        onPress: () => {
+                            setCustomMarkers((prevMarkers) => {
+                                const updatedMarkers = prevMarkers.filter(
+                                    (marker) => marker.id !== selectedAlert.id
+                                );
+                                saveMarkers(updatedMarkers); // Guarda a lista atualizada
+                                return updatedMarkers;
+                            });
+                            setShowAlertDetailsModal(false); // Fecha o modal de detalhes
+                            setSelectedAlert(null); // Limpa o alerta selecionado
+                            Alert.alert("Alerta Removido", `O alerta de ${selectedAlert.type} foi removido com sucesso.`);
+                        },
+                    },
+                ],
+                { cancelable: true }
+            );
         }
     };
 
@@ -173,7 +238,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
         console.log("Localização do utilizador (original): Lat:", location.coords.latitude, "Lon:", location.coords.longitude);
         console.log("Destino (original): Lat:", destinationLat, "Lon:", destinationLon);
 
-        // --- NOVA LÓGICA: Obter coordenadas roteáveis via geocodificação reversa ---
         const routableOrigin = await reverseGeocodeAndGetRoutableCoordinate(
             location.coords.longitude,
             location.coords.latitude
@@ -201,7 +265,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
             return;
         }
 
-        // Usar as coordenadas roteáveis obtidas
         const origin = `${routableOrigin.latitude.toFixed(6)},${routableOrigin.longitude.toFixed(6)}`;
         const destination = `${routableDestination.latitude.toFixed(6)},${routableDestination.longitude.toFixed(6)}`;
 
@@ -216,21 +279,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
 
             if (response.data.features && response.data.features.length > 0) {
                 const route = response.data.features[0].geometry.coordinates;
-                // A API de rotas da Geoapify retorna [lon, lat] para cada ponto da polyline
                 const formattedRoute = route[0].map((coord) => ({
-                    latitude: coord[1], // Mapeia lon para latitude
-                    longitude: coord[0], // Mapeia lat para longitude
+                    latitude: coord[1],
+                    longitude: coord[0],
                 }));
                 setRouteCoordinates(formattedRoute);
                 console.log("Rota encontrada com", formattedRoute.length, "pontos.");
-                // O fitToCoordinates pode ser útil se você quiser mostrar a rota inteira,
-                // mas para "zoom no POI", vamos depender do useEffect abaixo.
-                // if (mapRef.current) {
-                //     mapRef.current.fitToCoordinates(formattedRoute, {
-                //         edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-                //         animated: true,
-                //     });
-                // }
             } else {
                 Alert.alert("Rota não encontrada", "Não foi possível encontrar uma rota para o destino.");
                 setRouteCoordinates([]);
@@ -248,25 +302,22 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
         }
     };
 
-    // useEffect para lidar com o POI selecionado da Home e dar zoom
     useEffect(() => {
         if (selectedPoiForMapClick) {
             console.log("MapComponent recebeu POI para clique automático:", selectedPoiForMapClick.name);
-            // Simular o comportamento de um clique no marcador
             setSelectedLocation(selectedPoiForMapClick);
             fetchRoute(selectedPoiForMapClick.coordinates.longitude, selectedPoiForMapClick.coordinates.latitude);
 
-            // Animar o mapa para o POI selecionado com zoom
             if (mapRef.current) {
                 mapRef.current.animateToRegion({
                     latitude: selectedPoiForMapClick.coordinates.latitude,
-                    longitude: selectedPoiForMapClick.coordinates.longitude,
-                    latitudeDelta: 0.005, // Ajuste este valor para controlar o nível de zoom (menor = mais zoom)
-                    longitudeDelta: 0.005, // Ajuste este valor para controlar o nível de zoom
-                }, 1000); // Duração da animação em milissegundos
+                    longitude: selectedPoiForMapClick.longitude,
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
+                }, 1000);
             }
         }
-    }, [selectedPoiForMapClick]); // Dependência: executa quando selectedPoiForMapClick muda
+    }, [selectedPoiForMapClick]);
 
     return (
         <View style={styles.mapContainer}>
@@ -276,10 +327,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     style={styles.map}
                     showsUserLocation
                     onPress={(e) => {
-                        setClickedCoordinate(e.nativeEvent.coordinate);
                         setShowAddChoiceModal(true);
-                        setRouteCoordinates([]); // Limpa a rota ao clicar no mapa
-                        setSelectedLocation(null); // Limpa o POI selecionado
+                        setClickedCoordinate(e.nativeEvent.coordinate);
+                        setRouteCoordinates([]);
+                        setSelectedLocation(null);
+                        setShowAlertDetailsModal(false);
+                        setSelectedAlert(null);
                         console.log("Mapa clicado em:", e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude);
                     }}
                     initialRegion={{
@@ -289,7 +342,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         longitudeDelta: 0.1,
                     }}
                 >
-                    {/* Pontos de Interesse e outros locais */}
                     {pointsOfInterest.map((poi) => (
                         <Marker
                             key={poi.id}
@@ -298,8 +350,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                             onPress={() => {
                                 setSelectedLocation(poi);
                                 console.log("POI selecionado:", poi.name, "Lat:", poi.latitude, "Lon:", poi.longitude);
-                                // Passar LONGITUDE primeiro, depois LATITUDE para fetchRoute
                                 fetchRoute(poi.longitude, poi.latitude);
+                                setShowAlertDetailsModal(false);
+                                setSelectedAlert(null);
                             }}
                         />
                     ))}
@@ -318,13 +371,13 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                                     address: loc.address || { street: "", city: "", formatted: "" },
                                 });
                                 console.log("Localização selecionada:", loc.name, "Lat:", loc.coordinates.latitude, "Lon:", loc.coordinates.longitude);
-                                // Passar LONGITUDE primeiro, depois LATITUDE para fetchRoute
                                 fetchRoute(parseFloat(loc.coordinates.longitude), parseFloat(loc.coordinates.latitude));
+                                setShowAlertDetailsModal(false);
+                                setSelectedAlert(null);
                             }}
                         />
                     ))}
 
-                    {/* Marcadores personalizados com ícones */}
                     {customMarkers.map((marker) => (
                         <Marker
                             key={marker.id}
@@ -333,16 +386,27 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                                 longitude: marker.longitude,
                             }}
                             title={marker.type}
+                            description={`Alerta de ${marker.type}`}
+                            onPress={() => {
+                                setSelectedAlert(marker);
+                                setShowAlertDetailsModal(true);
+                                setRouteCoordinates([]);
+                                setSelectedLocation(null);
+                                setShowAddChoiceModal(false);
+                            }}
                         >
                             <Image
-                                source={marker.icon}
+                                source={
+                                    marker.icon === "construcao"
+                                        ? require("../../assets/construcao.png")
+                                        : require("../../assets/corte.jpg")
+                                }
                                 style={{ width: 32, height: 32 }}
                                 resizeMode="contain"
                             />
                         </Marker>
                     ))}
 
-                    {/* Render the route Polyline */}
                     {routeCoordinates.length > 0 && (
                         <Polyline
                             coordinates={routeCoordinates}
@@ -360,7 +424,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 <ActivityLoader />
             )}
 
-            {/* Botão de alerta */}
             <TouchableOpacity
                 style={styles.alertButton}
                 onPress={() => setShowAlertModal(true)}
@@ -372,7 +435,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 />
             </TouchableOpacity>
 
-            {/* Modal de alertas */}
             <Modal visible={showAlertModal} animationType="fade" transparent>
                 <TouchableWithoutFeedback onPress={() => setShowAlertModal(false)}>
                     <View style={styles.modalOverlay} />
@@ -421,7 +483,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 </View>
             </Modal>
 
-            {/* Modal de emergência */}
             <Modal visible={showSOSModal} animationType="fade" transparent>
                 <TouchableWithoutFeedback onPress={() => setShowSOSModal(false)}>
                     <View style={styles.modalOverlay} />
@@ -449,7 +510,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 </View>
             </Modal>
 
-            {/* Modal ao clicar no mapa (Obras ou Cortes com CÂMARA) */}
             <Modal
                 visible={showAddChoiceModal}
                 animationType="fade"
@@ -496,9 +556,54 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     </Pressable>
                 </View>
             </Modal>
+
+            {/* --- NOVO MODAL: Detalhes do Alerta --- */}
+            <Modal
+                visible={showAlertDetailsModal}
+                animationType="fade"
+                transparent
+                onRequestClose={() => setShowAlertDetailsModal(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setShowAlertDetailsModal(false)}>
+                    <View style={styles.modalOverlay} />
+                </TouchableWithoutFeedback>
+                {selectedAlert && ( // Renderiza apenas se houver um alerta selecionado
+                    <View style={styles.alertDetailsModalContent}>
+                        <Text style={styles.modalTitle}>{selectedAlert.type}</Text>
+                        {selectedAlert.imageUri ? (
+                            <Image
+                                source={{ uri: selectedAlert.imageUri }}
+                                style={styles.alertDetailImage}
+                                resizeMode="contain"
+                            />
+                        ) : (
+                            <Text>Nenhuma foto disponível.</Text>
+                        )}
+                        <Text style={styles.modalText}>
+                            <Text style={styles.boldText}>Publicado por:</Text> {selectedAlert.publishedBy || "Desconhecido"}
+                        </Text>
+                        <Text style={styles.modalText}>
+                            <Text style={styles.boldText}>Data/Hora:</Text> {selectedAlert.publishedAt ? new Date(selectedAlert.publishedAt).toLocaleString() : "N/A"}
+                        </Text>
+                        {}
+                        <Pressable
+                            style={[styles.modalButton, styles.removeAlertButton]}
+                            onPress={removeAlert}
+                        >
+                            <Text style={styles.modalButtonText}>Remover Alerta</Text>
+                        </Pressable>
+                        <Pressable
+                            style={styles.modalButton}
+                            onPress={() => setShowAlertDetailsModal(false)}
+                        >
+                            <Text style={styles.modalButtonText}>Fechar</Text>
+                        </Pressable>
+                    </View>
+                )}
+            </Modal>
         </View>
     );
-}); // Fechamento do forwardRef
+});
 
 const styles = StyleSheet.create({
     mapContainer: { flex: 1 },
@@ -525,6 +630,27 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
+    },
+    alertDetailsModalContent: {
+        position: "absolute",
+        alignSelf: 'center',
+        top: '25%',
+        width: '80%',
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        padding: 20,
+        elevation: 10, // Sombra para Android
+        shadowColor: '#000', // Sombra para iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    alertDetailImage: {
+        width: '100%',
+        height: 200,
+        marginBottom: 15,
+        borderRadius: 8,
+        backgroundColor: '#eee',
     },
     modalTitle: {
         fontSize: 20,
@@ -567,6 +693,10 @@ const styles = StyleSheet.create({
     iconLabel: {
         marginTop: 5,
         fontSize: 12,
+    },
+    removeAlertButton: {
+        backgroundColor: '#dc3545',
+        marginBottom: 10,
     },
 });
 
