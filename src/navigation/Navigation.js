@@ -30,13 +30,8 @@ const screens = {
     Map: {
         name: "Mapa",
         component: Home,
-        options: (t, openMenu) => ({
+        options: (t) => ({
             title: t("screens.map.title"),
-            headerRight: () => (
-                <TouchableOpacity onPress={openMenu} style={styles.headerButton}>
-                    <Image source={require("../assets/menu.png")} style={styles.headerIcon} />
-                </TouchableOpacity>
-            )
         }),
         details: {
             name: "DetalhesMapa",
@@ -76,12 +71,12 @@ const screens = {
     }
 };
 
-function createNavigator(Navigator, screenConfig, t, openMenu = () => {}) {
+function createNavigator(Navigator, screenConfig, t) {
     return (
         <Navigator.Navigator>
             <Navigator.Screen
                 name={screenConfig.name}
-                options={screenConfig.options(t, openMenu)}>
+                options={screenConfig.options(t)}>
                 {() => <screenConfig.component t={t} />}
             </Navigator.Screen>
             {screenConfig.details && (
@@ -95,13 +90,36 @@ function createNavigator(Navigator, screenConfig, t, openMenu = () => {}) {
     );
 }
 
-function MapLayout({ t, openMenu }) { return createNavigator(InsideMap, screens.Map, t, openMenu); }
+function MapLayout({ t }) { return createNavigator(InsideMap, screens.Map, t); }
 function ListLayout({ t }) { return createNavigator(InsideList, screens.List, t); }
 function ProfileLayout({ t }) { return createNavigator(InsideProfile, screens.Profile, t); }
 function ConfigLayout({ t }) { return createNavigator(InsideConfig, screens.Config, t); }
-function LoginLayout({ t }) { return createNavigator(LoginStack, screens.Login, t); }
 
-function TabLayout({ t, user, openMenu }) {
+// Definimos o componente LoginLayout diretamente, sem a função de envolvimento `createNavigator` aqui.
+// Isto é porque `LoginLayoutComponent` já retorna o `LoginStack.Navigator` completo.
+function LoginLayoutComponent({ t }) {
+    return (
+        <LoginStack.Navigator>
+            <LoginStack.Screen
+                name={screens.Login.name}
+                options={screens.Login.options(t)}
+            >
+                {() => <screens.Login.component t={t} />}
+            </LoginStack.Screen>
+            {screens.Login.details && (
+                <LoginStack.Screen
+                    name={screens.Login.details.name}
+                    options={screens.Login.details.options(t)}
+                >
+                    {() => <screens.Login.details.component t={t} />}
+                </LoginStack.Screen>
+            )}
+        </LoginStack.Navigator>
+    );
+}
+
+
+function TabLayout({ t, user }) {
     return (
         <Tab.Navigator screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
@@ -116,7 +134,7 @@ function TabLayout({ t, user, openMenu }) {
             tabBarInactiveTintColor: "gray"
         })}>
             <Tab.Screen name="MapaTab" options={{ headerShown: false, title: t("screens.map.title") }}>
-                {() => <MapLayout t={t} openMenu={openMenu} />}
+                {() => <MapLayout t={t} />}
             </Tab.Screen>
             <Tab.Screen name="ListaTab" options={{ headerShown: false, title: t("screens.list.title") }}>
                 {() => <ListLayout t={t} />}
@@ -136,30 +154,16 @@ function TabLayout({ t, user, openMenu }) {
 const Navigation = ({ t }) => {
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
-    const [menuVisible, setMenuVisible] = useState(false);
+
     const [photoModalVisible, setPhotoModalVisible] = useState(false);
     const [commentModalVisible, setCommentModalVisible] = useState(false);
-    const [slideAnim] = useState(new Animated.Value(250));
+
     const [slidePhotoAnim] = useState(new Animated.Value(250));
     const [slideCommentAnim] = useState(new Animated.Value(250));
-    const [fadeMenu] = useState(new Animated.Value(0));
     const [fadePhoto] = useState(new Animated.Value(0));
     const [fadeComment] = useState(new Animated.Value(0));
-    const { currentTheme } = useContext(ThemeContext);
 
-    const openMenu = () => {
-        setMenuVisible(true);
-        Animated.parallel([
-            Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true }),
-            Animated.timing(fadeMenu, { toValue: 1, duration: 200, useNativeDriver: true })
-        ]).start();
-    };
-    const closeMenu = () => {
-        Animated.parallel([
-            Animated.spring(slideAnim, { toValue: 250, useNativeDriver: true }),
-            Animated.timing(fadeMenu, { toValue: 0, duration: 200, useNativeDriver: true })
-        ]).start(() => setMenuVisible(false));
-    };
+    const { currentTheme } = useContext(ThemeContext);
 
     const openPhotoModal = () => {
         setPhotoModalVisible(true);
@@ -207,26 +211,16 @@ const Navigation = ({ t }) => {
                 <Stack.Navigator initialRouteName="Login">
                     {user ? (
                         <Stack.Screen name="App" options={{ headerShown: false }}>
-                            {() => <TabLayout t={t} user={user} openMenu={openMenu} />}
+                            {() => <TabLayout t={t} user={user} />}
                         </Stack.Screen>
                     ) : (
+                        // Correção para o warning: Usar a render prop (children)
                         <Stack.Screen name="LoginHome" options={{ headerShown: false }}>
-                            {() => <LoginLayout t={t} />}
+                            {() => <LoginLayoutComponent t={t} />}
                         </Stack.Screen>
                     )}
                 </Stack.Navigator>
             </NavigationContainer>
-
-            <Modal animationType="none" transparent visible={menuVisible} onRequestClose={closeMenu}>
-                <Animated.View style={[styles.modalOverlay, { opacity: fadeMenu }]}>
-                    <Animated.View style={[styles.modalContent, { transform: [{ translateX: slideAnim }] }]}>
-                        <Text style={styles.modalTitle}>Menu</Text>
-                        <TouchableOpacity style={styles.menuButton} onPress={openPhotoModal}><Text style={styles.buttonText}>Fotografias</Text></TouchableOpacity>
-                        <TouchableOpacity style={styles.menuButton} onPress={openCommentModal}><Text style={styles.buttonText}>Comentários</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={closeMenu} style={styles.closeButton}><Text style={styles.closeText}>Fechar</Text></TouchableOpacity>
-                    </Animated.View>
-                </Animated.View>
-            </Modal>
 
             <Modal animationType="none" transparent visible={photoModalVisible} onRequestClose={closePhotoModal}>
                 <Animated.View style={[styles.modalOverlay, { opacity: fadePhoto }]}>
@@ -250,13 +244,9 @@ const Navigation = ({ t }) => {
 };
 
 const styles = StyleSheet.create({
-    headerButton: { marginRight: 10 },
-    headerIcon: { width: 24, height: 24 },
     modalOverlay: { flex: 1, justifyContent: "center", alignItems: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" },
     modalContent: { backgroundColor: "#fff", width: 250, height: "100%", borderTopLeftRadius: 10, borderBottomLeftRadius: 10, padding: 20, position: "absolute", right: 0, top: 0, bottom: 0 },
     modalTitle: { fontSize: 18, marginBottom: 10 },
-    menuButton: { backgroundColor: "#d1d1d1", paddingVertical: 15, paddingHorizontal: 25, borderRadius: 25, marginBottom: 10, alignItems: "center" },
-    buttonText: { color: "#000", fontSize: 14 },
     closeButton: { marginTop: 20, backgroundColor: "#2196F3", padding: 10, borderRadius: 8, alignSelf: "flex-end" },
     closeText: { color: "#fff" }
 });
