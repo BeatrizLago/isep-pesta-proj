@@ -17,9 +17,10 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import ActivityLoader from "../activityloader/ActivityLoader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSelector } from "react-redux"; // Importação adicionada
+import { useSelector } from "react-redux";
+import haversine from 'haversine-distance';
 
-const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62"; // Sua chave API
+const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
 
 const useUserLocation = () => {
     const [location, setLocation] = useState(null);
@@ -29,10 +30,20 @@ const useUserLocation = () => {
             if (status === "granted") {
                 const currentLocation = await Location.getCurrentPositionAsync({});
                 setLocation(currentLocation);
-                console.log("Localização do utilizador obtida:", currentLocation.coords);
+
+                Location.watchPositionAsync(
+                    {
+                        accuracy: Location.Accuracy.High,
+                        timeInterval: 5000,
+                        distanceInterval: 10,
+                    },
+                    (newLocation) => {
+                        setLocation(newLocation);
+                    }
+                );
+
             } else {
                 Alert.alert("Permissão de Localização Negada", "Por favor, conceda permissão de localização para usar o mapa.");
-                console.warn("Permissão de localização negada.");
             }
         })();
     }, []);
@@ -43,7 +54,6 @@ const usePointsOfInterest = (latitude, longitude) => {
     const [poi, setPoi] = useState([]);
     useEffect(() => {
         if (latitude && longitude) {
-            console.log("Fetching POIs for Lat:", latitude, "Lon:", longitude);
             const fetchPOI = async () => {
                 try {
                     const response = await axios.get(
@@ -63,25 +73,17 @@ const usePointsOfInterest = (latitude, longitude) => {
                             },
                         }))
                     );
-                    console.log("POIs carregados:", response.data.features.length);
                 } catch (error) {
-                    console.error("Erro ao buscar POIs:", error.message);
-                    if (error.response) {
-                        console.error("Detalhes do erro da API (POIs):", error.response.data);
-                    }
                     Alert.alert("Erro POI", "Não foi possível carregar pontos de interesse. Verifique a chave API ou conexão.");
                 }
             };
             fetchPOI();
-        } else {
-            console.log("Latitude ou Longitude são nulas/indefinidas para POIs. Lat:", latitude, "Lon:", longitude);
         }
     }, [latitude, longitude]);
     return poi;
 };
 
 const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
-    console.log("Geocodificando reversamente para ponto roteável: Lon:", lon, "Lat:", lat);
     try {
         const response = await axios.get(
             `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${GEOAPIFY_API_KEY}`
@@ -93,16 +95,10 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
                 latitude: feature.geometry.coordinates[1],
                 address: feature.properties.formatted
             };
-            console.log("Ponto roteável encontrado:", routableCoord);
             return routableCoord;
         }
-        console.log("Não encontrou uma coordenada roteável para Lon:", lon, "Lat:", lat, "Resposta:", response.data);
         return null;
     } catch (error) {
-        console.error("Erro ao geocodificar reversamente para ponto roteável:", error.message);
-        if (error.response) {
-            console.error("Detalhes do erro da API (Geocode Reversa):", error.response.data);
-        }
         return null;
     }
 };
@@ -126,9 +122,14 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     const [showAlertDetailsModal, setShowAlertDetailsModal] = useState(false);
     const [selectedAlert, setSelectedAlert] = useState(null);
 
-    // Obter o utilizador do estado Redux
+    const [showProximityAlertModal, setShowProximityAlertModal] = useState(false);
+    const [proximityAlertDetails, setProximityAlertDetails] = useState(null);
+    const [shownProximityAlerts, setShownProximityAlerts] = useState({});
+
+    // Obtém o estado de autenticação diretamente do Redux
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const authUser = useSelector((state) => state.auth.user);
-    const currentUserName = authUser?.email || "Utilizador Anónimo";
+    const currentUserName = authUser?.name || "Utilizador Anónimo";
 
     useEffect(() => {
         const loadMarkers = async () => {
@@ -136,7 +137,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 const storedMarkers = await AsyncStorage.getItem('mapAlertMarkers');
                 if (storedMarkers) {
                     setCustomMarkers(JSON.parse(storedMarkers));
-                    console.log("Marcadores carregados do AsyncStorage:", JSON.parse(storedMarkers).length);
                 }
             } catch (error) {
                 console.error("Erro ao carregar marcadores do AsyncStorage:", error);
@@ -148,10 +148,27 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     const saveMarkers = async (markers) => {
         try {
             await AsyncStorage.setItem('mapAlertMarkers', JSON.stringify(markers));
-            console.log("Marcadores guardados no AsyncStorage:", markers.length);
         } catch (error) {
-            console.error("Erro ao guardar marcadores no AsyncStorage:", error);
+            console.error("Erro ao guardar marcadores do AsyncStorage:", error);
         }
+    };
+
+    const handleMapPress = (e) => {
+        if (!isAuthenticated) { // Verifica se o utilizador NÃO está autenticado (ou seja, é anónimo)
+            Alert.alert(
+                "Ação não permitida",
+                "Para adicionar alertas, você precisa estar logado na sua conta. Por favor, faça login ou registe-se."
+            );
+            return;
+        }
+        setShowAddChoiceModal(true);
+        setClickedCoordinate(e.nativeEvent.coordinate);
+        setRouteCoordinates([]);
+        setSelectedLocation(null);
+        setShowAlertDetailsModal(false);
+        setSelectedAlert(null);
+        setShowProximityAlertModal(false);
+        setProximityAlertDetails(null);
     };
 
     const openCamera = async (type) => {
@@ -175,8 +192,8 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 type,
                 imageUri: result.assets[0].uri,
                 icon: type === "Obras" ? "construcao" : "corte",
-                publishedBy: currentUserName, // Usa o nome do utilizador do Redux
-                publishedAt: new Date().toISOString(), // Data e hora da publicação
+                publishedBy: currentUserName,
+                publishedAt: new Date().toISOString(),
             };
 
             setCustomMarkers((prev) => {
@@ -189,14 +206,11 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 `${type} registado com foto!`,
                 `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
             );
-
-            console.log("Foto URI:", result.assets[0].uri);
         }
     };
 
-    // --- NOVA FUNÇÃO: Remover um alerta ---
     const removeAlert = () => {
-        if (selectedAlert) {
+        if (selectedAlert && (selectedAlert.publishedBy === currentUserName)) {
             Alert.alert(
                 "Remover Alerta",
                 `Tem a certeza que quer remover o alerta de ${selectedAlert.type} publicado por ${selectedAlert.publishedBy}?`,
@@ -212,31 +226,28 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                                 const updatedMarkers = prevMarkers.filter(
                                     (marker) => marker.id !== selectedAlert.id
                                 );
-                                saveMarkers(updatedMarkers); // Guarda a lista atualizada
+                                saveMarkers(updatedMarkers);
                                 return updatedMarkers;
                             });
-                            setShowAlertDetailsModal(false); // Fecha o modal de detalhes
-                            setSelectedAlert(null); // Limpa o alerta selecionado
+                            setShowAlertDetailsModal(false);
+                            setSelectedAlert(null);
                             Alert.alert("Alerta Removido", `O alerta de ${selectedAlert.type} foi removido com sucesso.`);
                         },
                     },
                 ],
                 { cancelable: true }
             );
+        } else {
+            Alert.alert("Permissão Negada", "Você só pode remover alertas que você publicou.");
         }
     };
 
     const fetchRoute = async (destinationLon, destinationLat) => {
         if (!location) {
             Alert.alert("Erro", "Localização atual indisponível.");
-            console.log("Localização do utilizador é nula, não é possível buscar rota.");
             setRouteCoordinates([]);
             return;
         }
-
-        console.log("Iniciando busca de rota...");
-        console.log("Localização do utilizador (original): Lat:", location.coords.latitude, "Lon:", location.coords.longitude);
-        console.log("Destino (original): Lat:", destinationLat, "Lon:", destinationLon);
 
         const routableOrigin = await reverseGeocodeAndGetRoutableCoordinate(
             location.coords.longitude,
@@ -268,11 +279,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
         const origin = `${routableOrigin.latitude.toFixed(6)},${routableOrigin.longitude.toFixed(6)}`;
         const destination = `${routableDestination.latitude.toFixed(6)},${routableDestination.longitude.toFixed(6)}`;
 
-        console.log("Valor de 'origin' (roteável e arredondado para API):", origin);
-        console.log("Valor de 'destination' (roteável e arredondado para API):", destination);
-
         const requestUrl = `https://api.geoapify.com/v1/routing?waypoints=${origin}|${destination}&mode=walk&apiKey=${GEOAPIFY_API_KEY}`;
-        console.log("URL de Requisição da Rota:", requestUrl);
 
         try {
             const response = await axios.get(requestUrl);
@@ -284,17 +291,13 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     longitude: coord[0],
                 }));
                 setRouteCoordinates(formattedRoute);
-                console.log("Rota encontrada com", formattedRoute.length, "pontos.");
             } else {
                 Alert.alert("Rota não encontrada", "Não foi possível encontrar uma rota para o destino.");
                 setRouteCoordinates([]);
-                console.warn("Nenhuma rota encontrada na resposta da API:", response.data);
             }
         } catch (error) {
-            console.error("Erro ao buscar rota:", error.message);
             if (error.response && error.response.data && error.response.data.message) {
                 Alert.alert("Erro Rota", `Erro da API: ${error.response.data.message}`);
-                console.error("Detalhes do erro da API:", error.response.data);
             } else {
                 Alert.alert("Erro Rota", "Não foi possível buscar a rota. Verifique sua chave API, conexão ou coordenadas.");
             }
@@ -304,7 +307,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
 
     useEffect(() => {
         if (selectedPoiForMapClick) {
-            console.log("MapComponent recebeu POI para clique automático:", selectedPoiForMapClick.name);
             setSelectedLocation(selectedPoiForMapClick);
             fetchRoute(selectedPoiForMapClick.coordinates.longitude, selectedPoiForMapClick.coordinates.latitude);
 
@@ -319,6 +321,33 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
         }
     }, [selectedPoiForMapClick]);
 
+    useEffect(() => {
+        if (location && customMarkers.length > 0) {
+            checkProximityToAlerts(location.coords);
+        }
+    }, [location, customMarkers]);
+
+    const checkProximityToAlerts = (userCoords) => {
+        const proximityRadius = 50;
+
+        customMarkers.forEach((marker) => {
+            const markerCoords = { latitude: marker.latitude, longitude: marker.longitude };
+            const distance = haversine(userCoords, markerCoords);
+
+            if (distance <= proximityRadius && !shownProximityAlerts[marker.id]) {
+                setProximityAlertDetails(marker);
+                setShowProximityAlertModal(true);
+                setShownProximityAlerts((prev) => ({ ...prev, [marker.id]: true }));
+            } else if (distance > proximityRadius * 2 && shownProximityAlerts[marker.id]) {
+                setShownProximityAlerts((prev) => {
+                    const newState = { ...prev };
+                    delete newState[marker.id];
+                    return newState;
+                });
+            }
+        });
+    };
+
     return (
         <View style={styles.mapContainer}>
             {location ? (
@@ -326,15 +355,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     ref={mapRef}
                     style={styles.map}
                     showsUserLocation
-                    onPress={(e) => {
-                        setShowAddChoiceModal(true);
-                        setClickedCoordinate(e.nativeEvent.coordinate);
-                        setRouteCoordinates([]);
-                        setSelectedLocation(null);
-                        setShowAlertDetailsModal(false);
-                        setSelectedAlert(null);
-                        console.log("Mapa clicado em:", e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude);
-                    }}
+                    onPress={handleMapPress} // Usa esta função para verificar autenticação
                     initialRegion={{
                         latitude: location.coords.latitude,
                         longitude: location.coords.longitude,
@@ -349,10 +370,11 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                             title={poi.name}
                             onPress={() => {
                                 setSelectedLocation(poi);
-                                console.log("POI selecionado:", poi.name, "Lat:", poi.latitude, "Lon:", poi.longitude);
                                 fetchRoute(poi.longitude, poi.latitude);
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
+                                setShowProximityAlertModal(false);
+                                setProximityAlertDetails(null);
                             }}
                         />
                     ))}
@@ -370,10 +392,11 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                                     ...loc,
                                     address: loc.address || { street: "", city: "", formatted: "" },
                                 });
-                                console.log("Localização selecionada:", loc.name, "Lat:", loc.coordinates.latitude, "Lon:", loc.coordinates.longitude);
                                 fetchRoute(parseFloat(loc.coordinates.longitude), parseFloat(loc.coordinates.latitude));
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
+                                setShowProximityAlertModal(false);
+                                setProximityAlertDetails(null);
                             }}
                         />
                     ))}
@@ -393,6 +416,8 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                                 setRouteCoordinates([]);
                                 setSelectedLocation(null);
                                 setShowAddChoiceModal(false);
+                                setShowProximityAlertModal(false);
+                                setProximityAlertDetails(null);
                             }}
                         >
                             <Image
@@ -453,7 +478,13 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         </View>
                         <View style={styles.iconWithLabel}>
                             <TouchableOpacity
-                                onPress={() => Alert.alert("Corte", "Alerta de corte registado")}
+                                onPress={() => {
+                                    if (!isAuthenticated) { // Verifica se está autenticado antes de permitir
+                                        Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
+                                    } else {
+                                        Alert.alert("Corte", "Alerta de corte registado"); // Ou chame openCamera("Cortes") se quiser uma foto
+                                    }
+                                }}
                             >
                                 <Image
                                     source={require("../../assets/corte.jpg")}
@@ -464,7 +495,13 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         </View>
                         <View style={styles.iconWithLabel}>
                             <TouchableOpacity
-                                onPress={() => Alert.alert("Obras", "Alerta de obras registado")}
+                                onPress={() => {
+                                    if (!isAuthenticated) { // Verifica se está autenticado antes de permitir
+                                        Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
+                                    } else {
+                                        Alert.alert("Obras", "Alerta de obras registado"); // Ou chame openCamera("Obras")
+                                    }
+                                }}
                             >
                                 <Image
                                     source={require("../../assets/construcao.png")}
@@ -510,54 +547,55 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 </View>
             </Modal>
 
-            <Modal
-                visible={showAddChoiceModal}
-                animationType="fade"
-                transparent
-                onRequestClose={() => setShowAddChoiceModal(false)}
-            >
-                <TouchableWithoutFeedback onPress={() => setShowAddChoiceModal(false)}>
-                    <View style={styles.modalOverlay} />
-                </TouchableWithoutFeedback>
-                <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>Registar</Text>
-                    <Text style={styles.modalText}>
-                        {clickedCoordinate
-                            ? `Selecione o tipo de alerta para:\nLat: ${clickedCoordinate.latitude.toFixed(
-                                5
-                            )}, Lon: ${clickedCoordinate.longitude.toFixed(5)}`
-                            : "Coordenadas indisponíveis"}
-                    </Text>
-                    <View style={styles.iconGrid}>
-                        <View style={styles.iconWithLabel}>
-                            <TouchableOpacity onPress={() => openCamera("Obras")}>
-                                <Image
-                                    source={require("../../assets/construcao.png")}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.iconLabel}>Obras</Text>
+            {isAuthenticated && ( // Este modal só será renderizado se o utilizador estiver autenticado
+                <Modal
+                    visible={showAddChoiceModal}
+                    animationType="fade"
+                    transparent
+                    onRequestClose={() => setShowAddChoiceModal(false)}
+                >
+                    <TouchableWithoutFeedback onPress={() => setShowAddChoiceModal(false)}>
+                        <View style={styles.modalOverlay} />
+                    </TouchableWithoutFeedback>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Registar</Text>
+                        <Text style={styles.modalText}>
+                            {clickedCoordinate
+                                ? `Selecione o tipo de alerta para:\nLat: ${clickedCoordinate.latitude.toFixed(
+                                    5
+                                )}, Lon: ${clickedCoordinate.longitude.toFixed(5)}`
+                                : "Coordenadas indisponíveis"}
+                        </Text>
+                        <View style={styles.iconGrid}>
+                            <View style={styles.iconWithLabel}>
+                                <TouchableOpacity onPress={() => openCamera("Obras")}>
+                                    <Image
+                                        source={require("../../assets/construcao.png")}
+                                        style={styles.icon}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={styles.iconLabel}>Obras</Text>
+                            </View>
+                            <View style={styles.iconWithLabel}>
+                                <TouchableOpacity onPress={() => openCamera("Cortes")}>
+                                    <Image
+                                        source={require("../../assets/corte.jpg")}
+                                        style={styles.icon}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={styles.iconLabel}>Cortes</Text>
+                            </View>
                         </View>
-                        <View style={styles.iconWithLabel}>
-                            <TouchableOpacity onPress={() => openCamera("Cortes")}>
-                                <Image
-                                    source={require("../../assets/corte.jpg")}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.iconLabel}>Cortes</Text>
-                        </View>
+                        <Pressable
+                            style={styles.modalButton}
+                            onPress={() => setShowAddChoiceModal(false)}
+                        >
+                            <Text style={styles.modalButtonText}>Cancelar</Text>
+                        </Pressable>
                     </View>
-                    <Pressable
-                        style={styles.modalButton}
-                        onPress={() => setShowAddChoiceModal(false)}
-                    >
-                        <Text style={styles.modalButtonText}>Cancelar</Text>
-                    </Pressable>
-                </View>
-            </Modal>
+                </Modal>
+            )}
 
-            {/* --- NOVO MODAL: Detalhes do Alerta --- */}
             <Modal
                 visible={showAlertDetailsModal}
                 animationType="fade"
@@ -567,7 +605,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 <TouchableWithoutFeedback onPress={() => setShowAlertDetailsModal(false)}>
                     <View style={styles.modalOverlay} />
                 </TouchableWithoutFeedback>
-                {selectedAlert && ( // Renderiza apenas se houver um alerta selecionado
+                {selectedAlert && (
                     <View style={styles.alertDetailsModalContent}>
                         <Text style={styles.modalTitle}>{selectedAlert.type}</Text>
                         {selectedAlert.imageUri ? (
@@ -585,7 +623,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         <Text style={styles.modalText}>
                             <Text style={styles.boldText}>Data/Hora:</Text> {selectedAlert.publishedAt ? new Date(selectedAlert.publishedAt).toLocaleString() : "N/A"}
                         </Text>
-                        {}
                         <Pressable
                             style={[styles.modalButton, styles.removeAlertButton]}
                             onPress={removeAlert}
@@ -597,6 +634,39 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                             onPress={() => setShowAlertDetailsModal(false)}
                         >
                             <Text style={styles.modalButtonText}>Fechar</Text>
+                        </Pressable>
+                    </View>
+                )}
+            </Modal>
+            <Modal
+                visible={showProximityAlertModal}
+                animationType="fade"
+                transparent
+                onRequestClose={() => setShowProximityAlertModal(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setShowProximityAlertModal(false)}>
+                    <View style={styles.modalOverlay} />
+                </TouchableWithoutFeedback>
+                {proximityAlertDetails && (
+                    <View style={styles.alertDetailsModalContent}>
+                        <Text style={styles.modalTitle}>Aviso de Proximidade!</Text>
+                        <Text style={styles.modalText}>
+                            Você está perto de um alerta de <Text style={styles.boldText}>{proximityAlertDetails.type}</Text> publicado por <Text style={styles.boldText}>{proximityAlertDetails.publishedBy || "Desconhecido"}</Text>.
+                        </Text>
+                        {proximityAlertDetails.imageUri ? (
+                            <Image
+                                source={{ uri: proximityAlertDetails.imageUri }}
+                                style={styles.alertDetailImage}
+                                resizeMode="contain"
+                            />
+                        ) : (
+                            <Text>Nenhuma foto disponível para este alerta.</Text>
+                        )}
+                        <Pressable
+                            style={styles.modalButton}
+                            onPress={() => setShowProximityAlertModal(false)}
+                        >
+                            <Text style={styles.modalButtonText}>OK</Text>
                         </Pressable>
                     </View>
                 )}
@@ -639,8 +709,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderRadius: 10,
         padding: 20,
-        elevation: 10, // Sombra para Android
-        shadowColor: '#000', // Sombra para iOS
+        elevation: 10,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
