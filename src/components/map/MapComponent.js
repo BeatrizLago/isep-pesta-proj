@@ -112,8 +112,8 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     );
 
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [showAlertModal, setShowAlertModal] = useState(false);
-    const [showSOSModal, setShowSOSModal] = useState(false);
+    const [showAlertModal, setShowAlertModal] = useState(false); // Esta modal agora não será mais o destino direto do botão principal
+    const [showSOSModal, setShowSOSModal] = useState(false); // Esta modal exibirá os números
     const [showAddChoiceModal, setShowAddChoiceModal] = useState(false);
     const [clickedCoordinate, setClickedCoordinate] = useState(null);
     const [customMarkers, setCustomMarkers] = useState([]);
@@ -449,17 +449,22 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 <ActivityLoader />
             )}
 
+            {/* BOTÃO DE ALERTA PRINCIPAL - AGORA LEVA DIRETAMENTE PARA A MODAL SOS */}
             <TouchableOpacity
                 style={styles.alertButton}
-                onPress={() => setShowAlertModal(true)}
+                onPress={() => setShowSOSModal(true)} // AQUI ESTÁ A MUDANÇA PRINCIPAL
             >
                 <Image
-                    source={require("../../assets/alerta.png")}
+                    source={require("../../assets/sos.png")} // Assumindo que este é o ícone do botão de alerta principal
                     style={styles.alertIcon}
                     resizeMode="contain"
                 />
             </TouchableOpacity>
 
+            {/* A MODAL 'showAlertModal' AGORA PODE SER REMOVIDA OU REUTILIZADA SE PRECISAR DELA PARA OUTRA COISA */}
+            {/* Se você não precisa mais da modal intermediária de "Alertas" que mostrava SOS, Cortes e Obras,
+                você pode remover todo este bloco de código: */}
+            {/*
             <Modal visible={showAlertModal} animationType="fade" transparent>
                 <TouchableWithoutFeedback onPress={() => setShowAlertModal(false)}>
                     <View style={styles.modalOverlay} />
@@ -468,7 +473,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     <Text style={styles.modalTitle}>Alertas</Text>
                     <View style={styles.iconGrid}>
                         <View style={styles.iconWithLabel}>
-                            <TouchableOpacity onPress={() => setShowSOSModal(true)}>
+                            <TouchableOpacity onPress={() => { setShowAlertModal(false); setShowSOSModal(true); }}>
                                 <Image
                                     source={require("../../assets/sos.png")}
                                     style={styles.icon}
@@ -479,10 +484,10 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         <View style={styles.iconWithLabel}>
                             <TouchableOpacity
                                 onPress={() => {
-                                    if (!isAuthenticated) { // Verifica se está autenticado antes de permitir
+                                    if (!isAuthenticated) {
                                         Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
                                     } else {
-                                        Alert.alert("Corte", "Alerta de corte registado"); // Ou chame openCamera("Cortes") se quiser uma foto
+                                        Alert.alert("Corte", "Alerta de corte registado");
                                     }
                                 }}
                             >
@@ -496,10 +501,10 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         <View style={styles.iconWithLabel}>
                             <TouchableOpacity
                                 onPress={() => {
-                                    if (!isAuthenticated) { // Verifica se está autenticado antes de permitir
+                                    if (!isAuthenticated) {
                                         Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
                                     } else {
-                                        Alert.alert("Obras", "Alerta de obras registado"); // Ou chame openCamera("Obras")
+                                        Alert.alert("Obras", "Alerta de obras registado");
                                     }
                                 }}
                             >
@@ -519,7 +524,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     </Pressable>
                 </View>
             </Modal>
+            */}
 
+            {/* MODAL SOS - ESTA AGORA SERÁ A PRIMEIRA A ABRIR */}
             <Modal visible={showSOSModal} animationType="fade" transparent>
                 <TouchableWithoutFeedback onPress={() => setShowSOSModal(false)}>
                     <View style={styles.modalOverlay} />
@@ -691,6 +698,7 @@ const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.3)",
+        justifyContent: 'flex-end', // Alinha o modalContent para baixo
     },
     modalContent: {
         position: "absolute",
@@ -700,6 +708,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
+        alignSelf: 'center', // Centraliza o conteúdo se a largura for menor que 100%
+        maxHeight: '80%', // Limita a altura da modal
     },
     alertDetailsModalContent: {
         position: "absolute",
@@ -726,9 +736,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 10,
+        textAlign: 'center',
     },
     modalText: {
         marginBottom: 10,
+        textAlign: 'center',
     },
     boldText: {
         fontWeight: "bold",
@@ -736,6 +748,7 @@ const styles = StyleSheet.create({
     phoneNumber: {
         color: "blue",
         textDecorationLine: "underline",
+        fontSize: 16,
     },
     modalButton: {
         backgroundColor: "#ccc",
@@ -745,27 +758,39 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     modalButtonText: {
-        fontSize: 16,
+        color: "white",
         fontWeight: "bold",
+        fontSize: 16,
     },
     iconGrid: {
         flexDirection: "row",
         justifyContent: "space-around",
+        alignItems: "center",
+        flexWrap: 'wrap',
         marginVertical: 10,
     },
     iconWithLabel: {
         alignItems: "center",
+        marginHorizontal: 10,
+        marginVertical: 10,
     },
     icon: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 2,
+        borderColor: '#ddd',
+        padding: 5,
     },
     iconLabel: {
         marginTop: 5,
-        fontSize: 12,
+        fontSize: 14,
+        fontWeight: '500',
+        textAlign: 'center',
     },
     removeAlertButton: {
         backgroundColor: '#dc3545',
+        marginTop: 5,
         marginBottom: 10,
     },
 });
