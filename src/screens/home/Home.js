@@ -326,13 +326,6 @@ const Home = ({ t }) => {
                         titleStyle={Styles.buttonText}
                         icon={<Icon name="clear" size={20} color="white" style={Styles.icon} />}
                     />
-                    <Button
-                        title="Ver Pontos de Interesse"
-                        onPress={handleGetPOIs}
-                        buttonStyle={Styles.button}
-                        titleStyle={Styles.buttonText}
-                        icon={<Icon name="place" size={20} color="white" style={Styles.icon} />}
-                    />
                   </View>
                 </>
             )}
