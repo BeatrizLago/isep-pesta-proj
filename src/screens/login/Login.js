@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   ActivityIndicator,
-  Button,
   KeyboardAvoidingView,
   TouchableOpacity,
 } from "react-native";
@@ -29,7 +28,7 @@ const Login = ({ t }) => {
   const signInAnonymousFunc = async () => {
     setLoading(true);
     try {
-     await dispatch(signInAnonymous());
+      await dispatch(signInAnonymous());
     } catch (e) {
     } finally {
       setLoading(false);
@@ -49,47 +48,64 @@ const Login = ({ t }) => {
   useEffect(() => {
     if (error) {
       alert(error);
-      // Optionally, clear error after displaying it
-      // dispatch(clearError());
     }
   }, [error]);
 
   return (
-    <View style={styles.conatinerCredentials}>
-      <KeyboardAvoidingView behavior="padding">
-        <TextInput
-          style={styles.inputCredentials}
-          value={email}
-          placeholder={t("screens.login.email")}
-          autoCapitalize="none"
-          onChangeText={(text) => setEmail(text.trim())}
-        ></TextInput>
-        <TextInput
-          style={styles.inputCredentials}
-          value={password}
-          secureTextEntry={true}
-          placeholder={t("screens.login.password")}
-          autoCapitalize="none"
-          onChangeText={(text) => setPassword(text.trim())}
-        ></TextInput>
-        {loading ? (
-          <ActivityLoader />
-        ) : (
-          <>
-            <Button title={t("screens.login.login")} onPress={signInFunc} />
-            <Button
-              title={t("screens.login.signup")}
-              onPress={() => navigation.navigate("Registar")}
-            />
-            <Button
-              title={t("screens.login.anonyLogin")}
-              onPress={signInAnonymousFunc}
-            />
-            <ChangeLanguage t={t} />
-          </>
-        )}
-      </KeyboardAvoidingView>
-    </View>
+      <View style={styles.conatinerCredentials}>
+        <KeyboardAvoidingView behavior="padding">
+          <TextInput
+              style={styles.inputCredentials}
+              value={email}
+              placeholder={t("screens.login.email")}
+              autoCapitalize="none"
+              onChangeText={(text) => setEmail(text.trim())}
+          ></TextInput>
+          <TextInput
+              style={styles.inputCredentials}
+              value={password}
+              secureTextEntry={true}
+              placeholder={t("screens.login.password")}
+              autoCapitalize="none"
+              onChangeText={(text) => setPassword(text.trim())}
+          ></TextInput>
+          {loading ? (
+              <ActivityLoader />
+          ) : (
+              <>
+
+                <View style={styles.buttonWrapper}>
+                  <TouchableOpacity
+                      style={[styles.roundedButton, { backgroundColor: '#2196F3' }]} // Exemplo de azul padrão do Button
+                      onPress={signInFunc}
+                  >
+                    <Text style={styles.buttonText}>{t("screens.login.login")}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.buttonWrapper}>
+                  <TouchableOpacity
+                      style={[styles.roundedButton, { backgroundColor: '#2196F3' }]} // Exemplo de verde para registar
+                      onPress={() => navigation.navigate("Registar")}
+                  >
+                    <Text style={styles.buttonText}>{t("screens.login.signup")}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.buttonWrapper}>
+                  <TouchableOpacity
+                      style={[styles.roundedButton, { backgroundColor: '#2196F3' }]}
+                      onPress={signInAnonymousFunc}
+                  >
+                    <Text style={styles.buttonText}>{t("screens.login.anonyLogin")}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <ChangeLanguage t={t} />
+              </>
+          )}
+        </KeyboardAvoidingView>
+      </View>
   );
 };
 

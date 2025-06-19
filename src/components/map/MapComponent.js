@@ -112,8 +112,8 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     );
 
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [showAlertModal, setShowAlertModal] = useState(false); // Esta modal agora não será mais o destino direto do botão principal
-    const [showSOSModal, setShowSOSModal] = useState(false); // Esta modal exibirá os números
+    const [showAlertModal, setShowAlertModal] = useState(false);
+    const [showSOSModal, setShowSOSModal] = useState(false);
     const [showAddChoiceModal, setShowAddChoiceModal] = useState(false);
     const [clickedCoordinate, setClickedCoordinate] = useState(null);
     const [customMarkers, setCustomMarkers] = useState([]);
@@ -126,7 +126,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     const [proximityAlertDetails, setProximityAlertDetails] = useState(null);
     const [shownProximityAlerts, setShownProximityAlerts] = useState({});
 
-    // Obtém o estado de autenticação diretamente do Redux
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const authUser = useSelector((state) => state.auth.user);
     const currentUserName = authUser?.name || "Utilizador Anónimo";
@@ -154,7 +153,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
     };
 
     const handleMapPress = (e) => {
-        if (!isAuthenticated) { // Verifica se o utilizador NÃO está autenticado (ou seja, é anónimo)
+        if (!isAuthenticated) {
             Alert.alert(
                 "Ação não permitida",
                 "Para adicionar alertas, você precisa estar logado na sua conta. Por favor, faça login ou registe-se."
@@ -313,7 +312,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
             if (mapRef.current) {
                 mapRef.current.animateToRegion({
                     latitude: selectedPoiForMapClick.coordinates.latitude,
-                    longitude: selectedPoiForMapClick.longitude,
+                    longitude: selectedPoiForMapClick.coordinates.longitude,
                     latitudeDelta: 0.005,
                     longitudeDelta: 0.005,
                 }, 1000);
@@ -355,7 +354,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                     ref={mapRef}
                     style={styles.map}
                     showsUserLocation
-                    onPress={handleMapPress} // Usa esta função para verificar autenticação
+                    onPress={handleMapPress}
                     initialRegion={{
                         latitude: location.coords.latitude,
                         longitude: location.coords.longitude,
@@ -449,13 +448,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 <ActivityLoader />
             )}
 
-            {/* BOTÃO DE ALERTA PRINCIPAL - AGORA LEVA DIRETAMENTE PARA A MODAL SOS */}
             <TouchableOpacity
                 style={styles.alertButton}
-                onPress={() => setShowSOSModal(true)} // AQUI ESTÁ A MUDANÇA PRINCIPAL
+                onPress={() => setShowSOSModal(true)}
             >
                 <Image
-                    source={require("../../assets/sos.png")} // Assumindo que este é o ícone do botão de alerta principal
+                    source={require("../../assets/sos.png")}
                     style={styles.alertIcon}
                     resizeMode="contain"
                 />
@@ -488,7 +486,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 </View>
             </Modal>
 
-            {isAuthenticated && ( // Este modal só será renderizado se o utilizador estiver autenticado
+            {isAuthenticated && (
                 <Modal
                     visible={showAddChoiceModal}
                     animationType="fade"
@@ -608,8 +606,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
 });
 
 const styles = StyleSheet.create({
-    mapContainer: { flex: 1 },
-    map: { flex: 1 },
+    mapContainer: {
+        flex: 1,
+    },
+    map: {
+        flex: 0.8,
+    },
     alertButton: {
         position: "absolute",
         top: 20,
@@ -623,7 +625,7 @@ const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.3)",
-        justifyContent: 'flex-end', // Alinha o modalContent para baixo
+        justifyContent: 'flex-end',
     },
     modalContent: {
         position: "absolute",
@@ -633,8 +635,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
-        alignSelf: 'center', // Centraliza o conteúdo se a largura for menor que 100%
-        maxHeight: '80%', // Limita a altura da modal
+        alignSelf: 'center',
+        maxHeight: '80%',
     },
     alertDetailsModalContent: {
         position: "absolute",

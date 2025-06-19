@@ -309,13 +309,6 @@ const Home = ({ t }) => {
 
                   <View style={Styles.buttonContainer}>
                     <Button
-                        title={t("screens.map.getDirections")}
-                        onPress={handleDirections} // This will now use startLocation and endLocation
-                        buttonStyle={Styles.button}
-                        titleStyle={Styles.buttonText}
-                        icon={<Icon name="directions" size={20} color="white" style={Styles.icon} />}
-                    />
-                    <Button
                         title={t("screens.map.clearDirections")}
                         onPress={() => {
                           handleClearDirections();

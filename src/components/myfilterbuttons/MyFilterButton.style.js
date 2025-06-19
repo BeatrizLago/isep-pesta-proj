@@ -8,7 +8,7 @@ export const Styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    zIndex: 2, 
+    zIndex: 2,
   },
   bottomBarHeader: {
     flexDirection: "row",
@@ -29,6 +29,7 @@ export const Styles = StyleSheet.create({
     borderRadius: 50,
     width: "45%",
   },
+
   bottomBarItem1: {
     justifyContent: "center",
     flexDirection: "row",
@@ -59,4 +60,3 @@ export const Styles = StyleSheet.create({
     paddingBottom: 70,
   },
 });
- 
