@@ -41,7 +41,7 @@ export const Styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row", // Align buttons horizontally
-    justifyContent: "space-between", // Distribute space between buttons
+    justifyContent: "center", // CENTRALIZA o único botão
     marginTop: 10, // Add some top margin
     marginBottom: 10, // Add some bottom margin
   },
@@ -52,7 +52,7 @@ export const Styles = StyleSheet.create({
     borderRadius: 10, // Rounded corners
     paddingVertical: 5, // Smaller vertical padding
     paddingHorizontal: 10, // Smaller horizontal padding
-    marginHorizontal: 10, // Space between the buttons
+    // marginHorizontal: 10, // Removido para evitar empurrar o botão se for o único
     alignItems: "center", // Center content horizontally
     justifyContent: "center", // Center content vertically
   },
@@ -62,7 +62,7 @@ export const Styles = StyleSheet.create({
     fontWeight: "bold", // Text weight
   },
   icon: {
-    color: "grey", // Icon color
+    color: "white", // Corrigido para branco para seguir o estilo do botão
   },
   suggestionText: {
     fontSize: 18, // Example: Increased font size for POI names

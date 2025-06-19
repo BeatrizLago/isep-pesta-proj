@@ -461,72 +461,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                 />
             </TouchableOpacity>
 
-            {/* A MODAL 'showAlertModal' AGORA PODE SER REMOVIDA OU REUTILIZADA SE PRECISAR DELA PARA OUTRA COISA */}
-            {/* Se você não precisa mais da modal intermediária de "Alertas" que mostrava SOS, Cortes e Obras,
-                você pode remover todo este bloco de código: */}
-            {/*
-            <Modal visible={showAlertModal} animationType="fade" transparent>
-                <TouchableWithoutFeedback onPress={() => setShowAlertModal(false)}>
-                    <View style={styles.modalOverlay} />
-                </TouchableWithoutFeedback>
-                <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>Alertas</Text>
-                    <View style={styles.iconGrid}>
-                        <View style={styles.iconWithLabel}>
-                            <TouchableOpacity onPress={() => { setShowAlertModal(false); setShowSOSModal(true); }}>
-                                <Image
-                                    source={require("../../assets/sos.png")}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.iconLabel}>SOS</Text>
-                        </View>
-                        <View style={styles.iconWithLabel}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    if (!isAuthenticated) {
-                                        Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
-                                    } else {
-                                        Alert.alert("Corte", "Alerta de corte registado");
-                                    }
-                                }}
-                            >
-                                <Image
-                                    source={require("../../assets/corte.jpg")}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.iconLabel}>Cortes</Text>
-                        </View>
-                        <View style={styles.iconWithLabel}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    if (!isAuthenticated) {
-                                        Alert.alert("Ação não permitida", "Para adicionar alertas, você precisa estar logado na sua conta.");
-                                    } else {
-                                        Alert.alert("Obras", "Alerta de obras registado");
-                                    }
-                                }}
-                            >
-                                <Image
-                                    source={require("../../assets/construcao.png")}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.iconLabel}>Obras</Text>
-                        </View>
-                    </View>
-                    <Pressable
-                        style={styles.modalButton}
-                        onPress={() => setShowAlertModal(false)}
-                    >
-                        <Text style={styles.modalButtonText}>Fechar</Text>
-                    </Pressable>
-                </View>
-            </Modal>
-            */}
-
-            {/* MODAL SOS - ESTA AGORA SERÁ A PRIMEIRA A ABRIR */}
             <Modal visible={showSOSModal} animationType="fade" transparent>
                 <TouchableWithoutFeedback onPress={() => setShowSOSModal(false)}>
                     <View style={styles.modalOverlay} />
@@ -575,22 +509,13 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
                         </Text>
                         <View style={styles.iconGrid}>
                             <View style={styles.iconWithLabel}>
-                                <TouchableOpacity onPress={() => openCamera("Obras")}>
-                                    <Image
-                                        source={require("../../assets/construcao.png")}
-                                        style={styles.icon}
-                                    />
-                                </TouchableOpacity>
-                                <Text style={styles.iconLabel}>Obras</Text>
-                            </View>
-                            <View style={styles.iconWithLabel}>
-                                <TouchableOpacity onPress={() => openCamera("Cortes")}>
+                                <TouchableOpacity onPress={() => openCamera("Cortes/Obstáculos")}>
                                     <Image
                                         source={require("../../assets/corte.jpg")}
                                         style={styles.icon}
                                     />
                                 </TouchableOpacity>
-                                <Text style={styles.iconLabel}>Cortes</Text>
+                                <Text style={styles.iconLabel}>Cortes/Obstáculos</Text>
                             </View>
                         </View>
                         <Pressable
