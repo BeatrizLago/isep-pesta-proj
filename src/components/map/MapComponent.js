@@ -50,36 +50,45 @@ const useUserLocation = () => {
     return location;
 };
 
-const usePointsOfInterest = (latitude, longitude) => {
+const usePointsOfInterest = (latitude, longitude, activeFilters) => {
     const [poi, setPoi] = useState([]);
     useEffect(() => {
         if (latitude && longitude) {
             const fetchPOI = async () => {
                 try {
+                    // Expanded categories to include a wider range of POIs
+                    const categories = "tourism,catering,accommodation,leisure,commercial,public_transport,education,healthcare,entertainment,sport,natural,service";
                     const response = await axios.get(
-                        `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}`
+                        `https://api.geoapify.com/v2/places?categories=${categories}&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}`
                     );
-                    setPoi(
-                        response.data.features.map((poiItem) => ({
-                            id: poiItem.properties.place_id,
-                            name: poiItem.properties.name || "Ponto de Interesse",
-                            latitude: poiItem.geometry.coordinates[1],
-                            longitude: poiItem.geometry.coordinates[0],
-                            address: {
-                                street: poiItem.properties.street || poiItem.properties.address_line1 || "",
-                                city: poiItem.properties.city || "",
-                                formatted: poiItem.properties.formatted || "",
-                                address_line2: poiItem.properties.address_line2 || "",
-                            },
-                        }))
-                    );
+                    const fetchedPoi = response.data.features.map((poiItem) => ({
+                        id: poiItem.properties.place_id,
+                        name: poiItem.properties.name || "Ponto de Interesse",
+                        latitude: poiItem.geometry.coordinates[1],
+                        longitude: poiItem.geometry.coordinates[0],
+                        address: {
+                            street: poiItem.properties.street || poiItem.properties.address_line1 || "",
+                            city: poiItem.properties.city || "",
+                            formatted: poiItem.properties.formatted || "",
+                            address_line2: poiItem.properties.address_line2 || "",
+                        },
+                        category: poiItem.properties.categories ? poiItem.properties.categories[0] : 'tourism',
+                    }));
+
+                    if (activeFilters && activeFilters.length > 0) {
+                        setPoi(fetchedPoi.filter(item => activeFilters.includes(item.category)));
+                    } else {
+                        setPoi(fetchedPoi);
+                    }
+
                 } catch (error) {
+                    console.error("Erro detalhado ao carregar POIs:", error.response?.data || error.message);
                     Alert.alert("Erro POI", "Não foi possível carregar pontos de interesse. Verifique a chave API ou conexão.");
                 }
             };
             fetchPOI();
         }
-    }, [latitude, longitude]);
+    }, [latitude, longitude, activeFilters]);
     return poi;
 };
 
@@ -103,12 +112,16 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
     }
 };
 
-const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick }, ref) => {
+const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, onApplyFilters }, ref) => {
     const mapRef = ref || useRef(null);
     const location = useUserLocation();
+
+    const [activePoiFilters, setActivePoiFilters] = useState([]);
+
     const pointsOfInterest = usePointsOfInterest(
         location?.coords.latitude,
-        location?.coords.longitude
+        location?.coords.longitude,
+        activePoiFilters
     );
 
     const [selectedLocation, setSelectedLocation] = useState(null);
@@ -346,6 +359,15 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick },
             }
         });
     };
+
+    useEffect(() => {
+        if (onApplyFilters) {
+            onApplyFilters.current = (filters) => {
+                setActivePoiFilters(filters);
+            };
+        }
+    }, [onApplyFilters]);
+
 
     return (
         <View style={styles.mapContainer}>

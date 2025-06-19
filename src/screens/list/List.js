@@ -16,6 +16,53 @@ import * as Location from "expo-location";
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
 
+// Helper function to map Geoapify categories to desired categories
+const mapGeoapifyCategory = (geoapifyCategory) => {
+  if (!geoapifyCategory) {
+    return "Outros"; // Default if no category is found
+  }
+
+  // Convert to lowercase for easier comparison
+  const lowerCaseCategory = geoapifyCategory.toLowerCase();
+
+  if (lowerCaseCategory.includes("monument") || lowerCaseCategory.includes("historic")) {
+    return "Monumentos";
+  }
+  if (lowerCaseCategory.includes("leisure") || lowerCaseCategory.includes("tourism.attraction") || lowerCaseCategory.includes("sport")) {
+    return "Lazer";
+  }
+  if (lowerCaseCategory.includes("hotel") || lowerCaseCategory.includes("accommodation")) {
+    return "Hotel";
+  }
+  // Add more mappings as needed
+  if (lowerCaseCategory.includes("catering") || lowerCaseCategory.includes("restaurant") || lowerCaseCategory.includes("cafe")) {
+    return "Alimentação";
+  }
+  if (lowerCaseCategory.includes("shop")) {
+    return "Comércio";
+  }
+  if (lowerCaseCategory.includes("education")) {
+    return "Educação";
+  }
+  if (lowerCaseCategory.includes("healthcare")) {
+    return "Saúde";
+  }
+  if (lowerCaseCategory.includes("service")) {
+    return "Serviços";
+  }
+  if (lowerCaseCategory.includes("transport")) {
+    return "Transportes";
+  }
+  if (lowerCaseCategory.includes("park") || lowerCaseCategory.includes("garden")) {
+    return "Parques e Jardins";
+  }
+  if (lowerCaseCategory.includes("museum")) {
+    return "Museus";
+  }
+
+  return "Outros"; // Fallback for uncategorized items
+};
+
 const usePoiLocations = () => {
   const [pointsOfInterest, setPointsOfInterest] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -40,7 +87,9 @@ const usePoiLocations = () => {
   useEffect(() => {
     const fetchPointsOfInterest = async (location) => {
       setLoading(true);
-      const url = `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${location.longitude},${location.latitude},100000&limit=100&apiKey=${GEOAPIFY_API_KEY}`;
+      // You might want to adjust the categories parameter for Geoapify if you want more specific initial results
+      // For example, instead of just 'tourism', you might add 'tourism.attraction', 'leisure', 'accommodation' etc.
+      const url = `https://api.geoapify.com/v2/places?categories=tourism.sights,tourism.attraction,leisure,accommodation,commercial,catering&filter=circle:${location.longitude},${location.latitude},100000&limit=100&apiKey=${GEOAPIFY_API_KEY}`;
       try {
         const response = await axios.get(url);
         const pois = response.data.features.map((poi) => ({
@@ -54,7 +103,8 @@ const usePoiLocations = () => {
             street: poi.properties.street || "Desconhecido",
             city: poi.properties.city || "Desconhecido"
           },
-          category: poi.properties.categories?.[0] || "Turismo",
+          // Apply the mapping function here
+          category: mapGeoapifyCategory(poi.properties.categories?.[0]),
           accessibility: {
             parking: false, entrance: false, handicapBathroom: false,
             internalCirculation: false, signLanguage: false, visualAlarms: false,
@@ -66,7 +116,8 @@ const usePoiLocations = () => {
         }));
         setPointsOfInterest(pois);
         setFilteredData(pois);
-      } catch {
+      } catch (error) {
+        console.error("Error fetching points of interest:", error);
         setPointsOfInterest([]);
         setFilteredData([]);
       } finally {
@@ -179,7 +230,7 @@ const List = ({ t }) => {
                             id: item.id,
                             name: item.name,
                             address: item.address,
-                            category: item.category,
+                            category: item.category, // This will now be your custom category
                             coordinates: item.coordinates,
                             accessibility: item.accessibility || {},
                             wheelchair: item.wheelchair || { width: null, height: null },
