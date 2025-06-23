@@ -15,18 +15,17 @@ import { SearchBar, Overlay, Button, Icon } from "@rneui/themed";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLocations } from "../../state/actions/locationAction";
 import { clearDirections, fetchDirections } from "../../state/actions/directionsAction";
-import MapComponent from "../../components/map/MapComponent"; // Caminho ajustado
+import MapComponent from "../../components/map/MapComponent";
 import MyFilterButtons from "../../components/myfilterbuttons/MyFilterButtons";
 import MyFilter from "../../components/myfilter/MyFilter";
 import ActivityLoader from "../../components/activityloader/ActivityLoader";
-import { Styles } from "./Home.styles";
 import axios from "axios";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Styles } from "./Home.styles";
 
-const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62"; // Your Geoapify API Key
+const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
 
-// Helper hook for location data and filtering
 const useLocations = () => {
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.location.locations);
@@ -69,10 +68,9 @@ const useLocations = () => {
   return { locations, filteredData, setFilteredData, loading, toggleFilter, clearFilters, showFilter, setShowFilter, selectedFilters, setSelectedFilters };
 };
 
-// Helper hook for handling directions
 const useDirections = (startLocation, endLocation, preference, isStraight, profile) => {
   const dispatch = useDispatch();
-  const directions = useSelector((state) => state.direction.directions); // Added directions state
+  const directions = useSelector((state) => state.direction.directions);
 
   const handleDirections = useCallback(() => {
     if (startLocation && endLocation) {
@@ -86,45 +84,42 @@ const useDirections = (startLocation, endLocation, preference, isStraight, profi
     }
   }, [startLocation, endLocation, dispatch, preference, isStraight, profile]);
 
-  const handleClearDirections = useCallback(async () => { // Made useCallback
+  const handleClearDirections = useCallback(async () => {
     await dispatch(clearDirections());
   }, [dispatch]);
 
-  return { directions, handleDirections, handleClearDirections }; // Return directions
+  return { directions, handleDirections, handleClearDirections };
 };
 
 const Home = ({ t }) => {
   const { locations, filteredData, setFilteredData, loading, toggleFilter, clearFilters, showFilter, selectedFilters, setSelectedFilters } = useLocations();
   const user = useSelector((state) => state.user.userInfo);
-  const [startLocation, setStartLocation] = useState(null); // User's current location for directions
-  const [endLocation, setEndLocation] = useState(null); // Destination for directions (selected POI or search result)
+  const [startLocation, setStartLocation] = useState(null);
+  const [endLocation, setEndLocation] = useState(null);
   const [profile, setProfile] = useState("driving-car");
   const [preference, setPreference] = useState("recommended");
   const [isStraight, setIsStraight] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showPOIList, setShowPOIList] = useState(false);
-  const [pointsOfInterest, setPointsOfInterest] = useState([]); // POIs fetched from Geoapify
-  const [userLocation, setUserLocation] = useState(null); // User's actual GPS location
+  const [pointsOfInterest, setPointsOfInterest] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const { directions, handleDirections, handleClearDirections } = useDirections(startLocation, endLocation, preference, isStraight, profile);
   const portugalCenter = { latitude: 39.5, longitude: -8, zoomLevel: 6 };
 
-  // Ref para o MapComponent
   const mapComponentRef = useRef(null);
 
-  // Novo estado para controlar o POI a ser "clicado" no mapa
   const [selectedPoiForMapClick, setSelectedPoiForMapClick] = useState(null);
+  const [clearRouteTrigger, setClearRouteTrigger] = useState(false);
 
 
-  // Request location permission and get user's current location
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync({});
         setUserLocation(location.coords);
-        // Set user's current location as startLocation for directions
         setStartLocation({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -135,7 +130,6 @@ const Home = ({ t }) => {
     })();
   }, []);
 
-  // Fetch Points of Interest (POIs) near the user's location
   const fetchPointsOfInterest = async () => {
     if (!userLocation) {
       Alert.alert("Localização Indisponível", "Não foi possível obter a sua localização atual para buscar POIs.");
@@ -165,13 +159,11 @@ const Home = ({ t }) => {
     }
   };
 
-  // Handle getting POIs and showing the list
   const handleGetPOIs = () => {
     fetchPointsOfInterest();
     setShowPOIList(true);
   };
 
-  // Handle selecting a POI from the list to get directions and center map
   const handleSelectPOI = useCallback((poi) => {
     setShowPOIList(false);
     setEndLocation({
@@ -179,10 +171,9 @@ const Home = ({ t }) => {
       longitude: poi.coordinates.longitude,
     });
 
-    // Define o POI para ser "clicado" no mapa
     setSelectedPoiForMapClick(poi);
+    setClearRouteTrigger(false);
 
-    // Zoom para o POI selecionado
     if (mapComponentRef.current && poi.coordinates) {
       mapComponentRef.current.animateToRegion({
         latitude: poi.coordinates.latitude,
@@ -193,7 +184,6 @@ const Home = ({ t }) => {
     }
   }, []);
 
-  // Handle search input and fetch autocomplete suggestions
   const handleSearch = async (text) => {
     setSearchQuery(text);
     if (text.length > 2 && userLocation) {
@@ -228,7 +218,6 @@ const Home = ({ t }) => {
     }
   };
 
-  // Handle selecting a search suggestion
   const handleSelectSearchSuggestion = (suggestion) => {
     setSearchQuery(suggestion.name);
     setShowSearchSuggestions(false);
@@ -239,8 +228,8 @@ const Home = ({ t }) => {
       longitude: suggestion.coordinates.longitude,
     });
 
-    // Define o POI para ser "clicado" no mapa
     setSelectedPoiForMapClick(suggestion);
+    setClearRouteTrigger(false);
 
 
     if (mapComponentRef.current && suggestion.coordinates) {
@@ -253,12 +242,15 @@ const Home = ({ t }) => {
     }
   };
 
-  // Effect to trigger directions when endLocation or startLocation changes
   useEffect(() => {
     if (startLocation && endLocation) {
       handleDirections();
     }
   }, [startLocation, endLocation, handleDirections]);
+
+  const handleRouteCleared = useCallback(() => {
+    setClearRouteTrigger(false);
+  }, []);
 
 
   if (loading) return <ActivityLoader />;
@@ -270,7 +262,6 @@ const Home = ({ t }) => {
             <MyFilterButtons toggleFilter={toggleFilter} clearFilters={clearFilters} showFilter={showFilter} t={t} />
             <MyFilter showFilter={showFilter} data={locations} selectedFilters={selectedFilters} setFilteredData={setFilteredData} onFilterChange={setSelectedFilters} user={user} t={t} />
 
-            {/* Conditionally render SearchBar and Buttons */}
             {!showFilter && (
                 <>
                   <View style={Styles.searchBarWrapper}>
@@ -312,8 +303,9 @@ const Home = ({ t }) => {
                         title={t("screens.map.clearDirections")}
                         onPress={() => {
                           handleClearDirections();
-                          setEndLocation(null); // Clear end location to reset map view
-                          setSelectedPoiForMapClick(null); // Clear the selected POI for map click
+                          setEndLocation(null);
+                          setSelectedPoiForMapClick(null);
+                          setClearRouteTrigger(true);
                         }}
                         buttonStyle={Styles.button}
                         titleStyle={Styles.buttonText}
@@ -362,13 +354,15 @@ const Home = ({ t }) => {
               </Overlay>
               <View style={{ flex: 1 }}>
                 <MapComponent
-                    ref={mapComponentRef} // Pass the ref to MapComponent
-                    directions={directions} // Pass directions from state
+                    ref={mapComponentRef}
+                    directions={directions}
                     portugalCenter={portugalCenter}
-                    locations={filteredData} // Pass your existing locations/filteredData
-                    pointsOfInterest={pointsOfInterest} // Pass pointsOfInterest
-                    userLocation={userLocation} // Pass userLocation
-                    selectedPoiForMapClick={selectedPoiForMapClick} // Pass the selected POI for auto-click
+                    locations={filteredData}
+                    pointsOfInterest={pointsOfInterest}
+                    userLocation={userLocation}
+                    selectedPoiForMapClick={selectedPoiForMapClick}
+                    clearRouteTrigger={clearRouteTrigger}
+                    onClearRouteDone={handleRouteCleared}
                     t={t}
                 />
               </View>

@@ -56,7 +56,6 @@ const usePointsOfInterest = (latitude, longitude, activeFilters) => {
         if (latitude && longitude) {
             const fetchPOI = async () => {
                 try {
-                    // Expanded categories to include a wider range of POIs
                     const categories = "tourism,catering,accommodation,leisure,commercial,public_transport,education,healthcare,entertainment,sport,natural,service";
                     const response = await axios.get(
                         `https://api.geoapify.com/v2/places?categories=${categories}&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}`
@@ -112,7 +111,7 @@ const reverseGeocodeAndGetRoutableCoordinate = async (lon, lat) => {
     }
 };
 
-const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, onApplyFilters }, ref) => {
+const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, onApplyFilters, clearRouteTrigger, onClearRouteDone }, ref) => {
     const mapRef = ref || useRef(null);
     const location = useUserLocation();
 
@@ -325,13 +324,23 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
             if (mapRef.current) {
                 mapRef.current.animateToRegion({
                     latitude: selectedPoiForMapClick.coordinates.latitude,
-                    longitude: selectedPoiForMapClick.coordinates.longitude,
+                    longitude: selectedPoiForMapClick.longitude,
                     latitudeDelta: 0.005,
                     longitudeDelta: 0.005,
                 }, 1000);
             }
         }
     }, [selectedPoiForMapClick]);
+
+    useEffect(() => {
+        if (clearRouteTrigger) {
+            setRouteCoordinates([]);
+            if (onClearRouteDone) {
+                onClearRouteDone();
+            }
+        }
+    }, [clearRouteTrigger, onClearRouteDone]);
+
 
     useEffect(() => {
         if (location && customMarkers.length > 0) {
@@ -536,6 +545,15 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                     />
                                 </TouchableOpacity>
                                 <Text style={styles.iconLabel}>Cortes/Obstáculos</Text>
+                            </View>
+                            <View style={styles.iconWithLabel}>
+                                <TouchableOpacity onPress={() => openCamera("Obras")}>
+                                    <Image
+                                        source={require("../../assets/construcao.png")}
+                                        style={styles.icon}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={styles.iconLabel}>Obras</Text>
                             </View>
                         </View>
                         <Pressable
