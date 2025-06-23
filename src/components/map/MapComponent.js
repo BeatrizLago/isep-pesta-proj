@@ -546,15 +546,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 </TouchableOpacity>
                                 <Text style={styles.iconLabel}>Cortes/Obstáculos</Text>
                             </View>
-                            <View style={styles.iconWithLabel}>
-                                <TouchableOpacity onPress={() => openCamera("Obras")}>
-                                    <Image
-                                        source={require("../../assets/construcao.png")}
-                                        style={styles.icon}
-                                    />
-                                </TouchableOpacity>
-                                <Text style={styles.iconLabel}>Obras</Text>
-                            </View>
                         </View>
                         <Pressable
                             style={styles.modalButton}
