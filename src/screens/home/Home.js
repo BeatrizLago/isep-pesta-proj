@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
-  Dimensions,
+  Dimensions, // Adicionado Dimensions
 } from "react-native";
 import { SearchBar, Overlay, Button, Icon } from "@rneui/themed";
 import { useDispatch, useSelector } from "react-redux";
@@ -113,6 +113,8 @@ const Home = ({ t }) => {
   const [selectedPoiForMapClick, setSelectedPoiForMapClick] = useState(null);
   const [clearRouteTrigger, setClearRouteTrigger] = useState(false);
 
+  // Calcula a altura da janela uma vez
+  const windowHeight = Dimensions.get('window').height;
 
   useEffect(() => {
     (async () => {
@@ -282,7 +284,10 @@ const Home = ({ t }) => {
                     />
                     {showSearchSuggestions && searchResults.length > 0 && (
                         <ScrollView
-                            style={Styles.suggestionsList}
+                            style={[
+                              Styles.suggestionsList,
+                              { maxHeight: windowHeight * 0.4 } // Por exemplo, 40% da altura da janela
+                            ]}
                             keyboardShouldPersistTaps="always"
                         >
                           {searchResults.map((item, index) => (
