@@ -1,7 +1,7 @@
-// authReducer.js
+
 const initialState = {
-  user: null, // Pode conter { uid, email, name, isAnonymous }
-  isAuthenticated: false, // Será 'true' apenas para utilizadores logados (não anónimos)
+  user: null,
+  isAuthenticated: false,
   error: null,
 };
 
@@ -9,18 +9,18 @@ const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case "SIGN_IN_SUCCESS":
     case "SIGN_UP_SUCCESS":
-    case "GET_CURRENT_USER_SUCCESS": // Esta ação será usada para carregar dados do storage
+    case "GET_CURRENT_USER_SUCCESS":
       return {
         ...state,
         user: action.payload,
-        isAuthenticated: !action.payload.isAnonymous, // Se 'isAnonymous' for false, então 'isAuthenticated' é true
+        isAuthenticated: !action.payload.isAnonymous,
         error: null,
       };
     case "SIGN_IN_ANONYMOUS_SUCCESS":
       return {
         ...state,
         user: action.payload,
-        isAuthenticated: false, // Utilizador anónimo NÃO é considerado "autenticado" para restrições
+        isAuthenticated: false,
         error: null,
       };
     case "SIGN_IN_FAILURE":

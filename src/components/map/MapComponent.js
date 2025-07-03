@@ -141,6 +141,18 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const authUser = useSelector((state) => state.auth.user);
     const currentUserName = authUser?.name || "Utilizador Anónimo";
+    const currentUserId = authUser?.uid;
+
+    const [alertClicks, setAlertClicks] = useState({});
+
+    useEffect(() => {
+        console.log("Estado de Autenticação:", {
+            isAuthenticated,
+            currentUserId,
+            authUser
+        });
+    }, [isAuthenticated, currentUserId, authUser]);
+
 
     useEffect(() => {
         const loadMarkers = async () => {
@@ -149,8 +161,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                 if (storedMarkers) {
                     setCustomMarkers(JSON.parse(storedMarkers));
                 }
+                const storedClicks = await AsyncStorage.getItem('alertClicks');
+                if (storedClicks) {
+                    setAlertClicks(JSON.parse(storedClicks));
+                }
             } catch (error) {
-                console.error("Erro ao carregar marcadores do AsyncStorage:", error);
+                console.error("Erro ao carregar marcadores/cliques do AsyncStorage:", error);
             }
         };
         loadMarkers();
@@ -161,6 +177,14 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
             await AsyncStorage.setItem('mapAlertMarkers', JSON.stringify(markers));
         } catch (error) {
             console.error("Erro ao guardar marcadores do AsyncStorage:", error);
+        }
+    };
+
+    const saveAlertClicks = async (clicks) => {
+        try {
+            await AsyncStorage.setItem('alertClicks', JSON.stringify(clicks));
+        } catch (error) {
+            console.error("Erro ao guardar cliques dos alertas do AsyncStorage:", error);
         }
     };
 
@@ -220,37 +244,44 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         }
     };
 
-    const removeAlert = () => {
-        if (selectedAlert && (selectedAlert.publishedBy === currentUserName)) {
-            Alert.alert(
-                "Remover Alerta",
-                `Tem a certeza que quer remover o alerta de ${selectedAlert.type} publicado por ${selectedAlert.publishedBy}?`,
-                [
-                    {
-                        text: "Cancelar",
-                        style: "cancel",
-                    },
-                    {
-                        text: "Remover",
-                        onPress: () => {
-                            setCustomMarkers((prevMarkers) => {
-                                const updatedMarkers = prevMarkers.filter(
-                                    (marker) => marker.id !== selectedAlert.id
-                                );
-                                saveMarkers(updatedMarkers);
-                                return updatedMarkers;
-                            });
-                            setShowAlertDetailsModal(false);
-                            setSelectedAlert(null);
-                            Alert.alert("Alerta Removido", `O alerta de ${selectedAlert.type} foi removido com sucesso.`);
-                        },
-                    },
-                ],
-                { cancelable: true }
-            );
-        } else {
-            Alert.alert("Permissão Negada", "Você só pode remover alertas que você publicou.");
+    const handleVote = (alertId, voteType) => {
+        // CORREÇÃO: Adicionei uma verificação explícita para ambos os valores
+        if (!isAuthenticated || currentUserId === undefined || currentUserId === null) {
+            console.log("Tentativa de votar sem autenticação ou UserID válido:", { isAuthenticated, currentUserId }); // Log para depuração
+            Alert.alert("Ação não permitida", "Para votar, você precisa estar logado na sua conta.");
+            return;
         }
+
+        setAlertClicks(prevClicks => {
+            const updatedClicks = { ...prevClicks };
+            const alertData = updatedClicks[alertId] || { confirmedBy: [], rejectedBy: [] };
+
+            const isConfirmed = alertData.confirmedBy.includes(currentUserId);
+            const isRejected = alertData.rejectedBy.includes(currentUserId);
+
+            if (voteType === 'confirm') {
+                if (isConfirmed) {
+                    alertData.confirmedBy = alertData.confirmedBy.filter(id => id !== currentUserId);
+                } else {
+                    alertData.confirmedBy.push(currentUserId);
+                    if (isRejected) {
+                        alertData.rejectedBy = alertData.rejectedBy.filter(id => id !== currentUserId);
+                    }
+                }
+            } else { // voteType === 'reject'
+                if (isRejected) {
+                    alertData.rejectedBy = alertData.rejectedBy.filter(id => id !== currentUserId);
+                } else {
+                    alertData.rejectedBy.push(currentUserId);
+                    if (isConfirmed) {
+                        alertData.confirmedBy = alertData.confirmedBy.filter(id => id !== currentUserId);
+                    }
+                }
+            }
+            updatedClicks[alertId] = alertData;
+            saveAlertClicks(updatedClicks);
+            return updatedClicks;
+        });
     };
 
     const fetchRoute = async (destinationLon, destinationLat) => {
@@ -376,6 +407,10 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
             };
         }
     }, [onApplyFilters]);
+
+
+    const confirmedCount = selectedAlert ? (alertClicks[selectedAlert.id]?.confirmedBy.length || 0) : 0;
+    const rejectedCount = selectedAlert ? (alertClicks[selectedAlert.id]?.rejectedBy.length || 0) : 0;
 
 
     return (
@@ -584,12 +619,24 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                         <Text style={styles.modalText}>
                             <Text style={styles.boldText}>Data/Hora:</Text> {selectedAlert.publishedAt ? new Date(selectedAlert.publishedAt).toLocaleString() : "N/A"}
                         </Text>
-                        <Pressable
-                            style={[styles.modalButton, styles.removeAlertButton]}
-                            onPress={removeAlert}
-                        >
-                            <Text style={styles.modalButtonText}>Remover Alerta</Text>
-                        </Pressable>
+
+                        {isAuthenticated && (
+                            <View style={styles.voteButtonsContainer}>
+                                <TouchableOpacity
+                                    style={[styles.voteButton, styles.confirmButton]}
+                                    onPress={() => handleVote(selectedAlert.id, 'confirm')}
+                                >
+                                    <Text style={styles.voteButtonText}>✔ {confirmedCount}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.voteButton, styles.rejectButton]}
+                                    onPress={() => handleVote(selectedAlert.id, 'reject')}
+                                >
+                                    <Text style={styles.voteButtonText}>✖ {rejectedCount}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
                         <Pressable
                             style={styles.modalButton}
                             onPress={() => setShowAlertDetailsModal(false)}
@@ -746,10 +793,24 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         textAlign: 'center',
     },
-    removeAlertButton: {
-        backgroundColor: '#dc3545',
-        marginTop: 5,
+    voteButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 15,
         marginBottom: 10,
+    },
+    voteButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        minWidth: 100,
+    },
+    confirmButton: {
+        backgroundColor: '#28a745',
+    },
+    rejectButton: {
+        backgroundColor: '#dc3545',
     },
 });
 
