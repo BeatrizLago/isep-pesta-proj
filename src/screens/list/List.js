@@ -16,12 +16,13 @@ import * as Location from "expo-location";
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
 
-
+// Helper function to map Geoapify categories to desired categories
 const mapGeoapifyCategory = (geoapifyCategory) => {
     if (!geoapifyCategory) {
-        return "Outros";
+        return "Outros"; // Default if no category is found
     }
 
+    // Convert to lowercase for easier comparison
     const lowerCaseCategory = geoapifyCategory.toLowerCase();
 
     if (lowerCaseCategory.includes("monument") || lowerCaseCategory.includes("historic")) {
@@ -33,6 +34,7 @@ const mapGeoapifyCategory = (geoapifyCategory) => {
     if (lowerCaseCategory.includes("hotel") || lowerCaseCategory.includes("accommodation")) {
         return "Hotel";
     }
+    // Add more mappings as needed
     if (lowerCaseCategory.includes("catering") || lowerCaseCategory.includes("restaurant") || lowerCaseCategory.includes("cafe")) {
         return "Alimentação";
     }
@@ -58,7 +60,7 @@ const mapGeoapifyCategory = (geoapifyCategory) => {
         return "Museus";
     }
 
-    return "Outros";
+    return "Outros"; // Fallback for uncategorized items
 };
 
 const usePoiLocations = () => {
@@ -85,6 +87,8 @@ const usePoiLocations = () => {
     useEffect(() => {
         const fetchPointsOfInterest = async (location) => {
             setLoading(true);
+            // You might want to adjust the categories parameter for Geoapify if you want more specific initial results
+            // For example, instead of just 'tourism', you might add 'tourism.attraction', 'leisure', 'accommodation' etc.
             const url = `https://api.geoapify.com/v2/places?categories=tourism.sights,tourism.attraction,leisure,accommodation,commercial,catering&filter=circle:${location.longitude},${location.latitude},100000&limit=100&apiKey=${GEOAPIFY_API_KEY}`;
             try {
                 const response = await axios.get(url);
