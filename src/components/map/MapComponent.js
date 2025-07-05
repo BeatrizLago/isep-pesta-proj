@@ -16,9 +16,13 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import ActivityLoader from "../activityloader/ActivityLoader";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from "react-redux";
 import haversine from 'haversine-distance';
+
+import { FIREBASE_DB, FIREBASE_STORAGE } from '../../services/firebase/firebaseConfig';
+import { collection, addDoc, doc, runTransaction, onSnapshot } from 'firebase/firestore';
+import { ref as storageRefCreator, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+
 
 const GEOAPIFY_API_KEY = "1a13f7c626df4654913fa4a3b79c9d62";
 
@@ -116,7 +120,6 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     const location = useUserLocation();
 
     const [activePoiFilters, setActivePoiFilters] = useState([]);
-
     const pointsOfInterest = usePointsOfInterest(
         location?.coords.latitude,
         location?.coords.longitude,
@@ -124,12 +127,10 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     );
 
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [showAlertModal, setShowAlertModal] = useState(false);
     const [showSOSModal, setShowSOSModal] = useState(false);
     const [showAddChoiceModal, setShowAddChoiceModal] = useState(false);
     const [clickedCoordinate, setClickedCoordinate] = useState(null);
     const [customMarkers, setCustomMarkers] = useState([]);
-    const [routeCoordinates, setRouteCoordinates] = useState([]);
 
     const [showAlertDetailsModal, setShowAlertDetailsModal] = useState(false);
     const [selectedAlert, setSelectedAlert] = useState(null);
@@ -138,12 +139,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     const [proximityAlertDetails, setProximityAlertDetails] = useState(null);
     const [shownProximityAlerts, setShownProximityAlerts] = useState({});
 
+    const [routeCoordinates, setRouteCoordinates] = useState([]);
+
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const authUser = useSelector((state) => state.auth.user);
     const currentUserName = authUser?.name || "Utilizador Anónimo";
     const currentUserId = authUser?.uid;
-
-    const [alertClicks, setAlertClicks] = useState({});
 
     useEffect(() => {
         console.log("Estado de Autenticação:", {
@@ -153,40 +154,34 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         });
     }, [isAuthenticated, currentUserId, authUser]);
 
-
     useEffect(() => {
-        const loadMarkers = async () => {
-            try {
-                const storedMarkers = await AsyncStorage.getItem('mapAlertMarkers');
-                if (storedMarkers) {
-                    setCustomMarkers(JSON.parse(storedMarkers));
-                }
-                const storedClicks = await AsyncStorage.getItem('alertClicks');
-                if (storedClicks) {
-                    setAlertClicks(JSON.parse(storedClicks));
-                }
-            } catch (error) {
-                console.error("Erro ao carregar marcadores/cliques do AsyncStorage:", error);
-            }
-        };
-        loadMarkers();
+        const alertsCollectionRef = collection(FIREBASE_DB, 'alerts');
+        const unsubscribe = onSnapshot(alertsCollectionRef, (snapshot) => {
+            const fetchedAlerts = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                confirmedBy: doc.data().confirmedBy || [],
+                rejectedBy: doc.data().rejectedBy || [],
+            }));
+            setCustomMarkers(fetchedAlerts);
+        }, (error) => {
+            console.error("Erro ao carregar alertas do Firestore:", error);
+            Alert.alert("Erro", "Não foi possível carregar os alertas do mapa.");
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    const saveMarkers = async (markers) => {
-        try {
-            await AsyncStorage.setItem('mapAlertMarkers', JSON.stringify(markers));
-        } catch (error) {
-            console.error("Erro ao guardar marcadores do AsyncStorage:", error);
+    useEffect(() => {
+        if (selectedAlert && customMarkers.length > 0) {
+            const updatedSelectedAlert = customMarkers.find(
+                (marker) => marker.id === selectedAlert.id
+            );
+            if (updatedSelectedAlert) {
+                setSelectedAlert(updatedSelectedAlert);
+            }
         }
-    };
-
-    const saveAlertClicks = async (clicks) => {
-        try {
-            await AsyncStorage.setItem('alertClicks', JSON.stringify(clicks));
-        } catch (error) {
-            console.error("Erro ao guardar cliques dos alertas do AsyncStorage:", error);
-        }
-    };
+    }, [customMarkers, selectedAlert]);
 
     const handleMapPress = (e) => {
         if (!isAuthenticated) {
@@ -220,68 +215,108 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         });
 
         if (!result.canceled) {
-            const newMarker = {
-                id: Date.now().toString(),
-                latitude: clickedCoordinate.latitude,
-                longitude: clickedCoordinate.longitude,
-                type,
-                imageUri: result.assets[0].uri,
-                icon: type === "Obras" ? "construcao" : "corte",
-                publishedBy: currentUserName,
-                publishedAt: new Date().toISOString(),
-            };
+            const imageUri = result.assets[0].uri;
+            const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+            const storageRef = storageRefCreator(FIREBASE_STORAGE, `alert_images/${filename}`);
 
-            setCustomMarkers((prev) => {
-                const updatedMarkers = [...prev, newMarker];
-                saveMarkers(updatedMarkers);
-                return updatedMarkers;
-            });
+            try {
+                const response = await fetch(imageUri);
+                const blob = await response.blob();
+                await uploadBytes(storageRef, blob);
+                const downloadURL = await getDownloadURL(storageRef);
 
-            Alert.alert(
-                `${type} registado com foto!`,
-                `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
-            );
+                const newAlertData = {
+                    latitude: clickedCoordinate.latitude,
+                    longitude: clickedCoordinate.longitude,
+                    type,
+                    imageUri: downloadURL,
+                    icon: type === "Obras" ? "construcao" : "corte",
+                    publishedBy: currentUserName,
+                    publishedAt: new Date().toISOString(),
+                    userId: currentUserId,
+                    confirmedBy: [],
+                    rejectedBy: [],
+                };
+
+                await addDoc(collection(FIREBASE_DB, 'alerts'), newAlertData);
+
+                Alert.alert(
+                    `${type} registado com foto!`,
+                    `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
+                );
+            } catch (error) {
+                console.error("Erro ao adicionar alerta ou fazer upload da imagem:", error);
+                Alert.alert("Erro", "Não foi possível registar o alerta. Tente novamente.");
+            }
         }
     };
 
-    const handleVote = (alertId, voteType) => {
-        // CORREÇÃO: Adicionei uma verificação explícita para ambos os valores
-        if (!isAuthenticated || currentUserId === undefined || currentUserId === null) {
-            console.log("Tentativa de votar sem autenticação ou UserID válido:", { isAuthenticated, currentUserId }); // Log para depuração
+    const handleVote = async (alertId, voteType) => {
+        if (!isAuthenticated || !currentUserId) {
             Alert.alert("Ação não permitida", "Para votar, você precisa estar logado na sua conta.");
             return;
         }
 
-        setAlertClicks(prevClicks => {
-            const updatedClicks = { ...prevClicks };
-            const alertData = updatedClicks[alertId] || { confirmedBy: [], rejectedBy: [] };
+        const alertDocRef = doc(FIREBASE_DB, 'alerts', alertId);
 
-            const isConfirmed = alertData.confirmedBy.includes(currentUserId);
-            const isRejected = alertData.rejectedBy.includes(currentUserId);
+        try {
+            const imageUriToDelete = await runTransaction(FIREBASE_DB, async (transaction) => {
+                const docSnapshot = await transaction.get(alertDocRef);
+                if (!docSnapshot.exists()) {
+                    throw "Documento não existe!";
+                }
 
-            if (voteType === 'confirm') {
-                if (isConfirmed) {
-                    alertData.confirmedBy = alertData.confirmedBy.filter(id => id !== currentUserId);
+                const data = docSnapshot.data();
+                let confirmedBy = data.confirmedBy || [];
+                let rejectedBy = data.rejectedBy || [];
+
+                const isConfirmed = confirmedBy.includes(currentUserId);
+                const isRejected = rejectedBy.includes(currentUserId);
+
+                if (voteType === 'confirm') {
+                    if (isConfirmed) {
+                        confirmedBy = confirmedBy.filter(id => id !== currentUserId);
+                    } else {
+                        confirmedBy.push(currentUserId);
+                        if (isRejected) {
+                            rejectedBy = rejectedBy.filter(id => id !== currentUserId);
+                        }
+                    }
                 } else {
-                    alertData.confirmedBy.push(currentUserId);
                     if (isRejected) {
-                        alertData.rejectedBy = alertData.rejectedBy.filter(id => id !== currentUserId);
+                        rejectedBy = rejectedBy.filter(id => id !== currentUserId);
+                    } else {
+                        rejectedBy.push(currentUserId);
+                        if (isConfirmed) {
+                            confirmedBy = confirmedBy.filter(id => id !== currentUserId);
+                        }
                     }
                 }
-            } else { // voteType === 'reject'
-                if (isRejected) {
-                    alertData.rejectedBy = alertData.rejectedBy.filter(id => id !== currentUserId);
+
+                if (rejectedBy.length > confirmedBy.length) {
+                    transaction.delete(alertDocRef);
+                    return data.imageUri;
                 } else {
-                    alertData.rejectedBy.push(currentUserId);
-                    if (isConfirmed) {
-                        alertData.confirmedBy = alertData.confirmedBy.filter(id => id !== currentUserId);
-                    }
+                    transaction.update(alertDocRef, { confirmedBy, rejectedBy });
+                    return null;
+                }
+            });
+
+            if (imageUriToDelete) {
+                setShowAlertDetailsModal(false);
+
+                try {
+                    const imageRef = storageRefCreator(FIREBASE_STORAGE, imageUriToDelete);
+                    await deleteObject(imageRef);
+                } catch (storageError) {
+                    console.warn("Não foi possível apagar a imagem do alerta do Storage:", storageError);
                 }
             }
-            updatedClicks[alertId] = alertData;
-            saveAlertClicks(updatedClicks);
-            return updatedClicks;
-        });
+
+        } catch (error) {
+            console.error("Erro ao votar ou eliminar o alerta:", error);
+            Alert.alert("Erro", "Não foi possível registrar seu voto ou processar a ação.");
+        }
     };
 
     const fetchRoute = async (destinationLon, destinationLat) => {
@@ -409,8 +444,8 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     }, [onApplyFilters]);
 
 
-    const confirmedCount = selectedAlert ? (alertClicks[selectedAlert.id]?.confirmedBy.length || 0) : 0;
-    const rejectedCount = selectedAlert ? (alertClicks[selectedAlert.id]?.rejectedBy.length || 0) : 0;
+    const confirmedCount = selectedAlert ? (selectedAlert.confirmedBy?.length || 0) : 0;
+    const rejectedCount = selectedAlert ? (selectedAlert.rejectedBy?.length || 0) : 0;
 
 
     return (
@@ -728,89 +763,85 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-    },
-    alertDetailImage: {
-        width: '100%',
-        height: 200,
-        marginBottom: 15,
-        borderRadius: 8,
-        backgroundColor: '#eee',
+        shadowRadius: 3.84
     },
     modalTitle: {
         fontSize: 20,
         fontWeight: "bold",
-        marginBottom: 10,
+        marginBottom: 15,
         textAlign: 'center',
     },
     modalText: {
+        fontSize: 16,
         marginBottom: 10,
         textAlign: 'center',
+        lineHeight: 22,
     },
     boldText: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
     },
     phoneNumber: {
-        color: "blue",
-        textDecorationLine: "underline",
+        color: '#007bff',
+        textDecorationLine: 'underline',
         fontSize: 16,
     },
     modalButton: {
-        backgroundColor: "#ccc",
-        padding: 10,
-        borderRadius: 10,
+        backgroundColor: '#007bff',
+        borderRadius: 20,
+        padding: 12,
+        elevation: 2,
         marginTop: 10,
-        alignItems: "center",
     },
     modalButtonText: {
         color: "white",
         fontWeight: "bold",
+        textAlign: "center",
         fontSize: 16,
     },
     iconGrid: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        flexWrap: 'wrap',
-        marginVertical: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 20,
     },
     iconWithLabel: {
-        alignItems: "center",
-        marginHorizontal: 10,
-        marginVertical: 10,
+        alignItems: 'center',
     },
     icon: {
         width: 60,
         height: 60,
-        borderRadius: 30,
-        borderWidth: 2,
-        borderColor: '#ddd',
-        padding: 5,
+        marginBottom: 8,
     },
     iconLabel: {
-        marginTop: 5,
-        fontSize: 14,
-        fontWeight: '500',
         textAlign: 'center',
+        fontSize: 14,
+    },
+    alertDetailImage: {
+        width: '100%',
+        height: 200,
+        borderRadius: 8,
+        marginBottom: 15,
     },
     voteButtonsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 15,
-        marginBottom: 10,
+        justifyContent: 'space-evenly',
+        marginVertical: 15,
     },
     voteButton: {
         paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 10,
-        alignItems: 'center',
-        minWidth: 100,
+        paddingHorizontal: 25,
+        borderRadius: 20,
+        elevation: 2,
     },
     confirmButton: {
         backgroundColor: '#28a745',
     },
     rejectButton: {
         backgroundColor: '#dc3545',
+    },
+    voteButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 18,
     },
 });
 
