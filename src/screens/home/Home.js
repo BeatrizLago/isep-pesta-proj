@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
-  Dimensions, // Adicionado Dimensions
+  Dimensions,
 } from "react-native";
 import { SearchBar, Overlay, Button, Icon } from "@rneui/themed";
 import { useDispatch, useSelector } from "react-redux";
@@ -101,6 +101,7 @@ const Home = ({ t }) => {
   const [isStraight, setIsStraight] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showPOIList, setShowPOIList] = useState(false);
+  // pointsOfInterest agora será a lista de POIs que o MapComponent pode exibir
   const [pointsOfInterest, setPointsOfInterest] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
@@ -132,17 +133,21 @@ const Home = ({ t }) => {
     })();
   }, []);
 
-  const fetchPointsOfInterest = async () => {
+  // Nova função para buscar e setar os POIs no Home component
+  // Esta função deve espelhar as categorias buscadas no MapComponent
+  const fetchPointsOfInterestForSearch = async () => {
     if (!userLocation) {
-      Alert.alert("Localização Indisponível", "Não foi possível obter a sua localização atual para buscar POIs.");
+      // Pode ser um erro ou apenas esperar a localização
       return;
     }
-    const url = `https://api.geoapify.com/v2/places?categories=tourism&filter=circle:${userLocation.longitude},${userLocation.latitude},100000&limit=100&apiKey=${GEOAPIFY_API_KEY}`;
+    // As mesmas categorias usadas no MapComponent
+    const categories = "tourism,accommodation,leisure,entertainment";
+    const url = `https://api.geoapify.com/v2/places?categories=${categories}&filter=circle:${userLocation.longitude},${userLocation.latitude},100000&limit=200&apiKey=${GEOAPIFY_API_KEY}`; // Aumentei o limite para mais POIs
     try {
       const response = await axios.get(url);
       const pois = response.data.features.map((poi) => ({
         id: poi.properties.place_id.toString(),
-        name: poi.properties.name || "Ponto Turístico",
+        name: poi.properties.name || "Ponto de Interesse",
         coordinates: {
           latitude: poi.geometry.coordinates[1],
           longitude: poi.geometry.coordinates[0],
@@ -151,19 +156,31 @@ const Home = ({ t }) => {
           street: poi.properties.street || "Desconhecido",
           city: poi.properties.city || "Desconhecido",
         },
-        category: poi.properties.categories || "Turismo",
+        category: poi.properties.categories ? poi.properties.categories[0] : "tourism", // Usar a primeira categoria se disponível
       }));
       setPointsOfInterest(pois);
     } catch (error) {
-      console.error("Erro ao buscar POIs:", error);
+      console.error("Erro ao buscar POIs para pesquisa:", error);
       setPointsOfInterest([]);
-      Alert.alert("Erro ao Buscar POIs", "Não foi possível carregar os pontos de interesse.");
     }
   };
 
+  useEffect(() => {
+    // Carrega os POIs uma vez que a localização do usuário esteja disponível
+    if (userLocation) {
+      fetchPointsOfInterestForSearch();
+    }
+  }, [userLocation]);
+
+
   const handleGetPOIs = () => {
-    fetchPointsOfInterest();
-    setShowPOIList(true);
+    // Já que pointsOfInterest será preenchido pelo useEffect,
+    // apenas mostra a lista se já tiver dados.
+    if (pointsOfInterest.length > 0) {
+      setShowPOIList(true);
+    } else {
+      Alert.alert("Nenhum POI encontrado", "Tente novamente mais tarde ou ajuste sua localização.");
+    }
   };
 
   const handleSelectPOI = useCallback((poi) => {
@@ -186,39 +203,24 @@ const Home = ({ t }) => {
     }
   }, []);
 
-  const handleSearch = async (text) => {
+  const handleSearch = (text) => {
     setSearchQuery(text);
-    if (text.length > 2 && userLocation) {
-      try {
-        const response = await axios.get(
-            `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&filter=circle:${userLocation.longitude},${userLocation.latitude},50000&limit=10&apiKey=${GEOAPIFY_API_KEY}`
-        );
-        if (response.data.features) {
-          setSearchResults(
-              response.data.features.map((feature) => ({
-                id: feature.properties.place_id,
-                name: feature.properties.name || feature.properties.address_line1 || feature.properties.formatted,
-                coordinates: {
-                  latitude: feature.geometry.coordinates[1],
-                  longitude: feature.geometry.coordinates[0],
-                },
-              }))
-          );
-          setShowSearchSuggestions(true);
-        } else {
-          setSearchResults([]);
-          setShowSearchSuggestions(false);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar sugestões de pesquisa:", error.message);
-        setSearchResults([]);
-        setShowSearchSuggestions(false);
-      }
+    if (text.length > 2) {
+      // Filtrar a lista de pointsOfInterest já carregada
+      const filtered = pointsOfInterest.filter(poi =>
+          poi.name.toLowerCase().includes(text.toLowerCase()) ||
+          poi.address.street.toLowerCase().includes(text.toLowerCase()) ||
+          poi.address.city.toLowerCase().includes(text.toLowerCase()) ||
+          poi.address.formatted?.toLowerCase().includes(text.toLowerCase()) // Caso tenha formatted address
+      );
+      setSearchResults(filtered);
+      setShowSearchSuggestions(filtered.length > 0);
     } else {
       setSearchResults([]);
       setShowSearchSuggestions(false);
     }
   };
+
 
   const handleSelectSearchSuggestion = (suggestion) => {
     setSearchQuery(suggestion.name);
@@ -286,7 +288,7 @@ const Home = ({ t }) => {
                         <ScrollView
                             style={[
                               Styles.suggestionsList,
-                              { maxHeight: windowHeight * 0.4 } // Por exemplo, 40% da altura da janela
+                              { maxHeight: windowHeight * 0.4 }
                             ]}
                             keyboardShouldPersistTaps="always"
                         >
@@ -363,7 +365,7 @@ const Home = ({ t }) => {
                     directions={directions}
                     portugalCenter={portugalCenter}
                     locations={filteredData}
-                    pointsOfInterest={pointsOfInterest}
+                    pointsOfInterest={pointsOfInterest} // Passando pointsOfInterest para o MapComponent
                     userLocation={userLocation}
                     selectedPoiForMapClick={selectedPoiForMapClick}
                     clearRouteTrigger={clearRouteTrigger}

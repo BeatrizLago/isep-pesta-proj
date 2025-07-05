@@ -60,7 +60,8 @@ const usePointsOfInterest = (latitude, longitude, activeFilters) => {
         if (latitude && longitude) {
             const fetchPOI = async () => {
                 try {
-                    const categories = "tourism,catering,accommodation,leisure,commercial,public_transport,education,healthcare,entertainment,sport,natural,service";
+                    // CATEGORIAS FILTRADAS: Apenas turismo, acomodação (hotéis), lazer e entretenimento
+                    const categories = "tourism,accommodation,leisure,entertainment";
                     const response = await axios.get(
                         `https://api.geoapify.com/v2/places?categories=${categories}&filter=circle:${longitude},${latitude},10000&limit=200&apiKey=${GEOAPIFY_API_KEY}`
                     );
@@ -139,9 +140,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     const [proximityAlertsCount, setProximityAlertsCount] = useState(0);
     const [shownProximityAlerts, setShownProximityAlerts] = useState({});
 
-    // State to manage if proximity alerts should be suppressed after adding one
+    // State para gerenciar se os alertas de proximidade devem ser suprimidos após adicionar um
     const [suppressProximityAlert, setSuppressProximityAlert] = useState(false);
-    // State to track if the proximity alert modal has been shown in this session
+    // State para rastrear se o modal de alerta de proximidade já foi mostrado nesta sessão
     const [hasProximityAlertBeenShown, setHasProximityAlertBeenShown] = useState(false);
 
 
@@ -203,7 +204,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         setSelectedLocation(null);
         setShowAlertDetailsModal(false);
         setSelectedAlert(null);
-        // Reset proximity modal state when starting a new alert action
+        // Redefine o estado do modal de proximidade ao iniciar uma nova ação de alerta
         setShowProximityAlertModal(false);
         setProximityAlertsCount(0);
     };
@@ -252,12 +253,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                     `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
                 );
 
-                // Temporarily suppress proximity alerts after adding a new one
+                // Suprime temporariamente os alertas de proximidade após adicionar um novo
                 setSuppressProximityAlert(true);
-                // Reset suppression after a brief delay
+                // Redefine a supressão após um breve atraso
                 setTimeout(() => {
                     setSuppressProximityAlert(false);
-                }, 3000); // Suppress for 3 seconds
+                }, 3000); // Suprime por 3 segundos
 
             } catch (error) {
                 console.error("Erro ao adicionar alerta ou fazer upload da imagem:", error);
@@ -424,7 +425,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
 
 
     useEffect(() => {
-        // Only run proximity check if not suppressing and hasn't been shown yet
+        // Apenas executa a verificação de proximidade se não estiver suprimindo E ainda não foi mostrado
         if (location && customMarkers.length > 0 && !suppressProximityAlert) {
             checkProximityToAlerts(location.coords);
         }
@@ -452,10 +453,10 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         setProximityAlertsCount(count);
         setShownProximityAlerts(newShownProximityAlerts);
 
-        // Only show modal if alerts are detected, not currently suppressed, AND it hasn't been shown yet
+        // Apenas mostra o modal se alertas forem detectados, não estiver atualmente suprimido E ainda não foi mostrado
         if (count > 0 && !showProximityAlertModal && !suppressProximityAlert && !hasProximityAlertBeenShown) {
             setShowProximityAlertModal(true);
-            setHasProximityAlertBeenShown(true); // Mark as shown for this session
+            setHasProximityAlertBeenShown(true); // Marca como mostrado para esta sessão
         } else if (count === 0 && showProximityAlertModal) {
             setShowProximityAlertModal(false);
         }
@@ -500,7 +501,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 fetchRoute(poi.longitude, poi.latitude);
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
-                                // Ensure proximity modal and count are reset when selecting POI
+                                // Garante que o modal de proximidade e a contagem sejam redefinidos ao selecionar um POI
                                 setShowProximityAlertModal(false);
                                 setProximityAlertsCount(0);
                             }}
@@ -523,7 +524,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 fetchRoute(parseFloat(loc.coordinates.longitude), parseFloat(loc.coordinates.latitude));
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
-                                // Ensure proximity modal and count are reset when selecting location
+                                // Garante que o modal de proximidade e a contagem sejam redefinidos ao selecionar um local
                                 setShowProximityAlertModal(false);
                                 setProximityAlertsCount(0);
                             }}
@@ -545,7 +546,7 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 setRouteCoordinates([]);
                                 setSelectedLocation(null);
                                 setShowAddChoiceModal(false);
-                                // Ensure proximity modal and count are reset when selecting an alert marker
+                                // Garante que o modal de proximidade e a contagem sejam redefinidos ao selecionar um marcador de alerta
                                 setShowProximityAlertModal(false);
                                 setProximityAlertsCount(0);
                             }}
@@ -775,7 +776,6 @@ const styles = StyleSheet.create({
     alertDetailsModalContent: {
         position: "absolute",
         alignSelf: 'center',
-        // Ajustado para ocupar mais espaço verticalmente
         top: '10%', // Começa mais acima
         width: '90%', // Aumenta a largura para 90% da tela
         backgroundColor: "#fff",
