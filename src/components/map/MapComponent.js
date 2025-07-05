@@ -136,8 +136,14 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
     const [selectedAlert, setSelectedAlert] = useState(null);
 
     const [showProximityAlertModal, setShowProximityAlertModal] = useState(false);
-    const [proximityAlertDetails, setProximityAlertDetails] = useState(null);
+    const [proximityAlertsCount, setProximityAlertsCount] = useState(0);
     const [shownProximityAlerts, setShownProximityAlerts] = useState({});
+
+    // State to manage if proximity alerts should be suppressed after adding one
+    const [suppressProximityAlert, setSuppressProximityAlert] = useState(false);
+    // State to track if the proximity alert modal has been shown in this session
+    const [hasProximityAlertBeenShown, setHasProximityAlertBeenShown] = useState(false);
+
 
     const [routeCoordinates, setRouteCoordinates] = useState([]);
 
@@ -197,8 +203,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
         setSelectedLocation(null);
         setShowAlertDetailsModal(false);
         setSelectedAlert(null);
+        // Reset proximity modal state when starting a new alert action
         setShowProximityAlertModal(false);
-        setProximityAlertDetails(null);
+        setProximityAlertsCount(0);
     };
 
     const openCamera = async (type) => {
@@ -244,6 +251,14 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                     `${type} registado com foto!`,
                     `Latitude: ${clickedCoordinate.latitude.toFixed(5)}\nLongitude: ${clickedCoordinate.longitude.toFixed(5)}`
                 );
+
+                // Temporarily suppress proximity alerts after adding a new one
+                setSuppressProximityAlert(true);
+                // Reset suppression after a brief delay
+                setTimeout(() => {
+                    setSuppressProximityAlert(false);
+                }, 3000); // Suppress for 3 seconds
+
             } catch (error) {
                 console.error("Erro ao adicionar alerta ou fazer upload da imagem:", error);
                 Alert.alert("Erro", "Não foi possível registar o alerta. Tente novamente.");
@@ -409,31 +424,43 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
 
 
     useEffect(() => {
-        if (location && customMarkers.length > 0) {
+        // Only run proximity check if not suppressing and hasn't been shown yet
+        if (location && customMarkers.length > 0 && !suppressProximityAlert) {
             checkProximityToAlerts(location.coords);
         }
-    }, [location, customMarkers]);
+    }, [location, customMarkers, suppressProximityAlert]);
 
     const checkProximityToAlerts = (userCoords) => {
         const proximityRadius = 50;
+        let count = 0;
+        const newShownProximityAlerts = { ...shownProximityAlerts };
 
         customMarkers.forEach((marker) => {
             const markerCoords = { latitude: marker.latitude, longitude: marker.longitude };
             const distance = haversine(userCoords, markerCoords);
 
-            if (distance <= proximityRadius && !shownProximityAlerts[marker.id]) {
-                setProximityAlertDetails(marker);
-                setShowProximityAlertModal(true);
-                setShownProximityAlerts((prev) => ({ ...prev, [marker.id]: true }));
-            } else if (distance > proximityRadius * 2 && shownProximityAlerts[marker.id]) {
-                setShownProximityAlerts((prev) => {
-                    const newState = { ...prev };
-                    delete newState[marker.id];
-                    return newState;
-                });
+            if (distance <= proximityRadius) {
+                count++;
+                if (!newShownProximityAlerts[marker.id]) {
+                    newShownProximityAlerts[marker.id] = true;
+                }
+            } else if (distance > proximityRadius * 2 && newShownProximityAlerts[marker.id]) {
+                delete newShownProximityAlerts[marker.id];
             }
         });
+
+        setProximityAlertsCount(count);
+        setShownProximityAlerts(newShownProximityAlerts);
+
+        // Only show modal if alerts are detected, not currently suppressed, AND it hasn't been shown yet
+        if (count > 0 && !showProximityAlertModal && !suppressProximityAlert && !hasProximityAlertBeenShown) {
+            setShowProximityAlertModal(true);
+            setHasProximityAlertBeenShown(true); // Mark as shown for this session
+        } else if (count === 0 && showProximityAlertModal) {
+            setShowProximityAlertModal(false);
+        }
     };
+
 
     useEffect(() => {
         if (onApplyFilters) {
@@ -473,8 +500,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 fetchRoute(poi.longitude, poi.latitude);
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
+                                // Ensure proximity modal and count are reset when selecting POI
                                 setShowProximityAlertModal(false);
-                                setProximityAlertDetails(null);
+                                setProximityAlertsCount(0);
                             }}
                         />
                     ))}
@@ -495,8 +523,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 fetchRoute(parseFloat(loc.coordinates.longitude), parseFloat(loc.coordinates.latitude));
                                 setShowAlertDetailsModal(false);
                                 setSelectedAlert(null);
+                                // Ensure proximity modal and count are reset when selecting location
                                 setShowProximityAlertModal(false);
-                                setProximityAlertDetails(null);
+                                setProximityAlertsCount(0);
                             }}
                         />
                     ))}
@@ -516,8 +545,9 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                                 setRouteCoordinates([]);
                                 setSelectedLocation(null);
                                 setShowAddChoiceModal(false);
+                                // Ensure proximity modal and count are reset when selecting an alert marker
                                 setShowProximityAlertModal(false);
-                                setProximityAlertDetails(null);
+                                setProximityAlertsCount(0);
                             }}
                         >
                             <Image
@@ -690,21 +720,12 @@ const MapComponent = React.forwardRef(({ locations, t, selectedPoiForMapClick, o
                 <TouchableWithoutFeedback onPress={() => setShowProximityAlertModal(false)}>
                     <View style={styles.modalOverlay} />
                 </TouchableWithoutFeedback>
-                {proximityAlertDetails && (
+                {proximityAlertsCount > 0 && (
                     <View style={styles.alertDetailsModalContent}>
                         <Text style={styles.modalTitle}>Aviso de Proximidade!</Text>
                         <Text style={styles.modalText}>
-                            Você está perto de um alerta de <Text style={styles.boldText}>{proximityAlertDetails.type}</Text> publicado por <Text style={styles.boldText}>{proximityAlertDetails.publishedBy || "Desconhecido"}</Text>.
+                            Você está perto de {proximityAlertsCount} alerta{proximityAlertsCount > 1 ? "s" : ""}.
                         </Text>
-                        {proximityAlertDetails.imageUri ? (
-                            <Image
-                                source={{ uri: proximityAlertDetails.imageUri }}
-                                style={styles.alertDetailImage}
-                                resizeMode="contain"
-                            />
-                        ) : (
-                            <Text>Nenhuma foto disponível para este alerta.</Text>
-                        )}
                         <Pressable
                             style={styles.modalButton}
                             onPress={() => setShowProximityAlertModal(false)}
@@ -754,8 +775,9 @@ const styles = StyleSheet.create({
     alertDetailsModalContent: {
         position: "absolute",
         alignSelf: 'center',
-        top: '25%',
-        width: '80%',
+        // Ajustado para ocupar mais espaço verticalmente
+        top: '10%', // Começa mais acima
+        width: '90%', // Aumenta a largura para 90% da tela
         backgroundColor: "#fff",
         borderRadius: 10,
         padding: 20,
@@ -763,7 +785,8 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
-        shadowRadius: 3.84
+        shadowRadius: 3.84,
+        maxHeight: '80%', // Limita a altura máxima para 80% da tela
     },
     modalTitle: {
         fontSize: 20,
@@ -782,55 +805,59 @@ const styles = StyleSheet.create({
     },
     phoneNumber: {
         color: '#007bff',
-        textDecorationLine: 'underline',
-        fontSize: 16,
-    },
-    modalButton: {
-        backgroundColor: '#007bff',
-        borderRadius: 20,
-        padding: 12,
-        elevation: 2,
-        marginTop: 10,
-    },
-    modalButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center",
-        fontSize: 16,
     },
     iconGrid: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginVertical: 20,
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        marginBottom: 10,
     },
     iconWithLabel: {
         alignItems: 'center',
+        marginHorizontal: 15,
+        marginBottom: 10,
     },
     icon: {
-        width: 60,
-        height: 60,
-        marginBottom: 8,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginBottom: 5,
     },
     iconLabel: {
+        fontSize: 12,
         textAlign: 'center',
-        fontSize: 14,
+    },
+    modalButton: {
+        backgroundColor: '#007bff',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    modalButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     alertDetailImage: {
-        width: '100%',
-        height: 200,
-        borderRadius: 8,
+        width: '100%', // Mantém a largura 100% do modal
+        height: 250, // Aumenta a altura da imagem para 250
         marginBottom: 15,
+        borderRadius: 8,
     },
     voteButtonsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        marginVertical: 15,
+        justifyContent: 'space-around',
+        marginTop: 10,
+        marginBottom: 15,
     },
     voteButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 25,
+        paddingVertical: 8,
+        paddingHorizontal: 20,
         borderRadius: 20,
-        elevation: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 80,
     },
     confirmButton: {
         backgroundColor: '#28a745',
@@ -839,9 +866,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#dc3545',
     },
     voteButtonText: {
-        color: 'white',
+        color: '#fff',
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 16,
     },
 });
 
